@@ -1,6 +1,6 @@
 # quine-linux
 
-Collection of system tweaks/config for this machine (Fedora Aurora, bootc/ostree).
+Quine distro of Linux based on uBlue Aurora
 
 ## systemd/user/disk-cleanup.{service,timer}
 
