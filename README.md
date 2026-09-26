@@ -16,6 +16,11 @@ list what's available. Notably:
 - `task build-image` — builds the image locally (`podman build`, as root).
 - `task build-iso` — builds a bootable install ISO from that image via
   `bootc-image-builder`, landing in `output/bootiso/install.iso`.
+- `task build-installer-iso` — builds an install ISO using a custom
+  Anaconda installer environment (`installer/Containerfile`) instead of
+  stock Fedora's, landing in `output/bootc-installer/install.iso`. See
+  [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
+  for forking/patching Anaconda itself.
 - `task test:stage` / `task test:boot` — stage the locally-built image as
   this machine's next boot target (`bootc switch`), optionally rebooting
   into it immediately. The fast way to test a change — especially the

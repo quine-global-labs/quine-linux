@@ -2,6 +2,8 @@ version: '3'
 
 vars:
   IMAGE: quine-linux
+  INSTALLER_IMAGE: quine-installer
+  COPR_REPO: philip-peterson/quine-anaconda-webui
   OUTPUT_DIR: ./output
 
 tasks:
@@ -39,6 +41,42 @@ tasks:
         --type iso --local {{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootiso/install.iso"
+
+  build-installer-image:
+    desc: >-
+      Build the patched-Anaconda installer-environment container (see
+      installer/Containerfile and docs/patched-anaconda-installer.md). This
+      is separate from the quine-linux OS image itself. Defaults to the
+      {{.COPR_REPO}} COPR project; override with
+      `task build-installer-image COPR_REPO=you/other-project`.
+    cmds:
+      - sudo podman build -t {{.INSTALLER_IMAGE}} --build-arg COPR_REPO={{.COPR_REPO}} -f installer/Containerfile installer/
+    sources:
+      - installer/Containerfile
+
+  build-installer-iso:
+    desc: >-
+      Build a bootable install ISO using the patched-Anaconda installer
+      image to install the quine-linux bootc image, via
+      bootc-image-builder's `bootc-installer` type. Output lands in
+      {{.OUTPUT_DIR}}/bootc-installer/install.iso. Uses the same COPR_REPO
+      default/override as build-installer-image.
+    deps: [build-image]
+    cmds:
+      - task: build-installer-image
+        vars: { COPR_REPO: "{{.COPR_REPO}}" }
+      - mkdir -p {{.OUTPUT_DIR}}
+      - >-
+        sudo podman run --rm --privileged --pull=newer
+        --security-opt label=type:unconfined_t
+        -v {{.OUTPUT_DIR}}:/output
+        -v /var/lib/containers/storage:/var/lib/containers/storage
+        quay.io/centos-bootc/bootc-image-builder:latest
+        --type bootc-installer
+        --bootc-installer-payload-ref localhost/{{.IMAGE}}
+        localhost/{{.INSTALLER_IMAGE}}
+    generates:
+      - "{{.OUTPUT_DIR}}/bootc-installer/install.iso"
 
   status:
     desc: Show current bootc deployment status (what's booted, what's staged/rollback).

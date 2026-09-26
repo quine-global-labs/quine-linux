@@ -1,0 +1,40 @@
+# Installer-environment container for bootc-image-builder's `bootc-installer`
+# image type. This is NOT the quine-linux OS -- it's the throwaway Anaconda
+# environment the ISO boots into, which then installs the real quine-linux
+# bootc image (passed separately via --bootc-installer-payload-ref). See
+# docs/patched-anaconda-installer.md for the full workflow this fits into.
+
+FROM quay.io/fedora/fedora-bootc:rawhide
+
+# Set to your COPR project (e.g. "yourname/quine-anaconda") holding a build
+# of your patched anaconda-webui fork. Override at build time with
+# --build-arg COPR_REPO=... instead of editing this file.
+ARG COPR_REPO
+
+RUN set -eux; \
+    dnf install -y dnf-plugins-core; \
+    if [ -n "${COPR_REPO}" ]; then \
+      dnf copr enable -y "${COPR_REPO}"; \
+    fi; \
+    dnf install -y \
+      anaconda-webui \
+      anaconda \
+      anaconda-install-env-deps \
+      anaconda-dracut \
+      dracut-config-generic \
+      dracut-network \
+      net-tools \
+      squashfs-tools \
+      grub2-efi-x64-cdboot \
+      python3-mako \
+      lorax-templates-generic \
+      biosdevname \
+      prefixdevname; \
+    dnf clean all
+
+# Fedora 43+ path fixup -- image-builder expects the EFI directory under
+# /boot/efi, not wherever the fedora-bootc base puts it.
+RUN mkdir -p /boot/efi && cp -ra /usr/lib/efi/*/*/EFI /boot/efi
+
+# lorax wants to symlink /mnt -> /var/mnt, which doesn't exist on this base.
+RUN mkdir -p /var/mnt
