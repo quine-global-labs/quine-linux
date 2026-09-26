@@ -24,6 +24,21 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now rpm-ostree-cleanup.timer
 ```
 
+## overlay/
+
+Files here mirror their path on the root filesystem, meant to be baked into
+the image (e.g. `COPY overlay/ /` in a future Containerfile). Until then,
+apply manually:
+
+```sh
+sudo cp overlay/etc/gitconfig /etc/gitconfig
+```
+
+### overlay/etc/gitconfig
+
+System-wide git config so every user on the box gets `main` as the default
+init branch, not `master`.
+
 ## systemd/journald.conf.d/size-cap.conf
 
 Continuous 500M journal retention cap instead of a periodic vacuum job.
