@@ -1,0 +1,8 @@
+[Unit]
+Description=User-level disk cleanup (podman/flatpak/cache prune)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman system prune -af
+ExecStart=/usr/bin/flatpak uninstall --unused -y
+ExecStart=/bin/sh -c 'rm -rf %h/.cache/*'

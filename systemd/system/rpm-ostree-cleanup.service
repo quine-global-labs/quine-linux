@@ -1,0 +1,6 @@
+[Unit]
+Description=Weekly rpm-ostree rollback/pending cleanup
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rpm-ostree cleanup -rb
