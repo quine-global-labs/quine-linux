@@ -1,0 +1,16 @@
+[Unit]
+Description=Force CS8409 internal-mic ADC out of D3 power state (iMac19,2 mic fix)
+# See docs/imac19-2-mic-fix.md. Confirmed needed on a sibling model
+# (iMac18,1); unconfirmed on iMac19,2 as of the date in that doc. This unit
+# is defensive: it logs the power state it finds either way, so its journal
+# is the evidence for whether this model actually needs it.
+After=sound.target systemd-udev-settle.service
+ConditionPathExists=/dev/snd/hwC0D0
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/libexec/quine-linux/cs8409-intmike-power-fixup.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,77 @@
+version: '3'
+
+vars:
+  IMAGE: quine-linux
+  OUTPUT_DIR: ./output
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  build-image:
+    desc: >-
+      Build the quine-linux bootc container image, as root (so bootc and
+      bootc-image-builder -- both of which read root's default
+      containers-storage location -- can see the result).
+    cmds:
+      - sudo podman build -t {{.IMAGE}} -f Containerfile .
+    sources:
+      - Containerfile
+      - overlay/**/*
+      - patches/**/*
+
+  build-iso:
+    desc: >-
+      Build a bootable install ISO from the local quine-linux image, via
+      bootc-image-builder. Output lands in {{.OUTPUT_DIR}}/bootiso/install.iso.
+    deps: [build-image]
+    cmds:
+      - mkdir -p {{.OUTPUT_DIR}}
+      - >-
+        sudo podman run --rm --privileged --pull=newer
+        --security-opt label=type:unconfined_t
+        -v {{.OUTPUT_DIR}}:/output
+        -v /var/lib/containers/storage:/var/lib/containers/storage
+        quay.io/centos-bootc/bootc-image-builder:latest
+        --type iso --local {{.IMAGE}}
+    generates:
+      - "{{.OUTPUT_DIR}}/bootiso/install.iso"
+
+  status:
+    desc: Show current bootc deployment status (what's booted, what's staged/rollback).
+    cmds:
+      - bootc status
+
+  test:stage:
+    desc: >-
+      Build the local image and stage it as the next-boot target on THIS
+      machine (bootc switch, no reboot yet). This is the fast way to test a
+      change -- especially the CS8409 mic-fix kernel module -- against the
+      real running system without building an ISO or reinstalling anything.
+      Reboot separately when ready: `task test:boot`, or `sudo systemctl reboot`.
+    deps: [build-image]
+    cmds:
+      - sudo bootc switch --transport containers-storage localhost/{{.IMAGE}}
+      - bootc status --booted
+      - echo "Staged localhost/{{.IMAGE}} for next boot. Run task test:boot when ready to reboot into it."
+
+  test:boot:
+    desc: Stage the local image (if not already) and reboot into it now.
+    prompt: This will reboot this machine into the locally-built {{.IMAGE}} image. Continue?
+    deps: [test:stage]
+    cmds:
+      - sudo systemctl reboot
+
+  revert:
+    desc: >-
+      Roll back to the previously-booted deployment and reboot into it --
+      undoes a `test:boot` switch (or any other deployment change) if
+      something's wrong. Safe even if nothing was ever switched: bootc/
+      rpm-ostree always keep the prior deployment around for exactly this.
+    prompt: This will reboot this machine back into the previous deployment. Continue?
+    cmds:
+      - sudo bootc rollback
+      - sudo systemctl reboot

@@ -1,0 +1,22 @@
+--- a/patch_cirrus_apple.h
++++ b/patch_cirrus_apple.h
+@@ -1257,6 +1257,19 @@
+ 				}
+ 				else if (stream == SNDRV_PCM_STREAM_CAPTURE)
+ 				{
++					// iMac19,2 mic fix: HDA auto-config sometimes lands this
++					// capture PCM stream's nid on neither the internal-mic ADC
++					// nor the headset-mic node (e.g. it lands on an unwired
++					// Line-In node such as 0x12), orphaning the real internal
++					// mic entirely -- its mixer/gain controls stay present and
++					// adjustable, but nothing is ever routed through them.
++					// Force it back onto the internal-mic ADC in that case.
++					// See egorenar/snd-hda-codec-cs8409#5 (comment 2026-08-19).
++					if (hinfo->nid != spec->intmike_adc_nid && hinfo->nid != 0x1a)
++					{
++						mycodec_dbg(codec, "cs_8409_apple_boot_init capture stream nid 0x%02x is not intmike (0x%02x) or headset (0x1a), forcing to intmike\n", hinfo->nid, spec->intmike_adc_nid);
++						hinfo->nid = spec->intmike_adc_nid;
++					}
+ 					//if (hinfo->nid == 0x22)
+ 					if (hinfo->nid == spec->intmike_adc_nid)
+ 					{
