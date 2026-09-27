@@ -13,7 +13,11 @@ compiles the CS8409 mic-fix kernel module (see
 the supported way to drive all of this — run `task` with no arguments to
 list what's available. Notably:
 
-- `task build-image` — builds the image locally (`podman build`, as root).
+- `task build-image` — builds the image locally, as root, with podman, or
+  docker if podman isn't installed (force either with
+  `CONTAINER_RUNTIME=docker|podman`). Every task below works with either;
+  under docker, images are copied via skopeo into a
+  `quine-containers-storage` volume for `bootc-image-builder` to read.
 - `task build-iso` — builds a bootable install ISO from that image via
   `bootc-image-builder`, landing in `output/bootiso/install.iso`.
 - `task build-installer-iso` — builds an install ISO using a custom
@@ -36,7 +40,10 @@ Equivalently, by hand:
 podman build -t quine-linux -f Containerfile .
 ```
 
-An ISO can then be generated from the built image with `bootc-image-builder`.
+An ISO can then be generated from the built image with `bootc-image-builder`
+(`ghcr.io/osbuild/bootc-image-builder`; the project now lives in
+[osbuild/image-builder](https://github.com/osbuild/image-builder), and the old
+`quay.io/centos-bootc/bootc-image-builder` image is no longer updated).
 
 ## overlay/
 

@@ -7,8 +7,11 @@ set -e
 echo "== Before =="
 df -h /var/home
 
-echo "== podman: prune unused images/containers/build cache (this is the one that matters) =="
-podman system prune -af
+for rt in podman docker; do
+    command -v "$rt" >/dev/null 2>&1 || continue
+    echo "== $rt: prune unused images/containers/build cache (this is the one that matters) =="
+    "$rt" system prune -af
+done
 
 echo "== ostree: drop rollback deployment =="
 sudo rpm-ostree cleanup -rb

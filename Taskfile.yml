@@ -5,6 +5,20 @@ vars:
   INSTALLER_IMAGE: quine-installer
   COPR_REPO: philip-peterson/quine-anaconda-webui
   OUTPUT_DIR: ./output
+  # Any docker-CLI-compatible runtime works for plain builds. Prefers podman,
+  # falls back to docker; override with CONTAINER_RUNTIME=... (env or task var).
+  CONTAINER_RUNTIME:
+    sh: echo "${CONTAINER_RUNTIME:-$(command -v podman >/dev/null 2>&1 && echo podman || echo docker)}"
+  # bootc-image-builder now lives in github.com/osbuild/image-builder and is
+  # published here; quay.io/centos-bootc/bootc-image-builder is frozen.
+  BIB_IMAGE: ghcr.io/osbuild/bootc-image-builder:latest
+  SKOPEO_IMAGE: quay.io/skopeo/stable:latest
+  # bootc-image-builder reads images from a containers-storage mounted at
+  # /var/lib/containers/storage. Under podman that's root's real store; docker
+  # has no such store, so images get copied (via skopeo) into this volume.
+  DOCKER_STORAGE_VOLUME: quine-containers-storage
+  STORAGE: '{{if eq .CONTAINER_RUNTIME "podman"}}/var/lib/containers/storage{{else}}{{.DOCKER_STORAGE_VOLUME}}{{end}}'
+  PULL_FLAG: '{{if eq .CONTAINER_RUNTIME "podman"}}--pull=newer{{else}}--pull=always{{end}}'
 
 tasks:
   default:
@@ -15,11 +29,11 @@ tasks:
 
   build-image:
     desc: >-
-      Build the quine-linux bootc container image, as root (so bootc and
-      bootc-image-builder -- both of which read root's default
-      containers-storage location -- can see the result).
+      Build the quine-linux bootc container image, as root (under podman
+      this lands in root's containers-storage, which bootc and
+      bootc-image-builder read; under docker, the ISO tasks copy it over).
     cmds:
-      - sudo podman build -t {{.IMAGE}} -f Containerfile .
+      - sudo {{.CONTAINER_RUNTIME}} build -t {{.IMAGE}} -f Containerfile .
     sources:
       - Containerfile
       - overlay/**/*
@@ -31,14 +45,16 @@ tasks:
       bootc-image-builder. Output lands in {{.OUTPUT_DIR}}/bootiso/install.iso.
     deps: [build-image]
     cmds:
+      - task: export-to-storage
+        vars: { IMAGES: "{{.IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
       - >-
-        sudo podman run --rm --privileged --pull=newer
+        sudo {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
         -v {{.OUTPUT_DIR}}:/output
-        -v /var/lib/containers/storage:/var/lib/containers/storage
-        quay.io/centos-bootc/bootc-image-builder:latest
-        --type iso --local {{.IMAGE}}
+        -v {{.STORAGE}}:/var/lib/containers/storage
+        {{.BIB_IMAGE}}
+        --type iso localhost/{{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootiso/install.iso"
 
@@ -50,7 +66,7 @@ tasks:
       {{.COPR_REPO}} COPR project; override with
       `task build-installer-image COPR_REPO=you/other-project`.
     cmds:
-      - sudo podman build -t {{.INSTALLER_IMAGE}} --build-arg COPR_REPO={{.COPR_REPO}} -f installer/Containerfile installer/
+      - sudo {{.CONTAINER_RUNTIME}} build -t {{.INSTALLER_IMAGE}} --build-arg COPR_REPO={{.COPR_REPO}} -f installer/Containerfile installer/
     sources:
       - installer/Containerfile
 
@@ -65,18 +81,37 @@ tasks:
     cmds:
       - task: build-installer-image
         vars: { COPR_REPO: "{{.COPR_REPO}}" }
+      - task: export-to-storage
+        vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
       - >-
-        sudo podman run --rm --privileged --pull=newer
+        sudo {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
         -v {{.OUTPUT_DIR}}:/output
-        -v /var/lib/containers/storage:/var/lib/containers/storage
-        quay.io/centos-bootc/bootc-image-builder:latest
+        -v {{.STORAGE}}:/var/lib/containers/storage
+        {{.BIB_IMAGE}}
         --type bootc-installer
         --bootc-installer-payload-ref localhost/{{.IMAGE}}
         localhost/{{.INSTALLER_IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootc-installer/install.iso"
+
+  export-to-storage:
+    internal: true
+    desc: >-
+      Under docker, copy IMAGES (space-separated local tags) from the docker
+      daemon into the containers-storage volume bootc-image-builder reads.
+      No-op under podman, which builds straight into containers-storage.
+    status:
+      - '[ "{{.CONTAINER_RUNTIME}}" = podman ]'
+    cmds:
+      - for: { var: IMAGES }
+        cmd: >-
+          sudo {{.CONTAINER_RUNTIME}} run --rm --privileged
+          -v /var/run/docker.sock:/var/run/docker.sock
+          -v {{.STORAGE}}:/var/lib/containers/storage
+          {{.SKOPEO_IMAGE}}
+          copy docker-daemon:{{.ITEM}}:latest containers-storage:localhost/{{.ITEM}}:latest
 
   status:
     desc: Show current bootc deployment status (what's booted, what's staged/rollback).
@@ -92,6 +127,11 @@ tasks:
       Reboot separately when ready: `task test:boot`, or `sudo systemctl reboot`.
     deps: [build-image]
     cmds:
+      # bootc reads the host's own containers-storage, i.e. podman's (which
+      # every bootc host ships), so a docker-built image is loaded into it.
+      - cmd: sudo docker save {{.IMAGE}} | sudo podman load
+        platforms: [linux]
+        if: '[ "{{.CONTAINER_RUNTIME}}" != podman ]'
       - sudo bootc switch --transport containers-storage localhost/{{.IMAGE}}
       - bootc status --booted
       - echo "Staged localhost/{{.IMAGE}} for next boot. Run task test:boot when ready to reboot into it."
