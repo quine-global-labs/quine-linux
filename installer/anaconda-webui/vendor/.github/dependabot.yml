@@ -1,0 +1,38 @@
+version: 2
+updates:
+  # Set update schedule for npm packages.
+  # FIXME: Update our npm development dependencies monthly.
+  # See: https://github.com/dependabot/dependabot-core/issues/2390
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      # run these when most of our developers don't work
+      day: "sunday"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "[no-test]"
+    labels:
+      - "node_modules"
+    groups:
+      eslint:
+        patterns:
+          - "eslint*"
+      esbuild:
+        patterns:
+          - "esbuild*"
+      stylelint:
+        patterns:
+          - "stylelint*"
+      patternfly:
+        patterns:
+          - "@patternfly*"
+    ignore:
+      - dependency-name: 'react'
+        # https://github.com/patternfly/patternfly-react/issues/11345
+        versions: '>= 19'
+
+      # The plugins we use didn't work with anything after 8 at some point
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]

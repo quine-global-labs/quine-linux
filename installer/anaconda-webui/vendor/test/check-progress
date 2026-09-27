@@ -1,0 +1,75 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2022 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+from anacondalib import INSTALLER_VM_MEMORY_MB, VirtInstallMachineCase, pixel_tests_ignore
+from installer import Installer
+from progress import Progress
+from storage import Storage
+from testlib import test_main  # pylint: disable=import-error
+from utils import get_pretty_name
+
+
+class TestInstallationProgress(VirtInstallMachineCase):
+    provision = {"machine1": {"memory_mb": INSTALLER_VM_MEMORY_MB}}
+
+    def testBasic(self):
+        """
+        Description:
+            Verify the installation progress page
+
+        Expected results:
+            - The installation steps are displayed in the correct order
+            - After reloading the page, the UI reconnects to the ongoing installation
+            - The 'Successfully installed' message is displayed at the end of the installation
+            - The 'Modify Storage' option is not available from the kebab menu
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, self.machine)
+        p = Progress(b)
+        _s = Storage(b, self.machine)  # noqa: F841
+
+        i.open()
+
+        i.reach(i.steps.REVIEW)
+        i.begin_installation(needs_confirmation=False)
+
+        with b.wait_timeout(300):
+            b.wait_in_text("h2", "Installing")
+
+        # Wait until payload step transition to "in progress" to verify reconnect. This particular step
+        # was chosen because it should take longer than others to run - making it less prone to race
+        # when reloading
+        payload_status_selector = "p[data-ouia-component-id='anaconda-screen-progress-step-payload-phase']"
+        with b.wait_timeout(100):
+            b.wait_in_text(payload_status_selector, "In progress")
+
+        # Reload the page while installation is running to verify reconnect
+        b.reload()
+        b.wait_visible(".pf-v6-c-progress-stepper")
+        b.wait_in_text(payload_status_selector, "In progress")
+
+        p.wait_done()
+        b.wait_in_text("h2", "Successfully installed")
+        b.wait_in_text(".pf-v6-c-empty-state", f"To begin using {get_pretty_name(m)}, reboot your system")
+
+        # Reload the page on success to make sure reconnect also works here
+        b.reload()
+        b.wait_in_text("h2", "Successfully installed")
+        b.wait_in_text(".pf-v6-c-empty-state", f"To begin using {get_pretty_name(m)}, reboot your system")
+
+        # Pixel test the complete progress step
+        b.assert_pixels(
+            "#app",
+            "installation-progress-complete",
+            ignore=[*pixel_tests_ignore, "#anaconda-screen-progress-step-done-description"]
+        )
+
+        self.handleReboot()
+
+
+if __name__ == '__main__':
+    test_main()

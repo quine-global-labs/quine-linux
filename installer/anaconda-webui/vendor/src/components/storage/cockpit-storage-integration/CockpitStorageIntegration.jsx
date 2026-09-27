@@ -1,0 +1,159 @@
+/*
+ * Copyright (C) 2024 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+import cockpit from "cockpit";
+
+import React, { useEffect, useState } from "react";
+import { Banner } from "@patternfly/react-core/dist/esm/components/Banner/index.js";
+import { Button } from "@patternfly/react-core/dist/esm/components/Button/index.js";
+import { Content } from "@patternfly/react-core/dist/esm/components/Content/index.js";
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalVariant } from "@patternfly/react-core/dist/esm/components/Modal/index.js";
+import { PageSection } from "@patternfly/react-core/dist/esm/components/Page/index.js";
+import { Flex, FlexItem } from "@patternfly/react-core/dist/esm/layouts/Flex/index.js";
+import { ArrowLeftIcon } from "@patternfly/react-icons/dist/esm/icons/arrow-left-icon";
+import { ExclamationTriangleIcon } from "@patternfly/react-icons/dist/esm/icons/exclamation-triangle-icon";
+import { TimesIcon } from "@patternfly/react-icons/dist/esm/icons/times-icon";
+
+import { useMaybeBackdrop } from "../../../hooks/CockpitIntegration.jsx";
+
+import { CheckStorageDialog } from "./CheckStorageDialog.jsx";
+import { ModifyStorageSideBar } from "./CockpitStorageIntegrationSidebar.jsx";
+
+import "./CockpitStorageIntegration.scss";
+
+const _ = cockpit.gettext;
+const idPrefix = "cockpit-storage-integration";
+
+const ReturnToInstallationButton = ({ onAction }) => (
+    <Button
+      icon={<ArrowLeftIcon />}
+      id={idPrefix + "-return-to-installation-button"}
+      variant="secondary"
+      onClick={onAction}>
+        {_("Return to installation")}
+    </Button>
+);
+
+const CockpitStorageConfirmationModal = ({ handleCancelOpenModal, handleConfirmOpenModal, showConfirmation }) => {
+    return (
+        <Modal
+          isOpen={showConfirmation}
+          onClose={handleCancelOpenModal}
+          variant="small"
+        >
+            <ModalHeader
+              title={_("Storage editor")}
+              iconVariant="warning"
+            />
+            <ModalBody>
+                <Content>
+                    <Content component="p">
+                        {_("The storage editor lets you resize, delete, and create partitions. It can set up LVM and much more. It is meant to be used as an advanced utility and not intended to be used in a typical installation.")}
+                    </Content>
+                    <Content component="strong">
+                        {_("All changes made in the storage editor take effect immediately.")}
+                    </Content>
+                </Content>
+            </ModalBody>
+            <ModalFooter>
+                <Button
+                  id={idPrefix + "-enter-storage-confirm"}
+                  key="confirm"
+                  variant="warning"
+                  onClick={handleConfirmOpenModal}>
+                    {_("Launch storage editor")}
+                </Button>
+                <Button
+                  id={idPrefix + "-enter-storage-cancel"}
+                  key="cancel"
+                  variant="link"
+                  onClick={handleCancelOpenModal}>
+                    {_("Cancel")}
+                </Button>
+            </ModalFooter>
+        </Modal>
+    );
+};
+
+export const CockpitStorageIntegration = ({
+    dispatch,
+    onCritFail,
+    setShowStorage,
+}) => {
+    const [showDialog, setShowDialog] = useState(false);
+    const [isIframeMounted, setIsIframeMounted] = useState(false);
+    const [isConfirmed, setIsConfirmed] = useState(false);
+    const backdropClass = useMaybeBackdrop();
+    const handleIframeLoad = () => setIsIframeMounted(true);
+
+    useEffect(() => {
+        if (isIframeMounted) {
+            const iframe = document.getElementById("cockpit-storage-frame");
+            iframe.contentWindow.addEventListener("error", exception => {
+                onCritFail({ context: _("Storage plugin failed") })({ message: exception.error.message, stack: exception.error.stack });
+            });
+        }
+    }, [isIframeMounted, onCritFail]);
+
+    const handleConfirmOpenModal = () => {
+        setIsConfirmed(true);
+        setShowStorage(true);
+    };
+
+    const handleCancelOpenModal = () => {
+        setShowStorage(false);
+        setIsConfirmed(false);
+    };
+
+    return (
+        <>
+            <CockpitStorageConfirmationModal
+              handleCancelOpenModal={handleCancelOpenModal}
+              handleConfirmOpenModal={handleConfirmOpenModal}
+              showConfirmation={!isConfirmed}
+            />
+            <Modal
+              aria-label={_("Configure storage")}
+              className={backdropClass + " " + idPrefix + "-modal-page-section"}
+              isOpen={isConfirmed}
+              showClose={false}
+              variant={ModalVariant.large}>
+                <Banner screenReaderText="Warning banner" status="warning">
+                    <Flex spaceItems={{ default: "spaceItemsSm" }}>
+                        <FlexItem><ExclamationTriangleIcon /></FlexItem>
+                        <FlexItem>
+                            {
+                                _("Changes made here will immediately affect the system. There is no 'undo'.")
+                            }
+                        </FlexItem>
+                    </Flex>
+                    <Button variant="plain" aria-label={_("Close storage editor")} onClick={() => setShowStorage(false)}>
+                        <TimesIcon />
+                    </Button>
+                </Banner>
+                <div className={idPrefix + "-page-section-cockpit-storage"}>
+                    <PageSection hasBodyWrapper={false}>
+                        <iframe
+                          src="/cockpit/@localhost/storage/index.html"
+                          name="cockpit-storage"
+                          id="cockpit-storage-frame"
+                          onLoad={handleIframeLoad}
+                          className={idPrefix + "-iframe-cockpit-storage"} />
+                    </PageSection>
+                    <ModifyStorageSideBar />
+                </div>
+                {showDialog &&
+                    <CheckStorageDialog
+                      dispatch={dispatch}
+                      onCritFail={onCritFail}
+                      setShowDialog={setShowDialog}
+                      setShowStorage={setShowStorage}
+                    />}
+                <ModalFooter>
+                    <ReturnToInstallationButton onAction={() => setShowDialog(true)} />
+                </ModalFooter>
+            </Modal>
+        </>
+    );
+};

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -xeu
+
+TEST_OS="$1"
+TEST_COMPOSE="$2"
+RELEASE="$3"
+
+# Check if file already exists
+if [ -f test/images/"$TEST_COMPOSE".iso ]; then
+    echo "$TEST_COMPOSE.iso already exists"
+    exit 0
+fi
+
+COMPOSE_BASE_URL=$(python3 test/helpers/compose_path.py "$TEST_COMPOSE")
+ISO_FOLDER="${COMPOSE_BASE_URL}/compose/Server/x86_64/iso"
+
+ISO=$(curl -L --silent ${ISO_FOLDER} | grep -oP 'href="\K[^"]+' | grep -E '\.iso' | head -n1 | tr -d '\n')
+URL="$ISO_FOLDER/$ISO"
+
+pushd test/images
+curl -L "$URL" -o "$TEST_COMPOSE".iso
+popd

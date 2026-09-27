@@ -1,0 +1,17 @@
+/*
+ * Copyright (C) 2023 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+// Limit the width of input fields
+#anaconda-screen-accounts {
+  width: min(60ch, 100%);
+}
+
+// No not wrap labels - the required icon should be on the same line
+#anaconda-screen-accounts .pf-v6-c-form__label-text {
+  white-space: nowrap;
+}
+
+#anaconda-screen-accounts-create-account-user-name-input-group {
+  width: min(39ch, 100%);
+}

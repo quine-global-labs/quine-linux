@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -eu
+
+# This script creates the report.json which will be used by the CI run to report the test results to OpenQA.
+# Here is only fills in the metadata section. The tests section will be filled by the test run.
+# Structure of report.json
+# https://github.com/rhinstaller/anaconda-webui/blob/main/test/README-FEDORAWIKI.rst#example-of-reportjson
+
+COMPOSE=$TEST_COMPOSE
+TEST_ENV="qemu-x86_64"
+
+cat <<EOF > ./test/report.json
+{
+  "metadata": {
+    "compose": "$COMPOSE",
+    "test_env": "$TEST_ENV"
+  },
+  "tests": [],
+  "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+}
+EOF

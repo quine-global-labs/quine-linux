@@ -1,0 +1,148 @@
+#! /bin/bash
+
+# This is the expected entry point for Cockpit CI; will be called without
+# arguments but with an appropriate $TEST_OS, and optionally $TEST_SCENARIO
+
+# Currently supported scenarios:
+#
+# expensive            - expensive tests (test which run a full installation)
+# storage              - storage related tests
+# cockpit              - storage related tests that utilize Cockpit Storage plugin
+# other                - all remaining tests
+# bios                 - tests in BIOS mode (they might be tests which are also present in other scenarios)
+# compose-{compose-id} - tests defined in wiki-testmap.json ran against given compose
+# bootoptns-net1       - tests run for installation with network configuration via boot options
+
+
+set -eux
+
+make codecheck
+make bots
+
+if [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ]; then
+    TESTING_BRANCH=main
+else
+    TESTING_BRANCH=$(git rev-parse HEAD)
+fi
+
+RUN_OPTS=""
+ALL_TESTS="$(test/common/run-tests --test-dir test -l)"
+
+RE_EXPENSIVE='E2E'
+RE_DNF_PAYLOAD='PayloadDNF'
+
+# Pre-filtered test sets for common patterns
+BASIC_TESTS="$(echo "$ALL_TESTS" | grep -vE "$RE_EXPENSIVE" | grep -vE "$RE_DNF_PAYLOAD")"
+
+# every known case needs to set RUN_OPTS to something non-empty, so that we can check if we hit any branch
+case "${TEST_SCENARIO:=}" in
+    *bios*) export TEST_FIRMWARE="bios";;&
+
+    *bootopts-net1*) export TEST_EXTRA_BOOT_ARGS="net.ifnames.prefix=net ip=net0:dhcp" TEST_VM_SETUP="bootopts-net1";;&
+
+    *compose-*)
+        # Supported values are: compose-<compose-id> or compose-<compose-id>-staging
+        for test in $ALL_TESTS; do
+            if grep "$test" test/fedora-wiki/wiki-testmap.json; then
+                RUN_OPTS="$RUN_OPTS $test"
+            fi
+        done
+        export TEST_COMPOSE="${TEST_SCENARIO#*compose-}"
+        if [[ "$TEST_COMPOSE" == *"-staging" ]]; then
+            export TEST_COMPOSE="${TEST_COMPOSE%-staging}"
+            TEST_FEDORA_WIKI_STAGING="true"
+        fi
+        ;;
+    *dnf*)
+        RUN_OPTS="$(echo "$ALL_TESTS" | grep -E "$RE_DNF_PAYLOAD")"
+        ;;
+    *expensive*)
+        RUN_OPTS="$(echo "$ALL_TESTS" | grep -E "$RE_EXPENSIVE" | grep -vE "$RE_DNF_PAYLOAD")"
+        ;;
+    *storage*)
+        RUN_OPTS="$(echo "$BASIC_TESTS" | grep "Storage" | grep -v "Cockpit")"
+        ;;
+    *other*)
+        RUN_OPTS="$(echo "$BASIC_TESTS" | grep -v "Cockpit" | grep -v "Storage")"
+        ;;
+    *cockpit*)
+        RUN_OPTS="$(echo "$BASIC_TESTS" | grep "Cockpit")"
+        ;;
+    *)
+        RUN_OPTS="$ALL_TESTS"
+        ;;
+esac
+
+# If TEST_COMPOSE is defined checkout the git repo to the corresponding tag
+if [ -n "${TEST_COMPOSE-}" ]; then
+    COMPOSE_BASE_URL=$(python3 test/helpers/compose_path.py "$TEST_COMPOSE")
+    COMPOSE_A_PACKAGES="${COMPOSE_BASE_URL}/compose/Everything/x86_64/os/Packages/a/"
+    ANACONDA_WEBUI_TAG=$(curl -sfL "$COMPOSE_A_PACKAGES" | grep -oE 'anaconda-webui-[0-9]+' | sed 's/anaconda-webui-//' | sort -n | tail -1)
+
+    git fetch --tags origin
+    git checkout "$ANACONDA_WEBUI_TAG"
+
+    # FIXME: Do not run pixel tests as we need a newer tasks container than the pixel tests used for generating the reference images
+    echo "FIXME" > test/reference-image
+fi
+
+# We need to know if a TEST_COMPOSE is specified before we start downloading the test images
+make create-updates.img
+
+# If TEST_COMPOSE is defined and we are testing main branch prepare the test report
+if [ -n "${TEST_COMPOSE-}" ] && [ "$TESTING_BRANCH" == "main" ]; then
+  test/fedora-wiki/prepare-report
+fi
+
+# test runs in kernel_t context and triggers massive amounts of SELinux
+# denials; SELinux gets disabled, but would still trigger unexpected messages
+if [ -z "${TEST_OS-}" ]; then
+  TEST_OS=fedora-rawhide-boot
+fi
+
+# Allow wiki-reporting even if test suite partially failed
+set +e
+
+# Create tmp storage pool to avoid parallel test runs to conflict
+echo "<pool type='dir'>
+  <name>tmp</name>
+  <target>
+    <path>/var/tmp/</path>
+  </target>
+</pool>" > /tmp/storage-pool.xml
+virsh pool-define --file /tmp/storage-pool.xml
+
+export TEST_OS
+# Keep the scheduler's RAM budget in sync with VirtInstallMachine (capacity planning).
+# Actual VM memory is also enforced in VirtInstallMachine.__init__.
+INSTALLER_VM_MEMORY_MB=$(python3 -c "import sys; sys.path.insert(0, 'test'); from machine_install import INSTALLER_VM_MEMORY_MB; print(INSTALLER_VM_MEMORY_MB)")
+RUN_TESTS_COMMON_OPTS="--nondestructive-memory-mb ${INSTALLER_VM_MEMORY_MB} --capacity-factor 0.5"
+TEST_AUDIT_NO_SELINUX=1 test/common/run-tests $RUN_TESTS_COMMON_OPTS --test-dir test/ $RUN_OPTS
+exit_code=$?
+
+if [ -n "${TEST_COMPOSE-}" ] && [ "$TESTING_BRANCH" == "main" ]; then
+    # Log the report file that we are about to use
+    echo "Using the following report file:"
+    cat test/report.json
+
+    # Copy the wiki token to the correct location
+    if [ ! -f "$COCKPIT_FEDORA_WIKI_STAGING_TOKEN" ]; then
+        echo "The wiki token file does not exist"
+        exit 1
+    fi
+
+    mkdir -p ~/.openidc
+    if [ "${TEST_FEDORA_WIKI_STAGING-}" = "true" ]; then
+        cp $COCKPIT_FEDORA_WIKI_STAGING_TOKEN ~/.openidc/oidc_wikitcms.json
+        test/fedora-wiki/wiki-report.py --staging test/report.json
+    else
+        cp $COCKPIT_FEDORA_WIKI_TOKEN ~/.openidc/oidc_wikitcms.json
+        test/fedora-wiki/wiki-report.py test/report.json
+    fi
+    report_exit=$?
+    if [ $report_exit -ne 0 ]; then
+        exit_code=$report_exit
+    fi
+fi
+
+exit $exit_code

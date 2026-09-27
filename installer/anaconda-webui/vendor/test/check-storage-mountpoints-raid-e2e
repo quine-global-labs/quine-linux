@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2024 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+from anacondalib import INSTALLER_VM_MEMORY_MB, VirtInstallMachineCase, disk_images
+from installer import Installer
+from storage import EFI_PARTITION_DEFAULT_SIZE, Storage
+from testlib import test_main, timeout  # pylint: disable=import-error
+
+
+class TestStorageMountPointsRAID_E2E(VirtInstallMachineCase):
+    provision = {"machine1": {"memory_mb": INSTALLER_VM_MEMORY_MB}}
+
+    def _testLVMOnRAID_partition_disk(self):
+        b = self.browser
+        m = self.machine
+        s = Storage(b, m)
+
+        disk1 = "/dev/vda"
+        disk2 = "/dev/vdb"
+        raid_name = "raid1"
+
+        s.partition_disk(disk1, [(EFI_PARTITION_DEFAULT_SIZE, "efi"), ("1GiB", "xfs"), ("", None)])
+        s.partition_disk(disk2, [(EFI_PARTITION_DEFAULT_SIZE, "efi"), ("1GiB", "xfs"), ("", None)])
+
+        # RAID1 on partition level for /boot and /
+        s.create_raid_device(f"{raid_name}-boot", "raid1", [f"{disk1}2", f"{disk2}2"])
+        s.create_raid_device(f"{raid_name}-root", "raid1", [f"{disk1}3", f"{disk2}3"])
+
+        m.execute(f"""
+        set -ex
+
+        # Plain ext4 for /boot
+        mkfs.xfs /dev/md/{raid_name}-boot
+
+        # LVM for /
+        pvcreate /dev/md/{raid_name}-root
+        vgcreate vol-group /dev/md/{raid_name}-root
+        lvcreate -n root -L 10G vol-group
+        mkfs.ext4 -F /dev/vol-group/root
+
+        """, timeout=90)
+
+    @disk_images([("", 15), ("", 15)])
+    @timeout(1200)
+    def testLVMOnRAID(self):
+        """
+        Description:
+            Test RAID1 on partition level with LVM. Both disks (vda, vdb) have:
+            - Partition 1: EFI system partition (500 MiB)
+            - Partition 2: RAID1 for /boot (xfs)
+            - Partition 3: RAID1 for LVM (ext4 for /)
+
+        Expected results:
+            - The user can assign /boot/efi, /boot, and / on UEFI
+            - The mount points are correctly assigned to the devices in the installed system
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        s = Storage(b, m)
+
+        disk1 = "/dev/vda"
+        disk2 = "/dev/vdb"
+        dev1 = disk1.split("/")[-1]
+        dev2 = disk2.split("/")[-1]
+        raid_name = "raid1"
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+
+        s.select_mountpoint([(dev1, True), (dev2, True)])
+        s.select_mountpoint_row_device(1, "vol-group-root")
+        s.select_mountpoint_row_device(2, f"{dev1}1")
+        s.select_mountpoint_row_device(3, f"{raid_name}-boot")
+
+        i.next(should_fail=True)
+        i.reach(i.steps.REVIEW)
+        self.install(button_text="Apply mount point assignment and install", needs_confirmation=True)
+
+        lsblk = s.get_lsblk_json()
+        block_devs = lsblk["blockdevices"]
+
+        for disk in ["vda", "vdb"]:
+            disk_data = next(dev for dev in block_devs if dev["name"] == disk)
+
+            disk_part_2 = next(part for part in disk_data["children"] if part["name"] == f"{disk}2")
+            md_part_2 = next(part for part in disk_part_2["children"] if part["type"] == "raid1")
+            self.assertEqual(md_part_2["mountpoints"], ["/boot"])
+
+            disk_part_3 = next(part for part in disk_data["children"] if part["name"] == f"{disk}3")
+            md_part_3 = next(part for part in disk_part_3["children"] if part["type"] == "raid1")
+            vol_group = next(part for part in md_part_3["children"] if part["type"] == "lvm")
+            self.assertEqual(vol_group["mountpoints"], ["/"])
+
+
+if __name__ == '__main__':
+    test_main()

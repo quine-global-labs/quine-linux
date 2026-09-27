@@ -1,0 +1,80 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2024 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+from anacondalib import VirtInstallMachineCase, disk_images
+from installer import Installer
+from review import Review
+from storage import Storage
+from testlib import nondestructive, test_main  # pylint: disable=import-error
+
+
+@nondestructive
+class TestStorageEraseAll(VirtInstallMachineCase):
+
+    @disk_images([("fedora-rawhide", 15)])
+    def testFedora(self):
+        """"
+        Description:
+            Test erase-all scenario with pre-existing Fedora OS
+
+        Expected results:
+            - The installer should allow the user to select the erase-all scenario
+            - The system should be marked as deleted in the review screen
+        """
+        b = self.browser
+        m = self.machine
+
+        i = Installer(b, m)
+        r = Review(b, m)
+        s = Storage(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.check_scenario_index("erase-all", 2)
+        s.set_scenario("erase-all")
+        i.reach(i.steps.REVIEW)
+
+        for device in ["vda1", "vda2", "vda3"]:
+            r.check_disk_row("vda", parent=device, action="delete")
+
+        r.check_deleted_system("Fedora Linux")
+
+    def _testWindows_partition_disk(self):
+        b = self.browser
+        m = self.machine
+        s = Storage(b, m)
+
+        disk = "/dev/vda"
+        s.partition_disk(disk, [("1MiB", "efi"), ("1GiB", "microsoft-reserved"), ("5GiB", "basic-data")])
+
+    def testWindows(self):
+        """
+        Description:
+            Test erase-all scenario with pre-existing Windows OS
+
+        Expected results:
+            - The installer should allow the user to select the erase-all scenario
+            - The system should be marked as deleted in the review screen
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        r = Review(b, m)
+        s = Storage(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.set_scenario("erase-all")
+        i.reach(i.steps.REVIEW)
+
+        for device in ["vda1", "vda2", "vda3"]:
+            r.check_disk_row("vda", parent=device, action="delete")
+
+        r.check_all_erased_checkbox_label()
+        r.check_deleted_system("Windows")
+
+
+if __name__ == '__main__':
+    test_main()

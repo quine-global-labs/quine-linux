@@ -1,0 +1,64 @@
+{
+    "root": true,
+    "env": {
+        "browser": true,
+        "es2022": true
+    },
+    "extends": ["eslint:recommended", "standard", "standard-jsx", "standard-react"],
+    "parserOptions": {
+        "ecmaVersion": 2022
+    },
+    "plugins": ["react", "react-hooks", "simple-import-sort", "sort-destructure-keys"],
+    "rules": {
+        "comma-dangle": "off",
+        "indent": ["error", 4,
+            {
+                "ObjectExpression": "first",
+                "CallExpression": {"arguments": "first"},
+                "MemberExpression": 2,
+                "ignoredNodes": [ "JSXAttribute" ]
+            }],
+        "jsx-quotes": ["error", "prefer-double"],
+        "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+        "newline-per-chained-call": ["error", { "ignoreChainWithDepth": 2 }],
+        "no-console": "error",
+        "no-unused-vars": ["error", { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }],
+        "no-var": "error",
+        "prefer-promise-reject-errors": ["error", { "allowEmptyReject": true }],
+        "quotes": ["error", "double" ],
+        "semi": ["error", "always", { "omitLastInOneLineBlock": true }],
+        "sort-destructure-keys/sort-destructure-keys": 2,
+        "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": true, "minKeys": 2}],
+        "simple-import-sort/imports": ["error", { "groups": [
+            ["^cockpit$"],
+            ["^"],
+            ["^react", "^@patternfly"],
+            ["/apis"],
+            ["/actions", "/reducer"],
+            ["/helpers"],
+            ["/components.*js[x]$"],
+            ["/contexts.*js[x]$"],
+            ["/hooks.*js[x]$"],
+            ["^cockpit-", "^os-release", "^dialogs"],
+            ["^\\."],
+            ["\\.scss"]
+        ] }],
+        "import/extensions": ["error", "ignorePackages", {
+            "js": "always",
+            "jsx": "always"
+        }],
+        "import/no-useless-path-segments": "error",
+
+        "react/hook-use-state": ["error", { "allowDestructuredState": false }],
+        "react/jsx-closing-bracket-location": "off",
+        "react/jsx-indent": ["error", 4],
+        "react/prop-types": "off",
+
+        "react-hooks/exhaustive-deps": "error",
+        "react-hooks/rules-of-hooks": "error"
+    },
+    "globals": {
+        "require": false,
+        "module": false
+    }
+}

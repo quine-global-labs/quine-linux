@@ -3,16 +3,6 @@ version: '3'
 vars:
   IMAGE: quine-linux
   INSTALLER_IMAGE: quine-installer
-  # dnf .repo for the patched anaconda-webui, built by the fork's CI.
-  RPM_REPO_URL: https://forge.quinefoundation.com/api/packages/quine/rpm.repo
-  # Checksum of that repo's current metadata; passed as a build arg so the
-  # installer's dnf layer is rebuilt exactly when a new RPM gets published.
-  RPM_REPO_REV:
-    sh: |
-      [ -n "{{.RPM_REPO_URL}}" ] || exit 0
-      base=$(curl -fsSL "{{.RPM_REPO_URL}}" | sed -n 's/^baseurl=//p' | head -1)
-      sum() { if command -v sha256sum >/dev/null; then sha256sum; else shasum -a 256; fi; }
-      curl -fsSL "$base/repodata/repomd.xml" 2>/dev/null | sum | cut -c1-16
   OUTPUT_DIR: ./output
   # Any docker-CLI-compatible runtime works for plain builds. Prefers podman,
   # falls back to docker; override with CONTAINER_RUNTIME=... (env or task var).
@@ -77,22 +67,19 @@ tasks:
       Build the patched-Anaconda installer-environment container (see
       installer/Containerfile and docs/patched-anaconda-installer.md). This
       is separate from the quine-linux OS image itself. Defaults to the
-      anaconda-webui build at {{.RPM_REPO_URL}}; override with
-      `task build-installer-image RPM_REPO_URL=...` (empty = stock Fedora).
+      anaconda-webui built from installer/anaconda-webui/vendor/.
     cmds:
-      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} --build-arg RPM_REPO_URL={{.RPM_REPO_URL}} --build-arg RPM_REPO_REV={{.RPM_REPO_REV}} -f installer/Containerfile installer/
+      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} -f installer/Containerfile installer/
 
   build-installer-iso:
     desc: >-
       Build a bootable install ISO using the patched-Anaconda installer
       image to install the quine-linux bootc image, via
       bootc-image-builder's `bootc-installer` type. Output lands in
-      {{.OUTPUT_DIR}}/bootc-installer/install.iso. Uses the same RPM_REPO_URL
-      default/override as build-installer-image.
+      {{.OUTPUT_DIR}}/bootc-installer/install.iso.
     deps: [build-image]
     cmds:
       - task: build-installer-image
-        vars: { RPM_REPO_URL: "{{.RPM_REPO_URL}}" }
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
@@ -104,7 +91,7 @@ tasks:
         {{.BIB_IMAGE}}
         --target-arch {{.TARGET_ARCH}}
         --type bootc-installer
-        --bootc-installer-payload-ref localhost/{{.IMAGE}}
+        --installer-payload-ref localhost/{{.IMAGE}}
         localhost/{{.INSTALLER_IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootc-installer/install.iso"

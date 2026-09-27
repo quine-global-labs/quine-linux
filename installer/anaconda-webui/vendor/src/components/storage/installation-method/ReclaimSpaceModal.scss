@@ -1,0 +1,172 @@
+/*
+ * Copyright (C) 2023 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+@import "global-variables";
+
+#reclaim-space-modal-table {
+  tr.reclaim-space-modal-table-row.reclaim-space-modal-device-level-1,
+  tr.reclaim-space-modal-table-row.reclaim-space-modal-device-level-2,
+  tr.reclaim-space-modal-table-row.reclaim-space-modal-device-level-3 {
+    td {
+      padding-block: var(--pf-t--global--spacer--sm);
+    }
+  }
+
+  tr.reclaim-space-modal-table-row {
+    border-block-end: none;
+  }
+
+  // Add a border between disk rows, except for the first one,
+  // since it already has a sticky header border that we shouldn't modify.
+  tbody:not(:nth-child(2)) {
+    tr.reclaim-space-modal-table-row.reclaim-space-modal-device-level-0 {
+      border-block-start: var(--pf-v6-c-table--border-width--base) solid var(--pf-v6-c-table--BorderColor);
+    }
+  }
+
+  .reclaim-space-modal-device-action-delete {
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--color--status--danger--default);
+  }
+
+  .reclaim-space-modal-device-action-shrink {
+    font-size: var(--pf-t--global--font--size--sm);
+    color: var(--pf-t--global--color--status--warning--default);
+  }
+
+  .pf-v6-c-table__td {
+    padding-block: var(--pf-t--global--spacer--sm);
+    align-items: center;
+  }
+
+  .reclaim-actions {
+    // Actions should not have a gap
+    gap: 0;
+    // Actions should "eat into" TD padding so they're aligned appropriately
+    margin: calc(-1 * var(--pf-t--global--spacer--xs)) calc(-1 * var(--pf-t--global--spacer--sm));
+
+    // Fix the button size of actions
+    .pf-v6-c-button {
+      padding: var(--pf-t--global--spacer--xs) var(--pf-t--global--spacer--sm);
+    }
+  }
+
+  // Bind indent level variable to classes (start indenting on level 2)
+  @for $i from 1 through 10 {
+    .reclaim-space-modal-device-level-#{$i} {
+      --indent: #{$i - 1};
+    }
+  }
+
+  // Small sizes
+  @media (max-width: $pf-v6-global--breakpoint--md - 1) {
+    // Indent the left for smaller sizes
+    .reclaim-space-modal-table-row:not(.reclaim-space-modal-device-level-0) {
+      margin-inline-start: calc(
+        var(--indent) * var(--pf-t--global--spacer--sm)
+      );
+    }
+
+    // Remove labels with no content on small sizes
+    td:empty {
+      display: none;
+    }
+
+    tr {
+      grid-template-columns: auto 1fr;
+    }
+
+    td {
+      grid-template-columns: subgrid;
+      grid-column: 1 / -1;
+    }
+  }
+
+  // Large sizes
+  @media (min-width: $pf-v6-global--breakpoint--md) {
+    // Indent the left for larger sizes
+    .reclaim-space-modal-table-row:not(.reclaim-space-modal-device-level-0) td:nth-child(2) {
+      padding-inline-start: calc(var(--pf-v6-c-table--cell--PaddingInlineEnd) + var(--indent) * var(--pf-t--global--spacer--md));
+    }
+
+    // Align columns to the right on larger screens
+    :is(th, td):nth-last-of-type(-n + 2) {
+      text-align: end;
+    }
+
+    // Also align the actions group to the right
+    .reclaim-actions {
+      justify-content: end;
+    }
+
+    // Set the disk icon size
+    td:first-of-type {
+      --icon-size: 1.5em;
+    }
+
+    // Adjust the disk size and make it align properly
+    .reclaim-space-modal-device-level-0 {
+      td:first-of-type svg {
+        height: auto;
+        width: var(--icon-size);
+        margin-inline-end: var(--pf-t--global--spacer--sm);
+        vertical-align: middle;
+      }
+    }
+
+    // Align non-icon text with the text that has an icon
+    .reclaim-space-modal-table-row:not(.reclaim-space-modal-device-level-0) {
+      td:first-of-type {
+        padding-left: calc(var(--icon-size) + var(--pf-t--global--spacer--sm) + var(--pf-v6-c-table--cell--PaddingInlineEnd));
+      }
+    }
+
+  }
+}
+
+// Make scrolling happen in the list instead of the dialog
+#reclaim-space-modal .pf-v6-c-modal-box__body {
+  // Stretch to fill the remaining area with content
+  display: flex;
+  flex-direction: column;
+
+  // Don't overflow here; overflow below
+  > .pf-v6-l-stack {
+    overflow: hidden;
+  }
+
+  .pf-v6-c-panel {
+    // Make the panel scroll (not the stack)
+    overflow: auto;
+    // Replace the border below with an actual border for the panel
+    border: var(--pf-v6-c-panel--before--BorderWidth) solid var(--pf-v6-c-panel--before--BorderColor);
+
+    // Hide the original border (as it doesn't work properly)
+    &::before {
+      display: none;
+    }
+  }
+}
+
+.pf-v6-c-popover {
+  // Increase the min-width of the slider
+  .reclaim-space-modal-shrink-slider {
+    min-width: 30rem;
+  }
+
+  // By default input groups take the full width of their container
+  .pf-v6-c-input-group {
+    width: unset;
+  }
+
+  // Hide the slider boundaries
+  .pf-v6-c-slider__step-label {
+    display: none;
+  }
+}
+
+.extended-partition-type {
+  color: var(--pf-t--global--text--color--disabled);
+  font-style: italic;
+}

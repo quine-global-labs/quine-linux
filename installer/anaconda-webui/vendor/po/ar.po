@@ -1,0 +1,5439 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Red Hat, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Translators:
+# Basem Narmok <narm@localhost.localdomain>, 2004
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Hicham Amaoui <amaoui@altern.ort>, 2004
+# Mosaab Alzoubi <moceap@hotmail.com>, 2013
+# Mohamed Eldesoky <mohamed@eldesoky.net>, 2004
+# Mohammad Ghoniem <Mohammad.Ghoniem@gmail.com>, 2005
+# Mosaab Alzoubi <moceap@hotmail.com>, 2013-2014
+# Muayyad Saleh Alsadi <alsadi@ojuba.org>, 2009
+# Muhammad Alkarouri <malkarouri@yahoo.co.uk>, 2004
+# Munzir Taha <munzirtaha@gmail.com>, 2011
+# Munzir Taha <munzirtaha@newhorizons.com.sa>, 2004
+# Tareq Al Jurf <taljurf.fedora@gmail.com>, 2009
+# Youcef Rabah Rahal <rahal@arabeyes.org>, 2004
+# Khalid Moharrum <khalid.moharram@gmail.com>, 2016. #zanata
+# ButterflyOfFire <butterflyoffire@protonmail.com>, 2020.
+# Hakim Ais <kimy747@zohomail.com>, 2021.
+# Ahmed M. Farrag <a.m.farrag@gmail.com>, 2021, 2022.
+# Yousef Alshammari <fawaz27000@hotmail.com>, 2022.
+# Amro Hatem <amro_hatem_1@outlook.com>, 2023.
+# Abdullah Albaroty <albaroty@gmail.com>, 2023.
+# yangyangdaji <1504305527@qq.com>, 2023.
+# Khalid Abu Shawarib <khalid.shawarib@gmail.com>, 2023.
+# Vladimír Slávik <vslavik@redhat.com>, 2023.
+# Avid Seeker <avidseeker7@protonmail.com>, 2023.
+msgid ""
+msgstr ""
+"Project-Id-Version: anaconda 32.22\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-25 08:11+0000\n"
+"PO-Revision-Date: 2026-08-14 04:27+0000\n"
+"Last-Translator: joo es <jonnyse@users.noreply.translate.fedoraproject.org>\n"
+"Language-Team: Arabic <https://translate.fedoraproject.org/projects/anaconda-"
+"webui/anaconda-webui/ar/>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 2026.8.1\n"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:143
+#: src/components/storage/installation-method/InstallationDestination.jsx:279
+msgid "$0 $1"
+msgstr "$0 $1"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:349
+#: src/components/storage/installation-method/InstallationDestination.jsx:163
+#: src/components/storage/installation-method/InstallationDestination.jsx:272
+msgid "$0 ($1)"
+msgstr "$0 ($1)"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:74
+#: src/components/storage/Common.jsx:58
+msgid "$0 error"
+msgid_plural "$0 errors"
+msgstr[0] "لا أخطاء"
+msgstr[1] "خطأ واحد"
+msgstr[2] "خطأن"
+msgstr[3] "$0 أخطاء"
+msgstr[4] "$0 خطأً"
+msgstr[5] "$0 خطأ"
+
+#: src/components/app.jsx:84
+msgid "$0 installation"
+msgstr "تثبيت $0"
+
+#: src/components/HeaderKebab.jsx:47
+msgid "$0 installer"
+msgstr "مُثبّت $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:244
+msgid ""
+"$0 is an MBR extended partition that contains logical partitions. Removing "
+"all logical partitions will also automatically remove the extended partition."
+msgstr ""
+"$0 هو قسم MBR موسع يحتوي على أقسام منطقية. ستؤدي إزالة جميع الأقسام المنطقية "
+"أيضًا إلى إزالة القسم الموسع تلقائيًا."
+
+#: src/components/storage/installation-method/usePageComplete.jsx:114
+msgid "$0 is required, but only $1 is available."
+msgstr "مطلوب $0، ولكن يتوفر $1 فقط."
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:90
+#: src/components/storage/Common.jsx:74
+msgid "$0 warning"
+msgid_plural "$0 warnings"
+msgstr[0] "$0 تحذير"
+msgstr[1] "تحذير"
+msgstr[2] "تحذيران"
+msgstr[3] "$0 تحذيرات"
+msgstr[4] "$0 تحذير"
+msgstr[5] "$0 تحذير"
+
+#: src/components/storage/StorageReview.jsx:290
+msgid "$0 will be deleted"
+msgstr "$0 سيُحذف"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:190
+msgid "'$0' filesystem cannot be on an encrypted block device"
+msgstr "لا يمكن أن يكون نظام الملفات '$0' على جهاز كُتلة مُعمَّاة"
+
+#: src/helpers/storage.js:267
+msgid "'$0' must be assigned to $1"
+msgstr "يجب تعيين '$0' إلى $1"
+
+#: src/helpers/storage.js:270
+msgid "'$0' must be on a device formatted to '$1'"
+msgstr "يجب أن يكون '$0' على جهاز مهيأ إلى '$1'"
+
+#: src/helpers/storage.js:261
+msgid ""
+"'$0' must be on an EFI System Partition. The selected partition uses a FAT "
+"filesystem, but is not marked as an ESP. Set the partition type to EFI "
+"System and enable the esp flag."
+msgstr ""
+"يجب أن يكون '$0' على قسم نظام EFI. يستخدم القسم المحدّد نظام ملفات FAT، ولكنه "
+"غير محدد كـ ESP. عيِّن نوع القسم إلى EFI System وفعِّل علامة esp."
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:272
+msgid ""
+"'$0' partition on MDRAID device $1 found. Bootloader partitions on MDRAID "
+"devices are not supported."
+msgstr ""
+"عُثر على قسم '$0' على جهاز MDRAID $1. أقسام محمّل إقلاع (bootloader) على أجهزة "
+"MDRAID غير مدعومة."
+
+#: src/components/users/Accounts.jsx:256
+msgid ""
+"A standard user account with admin access for making system-wide changes."
+msgstr "حساب مستخدم قياسي بصلاحيات إدارية لإجراء تغييرات على مستوى النظام."
+
+#: src/components/installation/InstallationNonCriticalErrorDialog.jsx:48
+msgid "Abort installation"
+msgstr "أجهض التثبيت"
+
+#: src/components/HeaderKebab.jsx:105
+msgid "About"
+msgstr "حول"
+
+#: src/components/review/ReviewConfiguration.jsx:254
+msgid "Account"
+msgstr "حساب"
+
+#: src/components/storage/StorageReview.jsx:248
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:142
+msgid "Actions"
+msgstr "إجراءات"
+
+#: src/components/datetime/CustomNTPModal.jsx:232
+msgid "Add another server..."
+msgstr "أضف خادم آخر..."
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:644
+msgid "Add mount"
+msgstr "أضف نقطة وصل"
+
+#: src/components/software/SoftwareSelection.jsx:122
+msgid "Add-ons for your chosen environment"
+msgstr "الإضافات لبيئتك المختارة"
+
+#: src/components/software/SoftwareSelection.jsx:131
+msgid "Add-ons not specific to your environment"
+msgstr "الإضافات غير مخصصة لبيئتك"
+
+#: src/components/localization/InstallationLanguage.jsx:148
+msgid "Additional languages"
+msgstr "اللّغات المتاحة"
+
+#: src/components/software/SoftwareSelection.jsx:156
+msgid "Additional software for the selected environment"
+msgstr "برمجيات إضافية للبيئة المُنتقاة"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:55
+msgid "All changes made in the storage editor take effect immediately."
+msgstr "تسري جميع التغييرات التي أجريت في محرّر التخزين على الفور."
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:133
+msgid "All devices using this passphrase will be unlocked"
+msgstr "سيُفتح جميع الأجهزة التي تستخدم عبارة السر هذه"
+
+#: src/manifest.json:0
+msgid "Anaconda"
+msgstr "أناكوندا"
+
+#: src/login.html:8 src/index.html:20
+msgid "Anaconda Web UI"
+msgstr "أناكوندا واجهة ويب"
+
+#: src/components/HeaderKebab.jsx:77
+msgid "Anaconda project page"
+msgstr "صفحة مشروع أناكوندا"
+
+#: src/components/storage/scenarios/mount-point-mapping/index.js:21
+msgid "Apply mount point assignment and install"
+msgstr "طبق تعيين نقطة الوصل وثبِّت"
+
+#: src/components/network/CockpitNetworkConfiguration.jsx:64
+msgid "Applying changes..."
+msgstr "يطبِّق التغييرات..."
+
+#: src/components/storage/scenarios/mount-point-mapping/index.js:22
+msgid ""
+"Assign partitions to mount points. Useful for pre-configured custom layouts."
+msgstr "عيّن الأقسام إلى نقاط الوصل. مفيد للتخطيطات المخصّصة مضبطة مسبقًا."
+
+#: src/components/Error.jsx:396
+msgid "Automatic log file upload"
+msgstr "رفع ملف السجل تلقائيًا"
+
+#: src/components/datetime/DateAndTime.jsx:133
+msgid "Automatically set date and time, using time servers"
+msgstr "عيّن التاريخ والوقت تلقائيًا، باستخدام خوادم الوقت"
+
+#: src/components/datetime/Timezone.jsx:140
+#: src/components/datetime/Timezone.jsx:141
+msgid "Automatically set timezone"
+msgstr "عيّن المنطقة الزمنية تلقائيًا"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:200
+msgid "Available free space: $0. Installation requires: $1."
+msgstr "المساحة الخالية المتاحة: $0. يتطلب التثبيت: $1."
+
+#: src/components/Error.jsx:668 src/components/Error.jsx:693
+#: src/components/AnacondaWizardFooter.jsx:62
+msgid "Back"
+msgstr "ارجع"
+
+#: src/components/software/SoftwareSelection.jsx:63
+msgid "Base environment"
+msgstr "البيئة الأساسية"
+
+#: src/components/Error.jsx:367
+msgid "Brief description of the issue"
+msgstr "وصف موجز للمشكلة"
+
+#: src/components/Error.jsx:356
+msgid "Bug report details"
+msgstr "تفاصيل تقرير الخطأ"
+
+#: src/components/Error.jsx:206
+msgid "Bugzilla API key"
+msgstr "مفتاح Bugzilla API"
+
+#: src/components/AnacondaHeader.jsx:73
+msgid ""
+"By continuing to use this software, you understand and accept the risks "
+"associated with pre-released software, that you intend to use this for "
+"testing and development purposes only and are willing to report any bugs or "
+"issues in order to enhance this work."
+msgstr ""
+"استمرارك في استخدام هذا البرنامج، فأنت تدرك وتقبل المخاطر المرتبطة "
+"بالبرمجيات التي أُصدرت مسبقًا، وعليك استخدامها لأغراض الاختبار والتطوير فقط، "
+"وأنت على استعداد للإبلاغ عن أي أخطاء أو مشاكل من أجل تحسين هذا العمل."
+
+#: src/components/datetime/CustomNTPModal.jsx:252
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:72
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:211
+#: src/components/storage/installation-method/InstallationDestination.jsx:378
+#: src/components/Error.jsx:861 src/components/localization/Keyboard.jsx:280
+#: src/components/review/Hostname.jsx:127
+msgid "Cancel"
+msgstr "ألغِ"
+
+#: src/components/review/Hostname.jsx:125
+msgid "Change"
+msgstr "غيّر"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:350
+msgid "Change destination"
+msgstr "غيّر الوجهة"
+
+#: src/components/review/Hostname.jsx:87
+msgid "Change hostname"
+msgstr "غيّر اسم المضيف"
+
+#: src/components/storage/installation-method/usePageComplete.jsx:128
+msgid "Change partition layout"
+msgstr "غيّر تخطيط الأقسام"
+
+#: src/components/localization/Keyboard.jsx:213
+#: src/components/localization/Keyboard.jsx:308
+#: src/components/localization/Keyboard.jsx:359
+msgid "Change system keyboard layout"
+msgstr "غيّر نظام تخطيط لوحة المفاتيح"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:127
+msgid ""
+"Changes made here will immediately affect the system. There is no 'undo'."
+msgstr "ستؤثر التغييرات التي أجريت هنا على النظام فورًا. لا يوجد \"تراجع\"."
+
+#: src/components/review/ReviewConfiguration.jsx:191
+msgid "Checking installation configuration..."
+msgstr "يجري التحقق من تضبيط التثبيت..."
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:475
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:481
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:39
+msgid "Checking storage configuration"
+msgstr "التحقق من تضبيط وحدة التخزين"
+
+#: src/components/common/MenuSearch.jsx:112
+msgid "Clear search"
+msgstr "امسح البحث"
+
+#: src/components/storage/Common.jsx:27
+msgid "Click 'Next' again to proceed despite these warnings."
+msgstr "انقر فوق 'التالي' مرة أخرى للمتابعة على الرغم من هذه التحذيرات."
+
+#: src/components/network/CockpitNetworkConfiguration.jsx:64
+#: src/components/storage/installation-method/EncryptedDevices.jsx:181
+#: src/components/storage/installation-method/InstallationDestination.jsx:383
+msgid "Close"
+msgstr "أغلق"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:131
+msgid "Close storage editor"
+msgstr "أغلق محرّر التخزين"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:328
+msgid ""
+"Cockpit storage did not provide the passphrase to unlock encrypted device."
+msgstr "لم يوفر Cockpit storage عبارة السر لفتح الجهاز المُعمَّى."
+
+#: src/components/installation/InstallationProgress.jsx:279
+msgid "Completed"
+msgstr "اكتُمل"
+
+#: src/components/review/ReviewConfiguration.jsx:212
+msgid "Configuration is incomplete"
+msgstr "التضبيط غير مكتمل"
+
+#: src/components/datetime/CustomNTPModal.jsx:270
+msgid "Configure NTP servers"
+msgstr "اضبط خوادم NTP"
+
+#: src/components/datetime/CustomNTPModal.jsx:154
+msgid "Configure custom NTP servers"
+msgstr "اضبط خوادم NTP المخصّصة"
+
+#: src/components/network/CockpitNetworkConfiguration.jsx:40
+msgid "Configure network"
+msgstr "اضبط الشبكة"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:117
+msgid "Configure storage"
+msgstr "اضبط التخزين"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:682
+msgid "Configure storage again"
+msgstr "اضبط التخزين مرة أخرى"
+
+#: src/components/users/Accounts.jsx:208 src/components/users/Accounts.jsx:411
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:96
+msgid "Confirm passphrase"
+msgstr "أكّد عبارة السر"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:667
+msgid "Continue"
+msgstr "استمر"
+
+#: src/components/installation/InstallationNonCriticalErrorDialog.jsx:41
+#: src/components/AnacondaWizardFooter.jsx:126
+msgid "Continue installation"
+msgstr "استمر التثبيت"
+
+#: src/components/installation/InstallationNonCriticalErrorDialog.jsx:28
+msgid "Continue installation?"
+msgstr "استمر التثبيت؟"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:620
+msgid "Continue with installation"
+msgstr "استمر مع التثبيت"
+
+#: src/components/storage/Common.jsx:40
+msgid "Correct these issues before continuing."
+msgstr "أصلح هذه الأخطاء قبل الاستمرار."
+
+#: src/components/users/index.js:20
+msgid "Create Account"
+msgstr "إنشاء حساب"
+
+#: src/components/users/Accounts.jsx:318
+msgid "Create account"
+msgstr "أنشئ حسابًا"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:66
+msgid "Currently installed: $0"
+msgstr "المثبتة حاليًا: $0"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:231
+msgid "Custom"
+msgstr "مخصّص"
+
+#: src/components/datetime/DateAndTime.jsx:172
+msgid "Date"
+msgstr "التاريخ"
+
+#: src/components/datetime/DateAndTime.jsx:151
+#: src/components/datetime/index.js:21
+msgid "Date and time"
+msgstr "التاريخ والوقت"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:395
+msgid "Delete partition"
+msgstr "احذف القسم"
+
+#: src/components/storage/StorageReview.jsx:348
+msgid "Deletion of certain partitions may prevent $0 from booting: $1"
+msgstr "قد يؤدي حذف بعض الأقسام إلى منع $0 من الإقلاع: $1"
+
+#: src/components/Error.jsx:262
+msgid "Description"
+msgstr "الوصف"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:264
+msgid "Destination"
+msgstr "الوجهة"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:52
+msgid "Destination is encrypted"
+msgstr "الوجهة مُعمَّاة"
+
+#: src/components/Error.jsx:267
+msgid "Detailed description of the issue"
+msgstr "وصف مفصل للمشكلة"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:646
+msgid "Detected valid storage layout:"
+msgstr "كُشف عن تخطيط تخزين صالح:"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:620
+#: src/components/storage/StorageReview.jsx:246
+msgid "Device"
+msgstr "جهاز"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:388
+msgid "Duplicate device."
+msgstr "جهاز مكرّر."
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:237
+msgid "Duplicate mount point."
+msgstr "نقطة الوصل مكرّرة."
+
+#: src/components/users/Accounts.jsx:342 src/components/users/Accounts.jsx:393
+msgid "Enable root account"
+msgstr "فعّل حساب الجذر"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:63
+msgid "Encrypt my data"
+msgstr "عمِّ «(شفّر)» بياناتي"
+
+#: src/components/storage/StorageReview.jsx:249
+msgid "Encrypted"
+msgstr "مُعمَّاة"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:106
+msgid "Encryption"
+msgstr "التعمية"
+
+#: src/components/login/LoginPage.jsx:88
+msgid "Enter PIN"
+msgstr "أدخِل PIN"
+
+#: src/components/login/LoginPage.jsx:77
+msgid "Enter PIN to access the installer"
+msgstr "أدخِل PIN للوصول إلى المثبِّت"
+
+#: src/components/Error.jsx:203
+msgid ""
+"Enter your Bugzilla API key to create a bug report. You will be able to "
+"review and edit the bug details in the next step."
+msgstr ""
+"أدخل مفتاح Bugzilla API لإنشاء تقرير عن خطأ. ستتمكن من مراجعة وتعديل تفاصيل "
+"الخطأ في الخطوة التالية."
+
+#: src/components/Error.jsx:279
+msgid "Environment"
+msgstr "البيئة"
+
+#: src/components/storage/scenarios/erase-all/index.js:20
+msgid "Erase data and install"
+msgstr "أمحو البيانات وثبّت"
+
+#: src/components/Error.jsx:818
+msgid "Error details"
+msgstr "تفاصيل الخطأ"
+
+#: src/components/installation/InstallationProgress.jsx:249
+msgid "Exit to live desktop"
+msgstr "اخرج إلى سطح المكتب المباشر"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:241
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:248
+msgid "Extended partition"
+msgstr "قسم ممتد"
+
+#: src/components/Error.jsx:642
+msgid "Failed to report issue"
+msgstr "فشل في الإبلاغ عن المشكلة"
+
+#: src/components/localization/Keyboard.jsx:202
+msgid "Failed to save layouts"
+msgstr "فشل حفظ التخطيطات"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:80
+msgid "Fedora linux requires at least $0 of disk space."
+msgstr "يتطلب فيدورا لينكس $0 على الأقل من مساحة القرص."
+
+#: src/components/installation/InstallationProgress.jsx:243
+msgid "Finalization"
+msgstr "الختام"
+
+#: src/components/installation/InstallationProgress.jsx:241
+msgid ""
+"Finalizing: The system configuration is complete. Finalizing installation "
+"may take a few moments."
+msgstr ""
+"اللمسات الأخيرة: اكتمل تضبيط النظام. قد يستغرق الانتهاء من التثبيت بضع لحظات."
+
+#: src/components/localization/Keyboard.jsx:218
+msgid "Find layout"
+msgstr "ابحث عن تخطيط"
+
+#: src/components/users/Accounts.jsx:409
+msgid ""
+"For better security, avoid using the root account directly. Instead, use the "
+"local account above to manage the system."
+msgstr ""
+"لأمان أفضل، تجنب استخدام حساب الجذر مباشرةً. بدلاً من ذلك، استخدم الحساب "
+"المحلي أعلاه لإدارة النظام."
+
+#: src/components/users/Accounts.jsx:258
+msgid "Full name"
+msgstr "الاسم الكامل"
+
+#: src/components/users/Accounts.jsx:194
+msgid "Full name cannot contain colon characters"
+msgstr "لا يمكن للاسم الكامل أن يحتوي على فواصل"
+
+#: src/components/storage/StorageReview.jsx:251
+msgid "Helper text"
+msgstr "نص المساعدة"
+
+#: src/components/Error.jsx:223
+msgid "Hide API key"
+msgstr "أخفِ مفتاح API"
+
+#: src/components/login/LoginPage.jsx:94
+msgid "Hide PIN"
+msgstr "أخفِ PIN"
+
+#: src/components/Password.jsx:265
+msgid "Hide confirmed password"
+msgstr "أخفِ تأكيد كلمة السر"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:166
+msgid "Hide passphrase"
+msgstr "أخفِ عبارة السر"
+
+#: src/components/Password.jsx:229
+msgid "Hide password"
+msgstr "أخفِ كلمة السر"
+
+#: src/components/review/Hostname.jsx:91 src/components/review/Hostname.jsx:145
+msgid "Hostname"
+msgstr "اسم المضيف"
+
+#: src/components/storage/installation-method/InstallationScenario.jsx:163
+msgid "How would you like to install?"
+msgstr "كيف تريد التثبيت؟"
+
+#: src/components/review/ReviewConfiguration.jsx:309
+msgid "I understand that all existing data will be erased"
+msgid_plural ""
+"I understand that all existing data will be erased from the selected disks"
+msgstr[0] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة حاليًا"
+msgstr[1] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة حاليًا"
+msgstr[2] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة على الأقراص المُحدّدة"
+msgstr[3] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة على الأقراص المُحدّدة"
+msgstr[4] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة على الأقراص المُحدّدة"
+msgstr[5] "أدرك تمامًا أنه سيتم مسح جميع البيانات الموجودة على الأقراص المُحدّدة"
+
+#: src/components/review/ReviewConfiguration.jsx:314
+msgid "I understand that some existing data will be erased"
+msgstr "أتفهم أنه سيتم مسح بعض البيانات الموجودة حاليًا"
+
+#: src/components/review/ReviewConfiguration.jsx:315
+msgid "I understand that some partitions will be modified"
+msgstr "أتفهم أنه سيتم تعديل بعض الأقسام"
+
+#: src/components/review/Hostname.jsx:114
+msgid "If empty, hostname will be transient and set by network information."
+msgstr ""
+"إذا كان فارغًا، فسيكون اسم المضيف عابرًا ويتم تعيينه بواسطة معلومات الشبكة."
+
+#: src/components/storage/installation-method/InstallationScenario.jsx:126
+msgid ""
+"If none of the options above apply, use the storage editor to create a "
+"custom partitioning before proceeding."
+msgstr ""
+"إذا لم ينطبق أي من الخيارات المذكورة أعلاه، فاستخدم محرِّر التخزين لإنشاء "
+"تقسيم مخصّص قبل المتابعة."
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:56
+msgid "If you are configuring partitions the following are required:"
+msgstr "إذا كنت تضبط الأقسام، فيجب اتباع التالي:"
+
+#: src/components/Error.jsx:411
+msgid ""
+"If you do not consent to automatic log file upload, you can $0 instead. "
+"Manual reporting allows you to review and selectively attach log files "
+"yourself."
+msgstr ""
+"إذا لم توافق على التحميل التلقائي لملفات السجلّ، يمكنك بدلاً من ذلك $0. يتيح "
+"لك الإبلاغ اليدوي مراجعة وإرفاق ملفات السجل بنفسك بشكل انتقائي."
+
+#: src/components/AnacondaHeader.jsx:76
+msgid ""
+"If you do not understand or accept the risks, then please exit this program."
+msgstr "إذا كنت لا تفهم أو لا تقبل المخاطر، ففضلاً أخرج من هذا البرنامج."
+
+#: src/components/Error.jsx:328
+msgid ""
+"If your issue matches one of the bugs above, you can open it and add your "
+"information there instead of creating a duplicate report."
+msgstr ""
+"إذا كانت مشكلتك تتطابق مع إحدى الأخطاء المذكورة أعلاه، فيمكنك فتحها وإضافة "
+"معلوماتك إليها بدلاً من إنشاء تقرير مكرر."
+
+#: src/components/installation/InstallationProgress.jsx:284
+msgid "In progress"
+msgstr "جارِ العمل"
+
+#: src/components/app.jsx:33
+msgid "Initializing..."
+msgstr "التهيئة..."
+
+#: src/components/storage/scenarios/use-free-space/index.js:27
+#: src/components/storage/scenarios/use-configured-storage/index.js:25
+#: src/components/storage/scenarios/use-configured-storage/index.js:39
+msgid "Install"
+msgstr "ثبِّت"
+
+#: src/components/installation/InstallationProgress.jsx:219
+#: src/components/Error.jsx:849
+msgid "Installation failed"
+msgstr "فشل التثبيت"
+
+#: src/components/storage/installation-method/index.js:24
+msgid "Installation method"
+msgstr "طريقة التثبيت"
+
+#: src/components/installation/InstallationProgress.jsx:61
+msgid "Installation of the system failed"
+msgstr "فشل تثبيت النظام"
+
+#: src/components/installation/InstallationProgress.jsx:98
+msgid "Installation of the system failed: $0"
+msgstr "فشل تثبيت النظام: $0"
+
+#: src/components/review/ReviewConfiguration.jsx:269
+msgid "Installation type"
+msgstr "نوع التثبيت"
+
+#: src/components/installation/InstallationProgress.jsx:221
+msgid "Installing"
+msgstr "جارِ التثبيت"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:310
+msgid "Insufficient disk space"
+msgstr "مساحة القرص غير كافية"
+
+#: src/components/login/LoginPage.jsx:68
+msgid "Invalid PIN. Please try again."
+msgstr "PIN غير صحيح. يُرجى المحاولة مرة أخرى."
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:255
+msgid ""
+"Invalid RAID configuration detected. If your RAID array is created directly "
+"on top of disks, a partition table must be created on the array. If your "
+"RAID array is created on top of partitions, it must contain a single "
+"filesystem or format (e.g., LVM PV). Any existing partitions on this array "
+"will be ignored."
+msgstr ""
+"اكتُشف تضبيط RAID غير صالح. إذا أُنشئت مصفوفة RAID مباشرةً فوق الأقراص، فيجب "
+"إنشاء جدول أقسام عليها. إذا أُنشئت مصفوفة RAID فوق أقسام، فيجب أن تحتوي على "
+"نظام ملفات أو تنسيق واحد (مثل LVM PV). سيتم تجاهل أي أقسام موجودة على هذه "
+"المصفوفة."
+
+#: src/components/datetime/CustomNTPModal.jsx:92
+msgid "Invalid hostname"
+msgstr "اسم المضيف غير صالح"
+
+#: src/components/review/ReviewConfiguration.jsx:208
+msgid "Jump to first incomplete step"
+msgstr "اقفز إلى أول خطوة غير مكتملة"
+
+#: src/components/storage/scenarios/use-free-space/index.js:28
+msgid ""
+"Keep current disk layout and use available space, to dual-boot with another "
+"OS."
+msgstr ""
+"احتفظ بتخطيط القرص الحالي واستخدم المساحة المتاحة، للإقلاع المزدوج مع نظام "
+"تشغيل آخر."
+
+#: src/components/localization/InstallationLanguage.jsx:254
+msgid "Keyboard"
+msgstr "لوحة المفاتيح"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:75
+msgid "Keyboard layout during boot"
+msgstr "تخطيط لوحة المفاتيح أثناء الإقلاع"
+
+#: src/components/localization/InstallationLanguage.jsx:240
+#: src/components/review/ReviewConfiguration.jsx:234
+msgid "Language"
+msgstr "اللّغة"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:65
+msgid "Launch storage editor"
+msgstr "أطلِق محرّر التخزين"
+
+#: src/components/Error.jsx:387
+msgid "Learn more about restricted access in the configuration"
+msgstr "تعرّف على المزيد حول الوصول المقيد في التضبيط"
+
+#: src/components/users/Accounts.jsx:209
+msgid "Leave both passphrase fields empty to use an empty password."
+msgstr "اترك كِلا حقلي عبارة المرور فارغين لاستخدام كلمة سر فارغة."
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:138
+msgid "Location"
+msgstr "الموقع"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:147
+msgid "Locked devices"
+msgstr "الأجهزة المقفلة"
+
+#: src/components/login/LoginPage.jsx:118
+msgid "Log in"
+msgstr "لِج"
+
+#: src/components/localization/Keyboard.jsx:122
+#: src/components/localization/Keyboard.jsx:126
+msgid "Make current"
+msgstr "اجعله الحالي"
+
+#: src/components/storage/mount-point-mapping/index.js:19
+msgid "Manual disk configuration"
+msgstr "تضبيط القرص اليدوي"
+
+#: src/components/storage/mount-point-mapping/index.js:20
+msgid "Manual disk configuration: Mount point mapping"
+msgstr "تضبيط القرص اليدوي: تعيين نقطة الوصل"
+
+#: src/components/review/Hostname.jsx:111
+msgid "May contain letters, numbers, and dashes."
+msgstr "قد يحتوي على حروف وأرقام وشرطات."
+
+#: src/components/storage/StorageReview.jsx:86
+msgid "May need more free space"
+msgstr "قد تحتاج إلى مساحة فارغة أكبر"
+
+#: src/components/Password.jsx:56
+msgid "Medium"
+msgstr "متوسط"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:313
+msgid "Minimum of $0 required"
+msgstr "الحد الأدنى المطلوب هو $0"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:137
+msgid "Mismatch between parent device and child device reformat selection."
+msgstr "عدم تطابق بين الجهاز الأصل وتحديد إعادة تهيئة الجهاز الفرعي."
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:619
+#: src/components/storage/StorageReview.jsx:250
+msgid "Mount point"
+msgstr "نقطة الوصل"
+
+#: src/components/storage/scenarios/mount-point-mapping/index.js:23
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:617
+msgid "Mount point assignment"
+msgstr "تعيين نقطة الوصل"
+
+#: src/components/localization/Keyboard.jsx:144
+#: src/components/localization/Keyboard.jsx:148
+msgid "Move down"
+msgstr "حرّك لأسفل"
+
+#: src/components/localization/Keyboard.jsx:133
+#: src/components/localization/Keyboard.jsx:137
+msgid "Move up"
+msgstr "حرّك لأعلى"
+
+#: src/components/Password.jsx:31
+msgid "Must be at least $0 characters"
+msgstr "يجب ألا يقل عدد المحارف عن $0"
+
+#: src/components/Error.jsx:676
+msgid "My issue is different, continue"
+msgstr "مشكلتي مختلفة، استمر"
+
+#: src/components/datetime/CustomNTPModal.jsx:157
+msgid "NTP Servers"
+msgstr "خوادم NTP"
+
+#: src/components/datetime/CustomNTPModal.jsx:205
+msgid "NTS"
+msgstr "NTS"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:139
+msgid "Name"
+msgstr "الاسم"
+
+#: src/components/storage/StorageReview.jsx:84
+msgid "Needs at least $0"
+msgstr "يحتاج إلى $0 على الأقل"
+
+#: src/components/network/index.js:19
+msgid "Network"
+msgstr "شبكة"
+
+#: src/components/network/CockpitNetworkConfiguration.jsx:46
+#: src/components/network/index.js:20
+msgid "Network Configuration"
+msgstr "تضبيط الشبكة"
+
+#: src/components/Error.jsx:726
+msgid ""
+"Network not available. Configure the network in the top bar menu to report "
+"the issue."
+msgstr ""
+"الشبكة غير متوفرة. اضبط الشبكة في قائمة الشريط العلوي للإبلاغ عن المشكلة."
+
+#: src/components/Error.jsx:727
+msgid "Network not available. Configure the network to report the issue."
+msgstr "الشبكة غير متوفرة. اضبط الشبكة للإبلاغ عن المشكلة."
+
+#: src/components/network/NetworkConfiguration.jsx:53
+msgid "Network plugin failed"
+msgstr "فشل المكون الإضافي للشبكة"
+
+#: src/components/Error.jsx:658 src/components/AnacondaWizardFooter.jsx:71
+msgid "Next"
+msgstr "التالي"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:624
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:144
+msgid "No devices"
+msgstr "لا يوجد أجهزة"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:125
+msgid "No disks available"
+msgstr "لا توجد أقراص متاحة"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:322
+msgid "No disks selected"
+msgstr "لم تحدّد أيّ قرص"
+
+#: src/components/localization/Keyboard.jsx:47
+msgid "No keyboard layouts selected"
+msgstr "لم يحدّد أي تخطيطات لوحة مفاتيح"
+
+#: src/components/localization/Keyboard.jsx:240
+msgid "No layouts selected yet"
+msgstr "لم يحدد أي تخطيطات بعد"
+
+#: src/components/common/MenuSearch.jsx:135
+msgid "No results found"
+msgstr "لم يُعثر على نتائج"
+
+#: src/components/localization/Keyboard.jsx:427
+msgid ""
+"No valid VConsole keymap can be obtained for the selected keyboard "
+"layout(s). Please make a different keyboard layout selection."
+msgstr ""
+"لا يمكن الحصول على تخطيط مفاتيح VConsole صالح لتخطيط/ات لوحة المفاتيح "
+"المحدّد. يُرجى اختيار تخطيط لوحة مفاتيح مختلف."
+
+#: src/components/storage/installation-method/usePageComplete.jsx:112
+msgid "Not enough available free space"
+msgstr "لا توجد مساحة فارغة كافية"
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:51
+msgid "Not enough free space on the selected disks."
+msgstr "لا تتوفر مساحة خالية كافية في الأقراص المُحدّدة."
+
+#: src/components/storage/scenarios/erase-all/EraseAll.jsx:43
+msgid "Not enough space on selected disks."
+msgstr "لا تتوفر المساحة الكافية في الأقراص المُحدّدة."
+
+#: src/components/AnacondaHeader.jsx:70
+msgid ""
+"Notice: This is pre-released software that is intended for development and "
+"testing purposes only. Do NOT use this software for any critical work or for "
+"production environments."
+msgstr ""
+"ملحوظة: هذا برنامج أُصدر مسبقًا وهو مخصّص لأغراض التطوير والاختبار فقط. لا "
+"تستخدم هذا البرنامج لأي عمل حرِج أو لبيئات الإنتاج."
+
+#: src/components/Error.jsx:181
+msgid "Open Bugzilla bug entry form"
+msgstr "افتح نموذج إدخال بلاغ خطأ في Bugzilla"
+
+#: src/components/review/ReviewConfiguration.jsx:223
+msgid "Operating system"
+msgstr "نظام التشغيل"
+
+#: src/components/datetime/CustomNTPModal.jsx:161
+msgid "Options"
+msgstr "الخيارات"
+
+#: src/components/localization/Keyboard.jsx:96
+msgid "Other keyboards"
+msgstr "لوحات مفاتيح أخرى"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:88
+msgid "Partitions (advanced)"
+msgstr "التقسيمات (متقدم)"
+
+#: src/components/users/Accounts.jsx:205 src/components/users/Accounts.jsx:407
+#: src/components/storage/installation-method/EncryptedDevices.jsx:150
+#: src/components/storage/installation-method/EncryptedDevices.jsx:157
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:93
+msgid "Passphrase"
+msgstr "عبارة السر"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:114
+msgid "Passphrase did not match any locked device"
+msgstr "لم تتطابق عبارة السر مع أي جهاز مُقفل"
+
+#: src/components/Password.jsx:278
+msgid "Passphrases must match"
+msgstr "يجب أن تتطابق عبارتا السر"
+
+#: src/components/installation/InstallationProgress.jsx:273
+msgid "Pending"
+msgstr "منتظر"
+
+#: src/components/Error.jsx:94
+msgid "Please attach the log file $0 to the issue."
+msgstr "يُرجى إرفاق ملف السجل $0 للمشكلة."
+
+#: src/components/login/LoginPage.jsx:44
+msgid "Please enter a PIN"
+msgstr "أدخِل PIN من فضلك"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:325
+msgid "Please select at least one disk to continue"
+msgstr "الرجاء تحديد قرص واحد على الأقل لاستمرار"
+
+#: src/components/datetime/CustomNTPModal.jsx:198
+msgid "Pool"
+msgstr "مجمع"
+
+#: src/components/Error.jsx:296
+msgid "Potential duplicate bugs found"
+msgstr "عُثر على أخطاء محتملة مكررة"
+
+#: src/components/HeaderKebab.jsx:48
+msgid "Powered by Anaconda"
+msgstr "مدعوم من أناكوندا"
+
+#: src/components/AnacondaHeader.jsx:60
+msgid "Pre-release"
+msgstr "الإصدار الأولي"
+
+#: src/components/Error.jsx:179
+msgid "Prefer to report manually? $0"
+msgstr "تفضل التبليغ يدويًا؟ $0"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:688
+msgid "Proceed with installation"
+msgstr "واصِل التثبيت"
+
+#: src/components/Error.jsx:838 src/components/AnacondaWizardFooter.jsx:84
+#: src/components/AnacondaWizardFooter.jsx:119
+msgid "Quit"
+msgstr "أنهِ"
+
+#: src/components/AnacondaWizardFooter.jsx:104
+msgid "Quit installer?"
+msgstr "إنهاء المثبِّت؟"
+
+#: src/components/app.jsx:130
+msgid "Reading information about the OS failed."
+msgstr "فشلت قراءة المعلومات حول نظام التشغيل."
+
+#: src/components/app.jsx:74
+msgid "Reading information about the computer failed."
+msgstr "فشلت قراءة المعلومات حول الحاسب."
+
+#: src/components/app.jsx:120
+msgid "Reading installer configuration failed."
+msgstr "فشلت قراءة تضبيط المثبِّت."
+
+#: src/components/AnacondaHeader.jsx:34
+msgid "Reading installer version information failed."
+msgstr "فشلت قراءة معلومات إصدار المثبِّت."
+
+#: src/components/review/Hostname.jsx:35
+msgid ""
+"Real hostname can only contain characters, digits, dashes (not starting or "
+"ending a character) and dots"
+msgstr ""
+"اسم المضيف الحقيقي يمكن أن يحتوي فقط على محارف وأرقام وشرطات (لا تبدأ أو "
+"تنتهي بمحرف) ونقاط"
+
+#: src/components/review/Hostname.jsx:31
+msgid "Real hostname must be 64 characters or less"
+msgstr "ينبغي أن يكون طول اسم المضيف ٦٤ حرفا أو أقل"
+
+#: src/components/installation/InstallationProgress.jsx:248
+#: src/components/Error.jsx:838 src/components/AnacondaWizardFooter.jsx:84
+#: src/components/AnacondaWizardFooter.jsx:119
+msgid "Reboot"
+msgstr "أعد التشغيل"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:565
+msgid ""
+"Reboot into Windows to resize BitLocker-encrypted partitions. Make at least "
+"$0 of free space available for installation."
+msgstr ""
+"أعد تشغيل Windows لتغيير حجم الأقسام المُعمَّاة باستخدام BitLocker. أتح مساحة "
+"خالية لا تقل عن $0 للتثبيت."
+
+#: src/components/AnacondaWizardFooter.jsx:104
+msgid "Reboot system?"
+msgstr "إعادة تشغيل النظام؟"
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:80
+msgid "Reclaim additional space"
+msgstr "استعد المساحة لإضافية"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:116
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:136
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:208
+msgid "Reclaim space"
+msgstr "استعد المساحة"
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:80
+msgid "Reclaim space (required)"
+msgstr "استعد المساحة (مطلوب)"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:230
+msgid "Recommended"
+msgstr "مستحسن"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:65
+msgid "Recommended partitions:"
+msgstr "التقسيمات الموصى بها:"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:408
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:621
+msgid "Reformat"
+msgstr "أعِد التهيئة"
+
+#: src/components/storage/scenarios/reinstall-fedora/index.js:21
+#: src/components/storage/scenarios/reinstall-fedora/index.js:23
+msgid "Reinstall Fedora"
+msgstr "أعد تثبيت فيدورا"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:435
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:622
+#: src/components/localization/Keyboard.jsx:155
+#: src/components/localization/Keyboard.jsx:159
+msgid "Remove"
+msgstr "أزِل"
+
+#: src/components/storage/scenarios/erase-all/index.js:21
+msgid ""
+"Remove all partitions on the selected devices, including existing operating "
+"systems."
+msgstr ""
+"أزِل جميع الأقسام الموجودة على الأجهزة المُحدّدة، بما في ذلك أنظمة التشغيل "
+"الموجودة."
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:120
+msgid ""
+"Remove or resize existing filesystems to free up space for the installation."
+msgstr "أزِل أنظمة الملفات الموجودة أو غيّر حجمها لإخلاء مساحة للتثبيت."
+
+#: src/components/datetime/CustomNTPModal.jsx:216
+msgid "Remove server"
+msgstr "أزِل الخادم"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:122
+msgid ""
+"Removing a filesystem will permanently delete all of the data it contains. "
+"Resizing a partition can free up unused space, but is not risk-free. Be sure "
+"to have backups of anything important before reclaiming space."
+msgstr ""
+"سيؤدي حذف نظام ملفات إلى حذف جميع البيانات التي يحتويها نهائيًا. قد يؤدي "
+"تغيير حجم القسم إلى إخلاء المساحة الغير مستخدمة، ولكنه ليس خاليًا من المخاطر. "
+"تأكد من الاحتفاظ بنُسخ احتياطية لأي بيانات مهمة قبل استعادة المساحة."
+
+#: src/components/storage/scenarios/reinstall-fedora/index.js:22
+msgid "Replace current installation, but keep files in home."
+msgstr "استبدل التثبيت الحالي، ولكن احتفظ بملفات المنزل."
+
+#: src/components/HeaderKebab.jsx:108
+msgid "Report Issue"
+msgstr "أبلغ عن مشكلة"
+
+#: src/components/Error.jsx:160
+msgid ""
+"Report an issue or provide feedback by opening the Bugzilla bug entry form "
+"$0."
+msgstr "أبلغ عن مشكلة أو قدم ملاحظات عن طريق فتح نموذج إدخال خطأ Bugzilla $0."
+
+#: src/components/Error.jsx:703 src/components/Error.jsx:870
+msgid "Report issue"
+msgstr "أبلغ عن مشكلة"
+
+#: src/components/Error.jsx:703
+msgid "Reporting issue..."
+msgstr "يُبلغ عن مشكلة..."
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:229
+msgid "Required"
+msgstr "مطلوب"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:77
+msgid "Requirements"
+msgstr "متطلبات"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:116
+msgid "Rescan devices"
+msgstr "أعد فحص الأجهزة"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:97
+msgid "Rescanning of the disks failed."
+msgstr "فشلت عملية إعادة فحص الأقراص."
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:539
+msgid "Resize"
+msgstr "غيّر الحجم"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:548
+msgid "Resize partition"
+msgstr "غيِّر حجم القسم"
+
+#: src/components/storage/StorageReview.jsx:354
+msgid "Resizing the following partitions from $0: $1"
+msgstr "غيّر حجم الأقسام التالية من $0: $1"
+
+#: src/components/Error.jsx:381
+msgid "Restrict access to the report"
+msgstr "تقييد الوصول إلى التقرير"
+
+#: src/components/Error.jsx:383
+msgid "Restricts the report to the $0 group. $1"
+msgstr "يقصر التقرير على المجموعة $0. $1"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:34
+msgid "Return to installation"
+msgstr "عُد إلى التثبيت"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:673
+msgid "Return to storage editor"
+msgstr "عُد إلى محرّر التخزين"
+
+#: src/components/review/index.js:18 src/components/review/index.js:19
+msgid "Review and install"
+msgstr "راجع وثبِّت"
+
+#: src/components/users/Accounts.jsx:94
+msgid "Root account has been configured"
+msgstr "ضُبط حساب جذر"
+
+#: src/components/users/Accounts.jsx:86
+msgid "Root account is enabled"
+msgstr "حساب الجذر مُفعّل"
+
+#: src/components/users/Accounts.jsx:78
+msgid "Root account is enabled, but no user account has been configured"
+msgstr "فُعَّل حساب الجذر، ولكن لم يُضبط أي حساب مستخدم"
+
+#: src/components/users/Accounts.jsx:351
+msgid "Root password has been set."
+msgstr "عُيِّن كلمة سر الجذر."
+
+#: src/components/datetime/CustomNTPModal.jsx:245
+#: src/components/localization/Keyboard.jsx:277
+#: src/components/review/Hostname.jsx:125
+msgid "Save"
+msgstr "احفظ"
+
+#: src/components/installation/Feedback.jsx:27
+msgid "Scan the QR code with your phone or visit:"
+msgstr "امسح QR باستخدام هاتفك أو زُر:"
+
+#: src/components/localization/InstallationLanguage.jsx:204
+msgid "Search for a language"
+msgstr "ابحث عن لُغة"
+
+#: src/components/software/SoftwareSelection.jsx:159
+msgid "Search for additional software"
+msgstr "ابحث عن برمجيات إضافية"
+
+#: src/components/software/SoftwareSelection.jsx:66
+msgid "Search for an environment"
+msgstr "ابحث عن بيئة"
+
+#: src/components/localization/Keyboard.jsx:222
+msgid "Search keyboard layout"
+msgstr "البحث عن تخطيط لوحة المفاتيح"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:110
+msgid ""
+"Secure your data using disk-based encryption. Only applies to new partitions"
+msgstr ""
+"أمّن بياناتك باستخدام التعمية المستندة إلى القرص. ينطبق فقط على الأقسام "
+"الجديدة"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:375
+msgid "Select"
+msgstr "حدّد"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:304
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:338
+msgid "Select a device"
+msgstr "الجهاز المُحدّد"
+
+#: src/components/datetime/Timezone.jsx:176
+msgid "Select city"
+msgstr "حدّد مدينة"
+
+#: src/components/storage/installation-method/InstallationDestination.jsx:358
+msgid "Select destination"
+msgstr "حدّد الهدف"
+
+#: src/components/datetime/Timezone.jsx:157
+msgid "Select region"
+msgstr "حدّد منطقة"
+
+#: src/components/localization/Keyboard.jsx:233
+msgid "Selected (top = current)"
+msgstr "محدّد (الأعلى = الحالي)"
+
+#: src/components/storage/mount-point-mapping/MountPointMapping.jsx:120
+msgid "Selected device's format '$0' cannot be reformatted."
+msgstr "الجهاز المهيء المُحدّد '$0' لا يمكن إعادة تهيئته."
+
+#: src/components/installation/Feedback.jsx:26
+msgid "Send us feedback on your installation"
+msgstr "أرسل لنا تعليقاتك حول تثبيتك"
+
+#: src/components/datetime/CustomNTPModal.jsx:160
+msgid "Server"
+msgstr "الخادم"
+
+#: src/components/datetime/CustomNTPModal.jsx:190
+msgid "Server is not reachable"
+msgstr "الخادم لا يمكن الوصول إليه"
+
+#: src/components/review/Hostname.jsx:87
+msgid "Set custom hostname"
+msgstr "اضبط اسم مضيف مخصّص"
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:94
+msgid "Share disk with other operating systems"
+msgstr "شارك القرص مع نظام تشغيل آخر"
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:91
+msgid "Share disk with other operating systems: $0"
+msgstr "شارك القرص مع أنظمة تشغيل أخرى: $0"
+
+#: src/components/datetime/DateAndTime.jsx:192
+msgid "Show AM/PM"
+msgstr "أظهِر صباحًا/مساءً"
+
+#: src/components/Error.jsx:223
+msgid "Show API key"
+msgstr "أظهِر مفتاح API"
+
+#: src/components/login/LoginPage.jsx:94
+msgid "Show PIN"
+msgstr "أظهِر PIN"
+
+#: src/components/Password.jsx:265
+msgid "Show confirmed password"
+msgstr "أظهِر كلمة السر المؤكدة"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:166
+msgid "Show passphrase"
+msgstr "أظهِر عبارة السر"
+
+#: src/components/Password.jsx:229
+msgid "Show password"
+msgstr "أظهِر كلمة السر"
+
+#: src/components/storage/StorageReview.jsx:247
+msgid "Size"
+msgstr "الحجم"
+
+#: src/components/installation/InstallationProgress.jsx:233
+msgid "Software installation"
+msgstr "تثبيت البرمجيات"
+
+#: src/components/installation/InstallationProgress.jsx:231
+msgid ""
+"Software installation: Storage configuration complete. The software is now "
+"being installed onto your device."
+msgstr ""
+"تثبيت البرنامج: اكتمل تضبيط التخزين. يتم الآن تثبيت البرنامج على جهازك."
+
+#: src/components/software/index.js:19 src/components/software/index.js:20
+#: src/components/review/ReviewConfiguration.jsx:247
+msgid "Software selection"
+msgstr "انتقاء البرمجيات"
+
+#: src/components/review/ReviewConfiguration.jsx:215
+msgid ""
+"Some installation steps still need to be completed before you can continue."
+msgstr ""
+"لا تزال هناك بعض خطوات التثبيت التي يجب إكمالها قبل أن تتمكن من الاستمرار."
+
+#: src/components/storage/scenarios/mount-point-mapping/MountPointMapping.jsx:52
+msgid "Some required partitions are missing: $0"
+msgstr "بعض الأقسام المطلوبة مفقودة: $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:141
+msgid "Space"
+msgstr "المساحة"
+
+#: src/components/Error.jsx:273
+msgid "Stacktrace"
+msgstr "Stacktrace"
+
+#: src/components/review/ReviewConfiguration.jsx:276
+msgid "Storage"
+msgstr "التخزين"
+
+#: src/components/steps.js:35
+#: src/components/installation/InstallationProgress.jsx:228
+#: src/components/storage/storage-configuration/index.js:21
+#: src/components/storage/storage-configuration/index.js:22
+msgid "Storage configuration"
+msgstr "تضبيط التخزين"
+
+#: src/components/installation/InstallationProgress.jsx:226
+msgid "Storage configuration: Storage is currently being configured."
+msgstr "تضبيط التخزين: التخزين حاليًا قيد التضبيط."
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:46
+msgid "Storage editor"
+msgstr "محرّر التخزين"
+
+#: src/components/storage/scenarios/use-configured-storage/index.js:26
+msgid "Storage is based on the configuration from 'Modify storage'."
+msgstr "يعتمد التخزين على تضبيط من \"تعديل التخزين\"."
+
+#: src/components/storage/scenarios/use-configured-storage/index.js:40
+msgid ""
+"Storage layout is defined by the kickstart file. The planned partitioning "
+"layout can be reviewed in the summary step."
+msgstr ""
+"حُدد مخطط التخزين بواسطة ملف الـ kickstart. ويمكن مراجعة مخطط التقسيم المخطط "
+"له في خطوة الملخص."
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:94
+msgid "Storage plugin failed"
+msgstr "فشل المكون الإضافي للتخزين"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:618
+msgid "Storage requirements not met"
+msgstr "متطلبات التخزين غير مستوفاة"
+
+#: src/components/Password.jsx:67
+msgid "Strong"
+msgstr "قوية"
+
+#: src/components/installation/InstallationProgress.jsx:216
+msgid "Successfully installed"
+msgstr "نجح التثبيت"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:109
+msgid "Successfully unlocked $0."
+msgstr "فُتح بنجاح $0."
+
+#: src/components/localization/Keyboard.jsx:96
+msgid "Suggested keyboards"
+msgstr "لوحات المفاتيح المقترحة"
+
+#: src/components/localization/InstallationLanguage.jsx:127
+msgid "Suggested languages"
+msgstr "اللّغات المقترحة"
+
+#: src/components/users/Accounts.jsx:339 src/components/users/Accounts.jsx:423
+msgid "System"
+msgstr "النظام"
+
+#: src/components/installation/InstallationProgress.jsx:238
+msgid "System configuration"
+msgstr "تضبيط النظام"
+
+#: src/components/installation/InstallationProgress.jsx:236
+msgid ""
+"System configuration: Software installation complete. The system is now "
+"being configured."
+msgstr "تضبيط النظام: اكتمل تثبيت البرنامج. يتم الآن تضبيط النظام."
+
+#: src/components/app.jsx:165
+msgid "The Anaconda installation has stopped unexpectedly."
+msgstr "توقف تثبيت أناكوندا بشكل غير متوقع."
+
+#: src/components/Error.jsx:301
+msgid ""
+"The following open bugs may be related to your issue. Please review them "
+"before creating a new report."
+msgstr ""
+"قد تكون الأخطاء المفتوحة التالية ذات صلة بمشكلتك. يُرجى مراجعتها قبل إنشاء "
+"تقرير جديد."
+
+#: src/components/users/Accounts.jsx:47
+msgid "The following user will be created:"
+msgid_plural "The following users will be created:"
+msgstr[0] "لا مستخدم لإنشاء:"
+msgstr[1] "سيُنشئ المستخدم التالي:"
+msgstr[2] "سيُنشئ المستخدمين التاليين:"
+msgstr[3] "سيُنشئ المستخدمين التاليين:"
+msgstr[4] "سيُنشئ المستخدمين التاليين:"
+msgstr[5] "سيُنشئ المستخدمين التاليين:"
+
+#: src/components/storage/scenarios/erase-all/EraseAll.jsx:45
+msgid ""
+"The installation needs $0 of disk space; however, the capacity of the "
+"selected disks is only $1."
+msgstr ""
+"يحتاج التثبيت إلى $0 من مساحة القرص؛ ومع ذلك، فإن سعة الأقراص المُحدّدة هي $1 "
+"فقط."
+
+#: src/components/Error.jsx:778
+msgid "The installer cannot continue due to a critical error."
+msgstr "يتعذر على المثبِّت الاستمرار بسبب خطأ فادح."
+
+#: src/components/Error.jsx:777
+msgid "The installer cannot continue due to a critical error: $0"
+msgstr "يتعذر على المثبِّت الاستمرار بسبب خطأ فادح: $0"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:35
+msgid ""
+"The passphrase you have provided contains non-ASCII characters. You may not "
+"be able to switch between keyboard layouts when typing it."
+msgstr ""
+"تحتوي عبارة السر التي أدخلتها على حروفا ليست ASCII (لاتينية). قد لا تتمكن من "
+"التبديل بين تخطيطات لوحة المفاتيح عند كتابتها."
+
+#: src/components/localization/Keyboard.jsx:262
+msgid ""
+"The selected default keyboard layout does not support ASCII characters. "
+"Please choose an ASCII-capable layout as the default."
+msgstr ""
+"تخطيط لوحة المفاتيح المبدئية المحدد لا يدعم أحرف ASCII. يُرجى اختيار تخطيط "
+"يدعم ASCII كالمبدئي."
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegration.jsx:52
+msgid ""
+"The storage editor lets you resize, delete, and create partitions. It can "
+"set up LVM and much more. It is meant to be used as an advanced utility and "
+"not intended to be used in a typical installation."
+msgstr ""
+"يتيح لك محرّر التخزين تغيير حجم الأقسام وحذفها وإنشائها. كما يمكنه إعداد LVM "
+"وغير ذلك الكثير. صُمّم للاستخدام كأداة مساعدة متقدمة، وليس للاستخدام في "
+"التثبيتات التقليدية."
+
+#: src/components/Error.jsx:407
+msgid ""
+"These log files may contain sensitive information such as IP addresses, "
+"usernames, or other system details."
+msgstr ""
+"قد تحتوي ملفات السجلات هذه على معلومات حساسة مثل عناوين IP أو أسماء "
+"المستخدمين أو تفاصيل نظام أخرى."
+
+#: src/components/review/Hostname.jsx:51
+msgid "This hostname can't be submitted"
+msgstr "لا يمكن إرسال اسم المضيف هذا"
+
+#: src/components/AnacondaHeader.jsx:64
+msgid "This is unstable, pre-release software"
+msgstr "هذه برمجيّات ما قبل الإصدار وهي غير مستقرة"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:87
+msgid "This layout will be used for unlocking your system on boot"
+msgstr "سيتم استخدام هذا التخطيط لفتح نظامك عند التمهيد"
+
+#: src/components/storage/storage-configuration/DiskEncryption.jsx:43
+msgid "This may take a moment"
+msgstr "قد تأخذ قليلًا من الوقت"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:476
+msgid "This will take a few moments"
+msgstr "سيستغرق ذلك بضع لحظات"
+
+#: src/components/datetime/DateAndTime.jsx:183
+msgid "Time"
+msgstr "الوقت"
+
+#: src/components/datetime/Timezone.jsx:130
+#: src/components/review/ReviewConfiguration.jsx:241
+msgid "Timezone"
+msgstr "المنطقة الزمنية"
+
+#: src/components/Error.jsx:359
+msgid "Title"
+msgstr "العنوان"
+
+#: src/components/installation/InstallationProgress.jsx:264
+msgid "To begin using $0, reboot your system."
+msgstr "لبدء استخدام $0، أعد تشغيل الجهاز."
+
+#: src/components/storage/installation-method/InstallationMethod.jsx:194
+msgid "To continue, select the devices to install to."
+msgstr "لاستمرار، حدّد الأجهزة المراد التثبيت عليها."
+
+#: src/components/storage/scenarios/use-free-space/UseFreeSpace.jsx:53
+msgid ""
+"To use this option, resize or remove existing partitions to free up at least "
+"$0."
+msgstr ""
+"لاستخدام هذا الخيار، غيّر حجم الأقسام الموجودة أو أزلها لإخلاء $0 على الأقل."
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:140
+msgid "Type"
+msgstr "النوع"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:87
+msgid "Unable to schedule deletion of $0"
+msgstr "غير قادر على جدولة حذف $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:89
+msgid "Unable to schedule resizing of $0"
+msgstr "غير قادر على جدولة تغيير حجم $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:374
+msgid "Undo last action"
+msgstr "تراجع عن آخر إجراء"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:58
+#: src/components/storage/installation-method/EncryptedDevices.jsx:178
+msgid "Unlock"
+msgstr "افتح"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:138
+msgid "Unlock encrypted devices"
+msgstr "افتح الأجهزة المُعمَّاة"
+
+#: src/components/storage/installation-method/EncryptedDevices.jsx:64
+msgid ""
+"Unlock encrypted partitions to keep existing data and show more installation "
+"methods."
+msgstr ""
+"افتح الأقسام المُعمَّاة للاحتفاظ بالبيانات الموجودة وإظهار المزيد من طُرق "
+"التثبيت."
+
+#: src/components/storage/scenarios/use-configured-storage/index.js:27
+#: src/components/storage/scenarios/use-configured-storage/index.js:41
+msgid "Use configured storage"
+msgstr "استخدام التخزين المضبط"
+
+#: src/components/storage/scenarios/erase-all/index.js:22
+msgid "Use entire disk"
+msgstr "استخدم القرص بأكمله"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:653
+msgid "Use free space"
+msgstr "استخدم المساحة الخالية"
+
+#: src/components/users/Accounts.jsx:244
+msgid "Use local account"
+msgstr "استخدم حساب محلي"
+
+#: src/components/storage/cockpit-storage-integration/CheckStorageDialog.jsx:652
+msgid "Use the RAID device for automatic partitioning"
+msgstr "استخدم جهاز RAID للتقسيم التلقائي"
+
+#: src/components/users/Accounts.jsx:494
+msgid "User creation"
+msgstr "إنشاء المستخدم"
+
+#: src/components/users/Accounts.jsx:289
+msgid "User name"
+msgstr "اسم المستخدم"
+
+#: src/components/users/Accounts.jsx:182
+msgid ""
+"User name may only contain: letters from a-z, digits 0-9, dash $0, period "
+"$1, underscore $2"
+msgstr ""
+"يمكن أن يحتوي اسم المستخدم فقط على: الأحرف من a-z، والأرقام من 0-9، والشرطة "
+"$0، والنقطة $1، والشرطة السفلية $2"
+
+#: src/components/users/Accounts.jsx:179
+msgid "User name must not be a reserved word"
+msgstr "يجب ألا يكون اسم المستخدم كلمة محجوزة"
+
+#: src/components/users/Accounts.jsx:176
+msgid "User names must be shorter than 33 characters"
+msgstr "ينبغي أن يكون اسماء المستخدمين أقصر من 33 حرفا"
+
+#: src/components/Error.jsx:658
+msgid "Validating..."
+msgstr "يتحقق..."
+
+#: src/components/Password.jsx:45
+msgid "Weak"
+msgstr "ضعيفة"
+
+#: src/components/localization/index.js:21
+msgid "Welcome"
+msgstr "الترحيب"
+
+#: src/components/localization/index.js:22
+msgid "Welcome to Fedora Linux"
+msgstr "مرحبًا بكم في فيدورا لينكس"
+
+#: src/components/AnacondaPage.jsx:88
+msgid "Welcome. Let's install $0 now."
+msgstr "أهلاً وسهلاً بك. هيا لنثبت $0 الآن."
+
+#: src/components/Error.jsx:402
+msgid ""
+"When you submit this bug report, the following log files will be uploaded "
+"automatically: $0"
+msgstr ""
+"عند تقديمك لهذا التقرير عن الخطأ، سيتم رفع ملفات السجلّ التالية تلقائيًا: $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:563
+msgid "Windows partitions with BitLocker encryption cannot be resized"
+msgstr "لا يمكن تغيير حجم أقسام Windows المزودة بتعمية BitLocker"
+
+#: src/components/storage/cockpit-storage-integration/CockpitStorageIntegrationSidebar.jsx:83
+msgid ""
+"You can either free up enough space here and let the installer handle the "
+"rest or manually set up partitions."
+msgstr ""
+"يمكنك إما إخلاء مساحة كافية هنا والسماح للمُثبِّت بالتعامل مع الباقي أو إعداد "
+"الأقسام يدويًا."
+
+#: src/components/Error.jsx:232
+msgid "You can generate the API key for your Bugzilla account $0."
+msgstr "يمكنك إنشاء مفتاح API لحساب Bugzilla الخاص بك $0."
+
+#: src/components/users/Accounts.jsx:527
+msgid ""
+"You have to enable the root account or create a local user account to "
+"proceed."
+msgstr "يجب عليك تفعيل حساب الجذر أو إنشاء حساب مستخدم محلي للمتابعة."
+
+#: src/components/datetime/DateAndTime.jsx:142
+msgid "You must be connected to a network to enable automatic date and time."
+msgstr "يجب أن تكون متصلاً بالشبكة لتفعيل التاريخ والوقت التلقائيين."
+
+#: src/components/AnacondaWizardFooter.jsx:108
+msgid "Your progress will not be saved."
+msgstr "لن يُحفظ تقدمك."
+
+#: src/components/installation/InstallationProgress.jsx:278
+msgid "completed step"
+msgstr "اكتملت الخطوة"
+
+#: src/components/installation/InstallationProgress.jsx:283
+msgid "current step"
+msgstr "الخطوة الحالية"
+
+#: src/components/storage/StorageReview.jsx:168
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:383
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:397
+msgid "delete"
+msgstr "احذف"
+
+#: src/components/review/Hostname.jsx:77
+msgid "edit"
+msgstr "عدل"
+
+#: src/components/storage/StorageReview.jsx:135
+msgid "encrypt"
+msgstr "عمِّ"
+
+#: src/components/storage/StorageReview.jsx:135
+msgid "encrypted"
+msgstr "مُعمَّاة"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:237
+msgid "extended partition"
+msgstr "قسم موسع"
+
+#: src/components/storage/StorageReview.jsx:104
+msgid "format as $0"
+msgstr "هيئ ك $0"
+
+#: src/components/Error.jsx:162 src/components/Error.jsx:235
+msgid "here"
+msgstr "هنا"
+
+#: src/components/review/ReviewConfiguration.jsx:57
+msgid "incomplete"
+msgstr "غير مكتمل"
+
+#: src/components/storage/StorageReview.jsx:108
+msgid "mount"
+msgstr "اوصل"
+
+#: src/components/installation/InstallationProgress.jsx:272
+msgid "pending step"
+msgstr "خطوة معلقة"
+
+#: src/components/Error.jsx:413
+msgid "report the issue manually"
+msgstr "بلغ عن المشكلة يدويًا"
+
+#: src/components/storage/StorageReview.jsx:173
+msgid "resized from $0"
+msgstr "غُيّر الحجم من $0"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:478
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:486
+msgid "shrink"
+msgstr "قلّص"
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:419
+msgid "shrink to $0"
+msgstr "قلّص إلى $0"
+
+#: src/components/review/Hostname.jsx:154
+msgid "transient, will use DHCP"
+msgstr ""
+
+#: src/components/storage/installation-method/ReclaimSpaceModal.jsx:375
+msgid "undo"
+msgstr "تراجع"
+
+#~ msgid "Storage editor is available only in the `Installation method` step."
+#~ msgstr "محرّر التخزين متاح فقط في خطوة `طريقة التثبيت`."
+
+#~ msgid "Reboot to installed system"
+#~ msgstr "أعد التشغيل إلى النظام المثبِّت"
+
+#~ msgid "Note"
+#~ msgstr "ملاحظة"
+
+#~ msgid ""
+#~ "I understand that all existing data will be erased from the selected disks"
+#~ msgstr "أتفهم أنه سيتم مسح جميع البيانات الموجودة من الأقراص المُحدّدة"
+
+#, fuzzy
+#~| msgid "User %s will be created"
+#~ msgid "The following users will be created:"
+#~ msgstr "سيتم إنشاء المستخدم %s"
+
+#~ msgid ""
+#~ "After creating the issue, click 'Add attachment' and attach file $0 and "
+#~ "$1."
+#~ msgstr "بعد إنشاء المشكلة، انقر على \"أضف مرفق\" وأرفق الملف $0 و $1."
+
+#~ msgid "After creating the issue, click 'Add attachment' and attach file $0."
+#~ msgstr "بعد إنشاء المشكلة، انقر على \"أضف مرفق\" وأرفق الملف $0."
+
+#~ msgid "Click \"$0\" to open Bugzilla in a new window."
+#~ msgstr "انقر على \"$0\" لفتح Bugzilla في نافذة جديدة."
+
+#~ msgid "Help us fix the issue!"
+#~ msgstr "ساعدنا في حل المشكلة!"
+
+#~ msgid "Log in to Bugzilla, or create a new account."
+#~ msgstr "لِج إلى Bugzilla، أو أنشئ حسابًا جديدًا."
+
+#~ msgid "More than one layout detected. Remove additional layouts to proceed"
+#~ msgstr "اكتُشف أكثر من تخطيط. أزِل التخطيطات الإضافية للمواصلة"
+
+#~ msgid "$0 layouts detected"
+#~ msgstr "$0 تخطيطات مكتشفة"
+
+#~ msgid ""
+#~ "The active keyboard layout in the compositor differs from the default "
+#~ "layout selected for the target system."
+#~ msgstr ""
+#~ "يختلف تخطيط لوحة المفاتيح النشط في المركّب عن التخطيط المبدئي المحدّد "
+#~ "للنظام الهدف."
+
+#~ msgid ""
+#~ "The selected layout does not support ASCII input. Please select a "
+#~ "different layout to proceed."
+#~ msgstr ""
+#~ "التخطيط المحدد لا يدعم إدخال ASCII. يُرجى تحديد تخطيط مختلف للمتابعة."
+
+#~ msgid "Unusable layout"
+#~ msgstr "تخطيط غير قابل للاستخدام"
+
+#~ msgid "No keyboard layout detected. Add at least one layout to proceed"
+#~ msgstr "لم يكتشف تخطيط لوحة المفاتيح. أضف تخطيطًا واحدًا على الأقل للمتابعة"
+
+#~ msgid ""
+#~ "Skipping account creation during installation. It will happen on first "
+#~ "boot instead."
+#~ msgstr ""
+#~ "تخطي إنشاء الحساب أثناء التثبيت. سيتم ذلك عند التشغيل الأول بدلاً من ذلك."
+
+#~ msgid "This account will have administration privilege with sudo."
+#~ msgstr "سيكون لهذا الحساب امتياز الإدارة مع sudo."
+
+#~ msgid "Clear search input"
+#~ msgstr "امسح مدخلات البحث"
+
+#~ msgid "Critical error"
+#~ msgstr "خطأ فادح"
+
+#~ msgid "Log"
+#~ msgstr "السجل"
+
+#~ msgid "Preparing report"
+#~ msgstr "إعداد التقرير"
+
+#~ msgid ""
+#~ "Reporting an issue will send information over the network. Please review "
+#~ "and edit the attached log to remove any sensitive information."
+#~ msgstr ""
+#~ "سيؤدي الإبلاغ عن مشكلة إلى إرسال المعلومات عبر الشبكة. يرجى مراجعة السجل "
+#~ "المرفق وتعديله لإزالة أي معلومات حساسة."
+
+#~ msgid ""
+#~ "The following log will be sent to the issue tracking system where you may "
+#~ "provide additional details."
+#~ msgstr ""
+#~ "سيتم إرسال السجل التالي إلى نظام تتبُع المشكلات حيث يمكنك تقديم تفاصيل "
+#~ "إضافية."
+
+#~ msgid "Anaconda installer"
+#~ msgstr "مُثبّت أناكوندا"
+
+#~ msgid ""
+#~ "Anaconda is the OS installer used by Fedora, RHEL, CentOS and other Linux "
+#~ "distributions."
+#~ msgstr ""
+#~ "أناكوندا هو مُثبّت نظام تشغيل مستخدم من قِبل فيدورا وريدهات وسنتوس وغيرها من "
+#~ "توزيعات لينكس."
+
+#~ msgid "Unknown layout"
+#~ msgstr "تخطيط غير معروف"
+
+#~ msgid "Choose a language"
+#~ msgstr "اختر لغة"
+
+#~ msgid "Free space requirements met"
+#~ msgstr "استوفت متطلبات المساحة الحرة"
+
+#~ msgid ""
+#~ "Removing a filesystem will permanently delete all of the data it "
+#~ "contains. "
+#~ msgstr ""
+#~ "سيؤدي إزالة نظام الملفات إلى حذف جميع البيانات التي يحتوي عليها بشكل "
+#~ "دائم. "
+
+#~ msgid "The installation needs $1 of disk space; "
+#~ msgstr "يحتاج التثبيت إلى $1 من مساحة القرص; "
+
+#~ msgid "The storage editor lets you resize, delete, and create partitions. "
+#~ msgstr "يتيح لك محرر التخزين تغيير حجم الأقسام وحذفها وإنشاءها. "
+
+#~ msgid "Welcome to $0"
+#~ msgstr "مرحبا بكم في $0"
+
+#~ msgid "Find a language"
+#~ msgstr "اعثر على لغة"
+
+#, fuzzy
+#~ msgid "Unlock devices"
+#~ msgstr "لإعادة فحص الأجهزة"
+
+#~ msgid "Disk configuration"
+#~ msgstr "إعدادات القرص"
+
+#~ msgid "Disk encryption"
+#~ msgstr "شفر القرص"
+
+#~ msgid "No usable devices on the selected disks."
+#~ msgstr "لا توجد أجهزة قابلة للاستخدام على الأقراص المحددة."
+
+#, fuzzy
+#~ msgid "Modify storage"
+#~ msgstr "_عدّل مخطط التخزين"
+
+#~ msgid "Use free space for the installation"
+#~ msgstr "استخدِم المساحة الحرة للتثبيت"
+
+#, fuzzy
+#~ msgid "Current selections"
+#~ msgstr "انتقاء البرمجيات"
+
+#, fuzzy
+#~ msgid "Installing to $0 ($1)"
+#~ msgstr "يثبّت {}"
+
+#~ msgid "No additional disks detected"
+#~ msgstr "لم تُكتشف أي أقراص أضافية"
+
+#, fuzzy
+#~ msgid "No usable disks detected"
+#~ msgstr "لم تُكتشف أي أقراص أضافية"
+
+#, fuzzy
+#~ msgid "Rescan"
+#~ msgstr "إنقاذ"
+
+#, fuzzy
+#~ msgid "Select a disk"
+#~ msgstr "اختر كل الأقراص"
+
+#, fuzzy
+#~ msgid "The usable disks have changed"
+#~ msgstr "لم تُكتشف أي أقراص أضافية"
+
+#, fuzzy
+#~ msgid "Erase data and install?"
+#~ msgstr "راجع وثبّت"
+
+#, fuzzy
+#~ msgid "Install using the configured storage?"
+#~ msgstr "يجري تثبيت البرمجيات"
+
+#~ msgid "Disabled"
+#~ msgstr "معطّل"
+
+#~ msgid "Enabled"
+#~ msgstr "مفعّل"
+
+#, fuzzy
+#~| msgid "Connection failed"
+#~ msgid "Account setting failed."
+#~ msgstr "فشل الاتصال"
+
+#, fuzzy
+#~| msgid ""
+#~| "You need to configure the network to use a network installation source."
+#~ msgid "Current configuration can be used for installation."
+#~ msgstr "عليك إعداد الشبكة لاستخدام مصدر تثبيت شبكيّ."
+
+#, fuzzy
+#~ msgid "Modified storage"
+#~ msgstr "_عدّل مخطط التخزين"
+
+#, fuzzy
+#~ msgid "Modifying the storage failed."
+#~ msgstr "_عدّل مخطط التخزين"
+
+#, fuzzy
+#~ msgid "Rescan storage"
+#~ msgstr "إنقاذ"
+
+#, fuzzy
+#~ msgid "Failed to get device names."
+#~ msgstr "فشل في تغيير الجهاز."
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "Unknown Error.  Aborting. \n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "خطأ غير معروف. إجهاض \n"
+#~ "\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "You chose to connect to a listening vncviewer. \n"
+#~ "This does not require a password to be set.  If you \n"
+#~ "set a password, it will be used in case the connection \n"
+#~ "to the vncviewer is unsuccessful\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "لقد اخترت الاتصال عبر عارض vnc المراقب. \n"
+#~ "وهذه العملية لا تتطلب ضبط كلمة مرور . إذا \n"
+#~ "قمت بضبط كلمة المرور في هذه الحالة فإن \n"
+#~ "اتصال عارض vnc لن ينجح\n"
+#~ "\n"
+
+#~ msgid ""
+#~ "\n"
+#~ "\n"
+#~ "You chose to execute vnc with a password. \n"
+#~ "\n"
+#~ msgstr ""
+#~ "\n"
+#~ "\n"
+#~ "لقد اخترت تطبيق vnc مع كلمة مرور. \n"
+#~ "\n"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "An error occurred during reading the kickstart file:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "The installer will now terminate."
+#~ msgstr ""
+#~ "\n"
+#~ "حدث خطأ أثناء قراءة الملف البادئ kickstart:\n"
+#~ "%s\n"
+#~ "\n"
+#~ "سينهى المثبت الآن."
+
+#~ msgid ""
+#~ "\n"
+#~ "Press [Enter] to reboot your system.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "اضغط على <مفتاح الإدخال> لإعادة تشغيل النّظام.\n"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "Running in cmdline mode, no interactive debugging allowed.\n"
+#~ "The exact error message is: \n"
+#~ "\n"
+#~ "%s.\n"
+#~ "\n"
+#~ "The installer will now terminate."
+#~ msgstr ""
+#~ "\n"
+#~ "أثناء التشغيل في وضع سطر الأوامر، غير مسموح باصطياد العلل التفاعلي.\n"
+#~ "رسالة الخطأ هي:\n"
+#~ "\n"
+#~ "%s.\n"
+#~ "\n"
+#~ "سيتوقف المُثبِّت الآن."
+
+#~ msgid ""
+#~ "\n"
+#~ "Some warnings occurred during reading the kickstart file:"
+#~ msgstr ""
+#~ "\n"
+#~ "بعض التحذيرات ظهرت خلال قراءة الملف البادئ kickstart:"
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "The installation was stopped due to an error which occurred while running "
+#~ "in non-interactive cmdline mode. Since there cannot be any questions in "
+#~ "cmdline mode, edit your kickstart file and retry installation. \n"
+#~ "The exact error message is: \n"
+#~ "\n"
+#~ "%s. \n"
+#~ "\n"
+#~ "The installer will now terminate."
+#~ msgstr ""
+#~ "\n"
+#~ "توقف التثبيت بسبب خطأ وقع أثناء التشغيل في وضع سطر الأوامر غير التفاعلي. "
+#~ "حيث أنه لا يمكن الإجابة عن الأسئلة في وضع سطر الأوامر، عدّل الملف البادئ "
+#~ "kickstarter وأعد المحاولة. \n"
+#~ "الخطأ التام هو: \n"
+#~ "\n"
+#~ "%s. \n"
+#~ "\n"
+#~ "سيتوقف المُثبِّت الآن."
+
+#~ msgid ""
+#~ "\n"
+#~ "Would you like to use it anyway?"
+#~ msgstr ""
+#~ "\n"
+#~ "هل ترغب باستعمالها بأي حال؟"
+
+#, python-format
+#~ msgid ""
+#~ "  You don't have enough space available to install <b>%(product)s</b>, "
+#~ "even if you used all of the free space available on the selected disks."
+#~ msgstr ""
+#~ "  ليس لديك مساحة كافية لتثبيت <b>%(product)s</b>، حتى لو استعملت كل "
+#~ "المساحة الحرة المتاحة على كل الأقراص المنتقاة."
+
+#~ msgid " <a href=\"\">Click for details.</a>"
+#~ msgstr " <a href=\"\">اضغط للتفاصيل.</a>"
+
+#, python-format
+#~ msgid " DNS: %s\n"
+#~ msgstr " DNS: %s\n"
+
+#, python-format
+#~ msgid " IPv4 Address: %(addr)s Netmask: %(netmask)s Gateway: %(gateway)s\n"
+#~ msgstr ""
+#~ " عنوان أيبي4: %(addr)s قناع الشّبكة: %(netmask)s البوّابة: %(gateway)s\n"
+
+#, python-format
+#~ msgid " IPv6 Address: %(addr)s/%(prefix)d\n"
+#~ msgstr " عنوان آيبي 6: %(addr)s/%(prefix)d\n"
+
+#~ msgid " Starting text mode."
+#~ msgstr " يجري بدء النمط النّصي."
+
+#~ msgid ""
+#~ " Try the text mode installer by running:\n"
+#~ "\n"
+#~ "'/usr/bin/liveinst -T'\n"
+#~ "\n"
+#~ " from a root terminal."
+#~ msgstr ""
+#~ " جرب نمط التثبيت النّصي من خلال تشغيل:\n"
+#~ "\n"
+#~ "'/usr/bin/liveinst -T'\n"
+#~ "\n"
+#~ " من الطرفية بصلاحيات الجذر."
+
+#~ msgctxt "GUI|Custom Partitioning|Devices"
+#~ msgid " and {} other"
+#~ msgid_plural " and {} others"
+#~ msgstr[0] " فقط"
+#~ msgstr[1] " و واحدٌ آخر"
+#~ msgstr[2] " و اثنين آخرين"
+#~ msgstr[3] " و {} آخرين"
+#~ msgstr[4] " و {} آخراً"
+#~ msgstr[5] " و {} آخر"
+
+#, python-format
+#~ msgid ""
+#~ "%(bootloader_stage2_description)s cannot be on an iSCSI disk which is not "
+#~ "configured in iBFT."
+#~ msgstr ""
+#~ "لا يمكن لـ %(bootloader_stage2_description)s أن يكون على قرص iSCSI لم يعدّ "
+#~ "في وضع iBFT."
+
+#, python-format
+#~ msgid "%(desc)s cannot be of type %(type)s"
+#~ msgstr "%(desc)s لا يمكن أن يكون نوعًا من %(type)s"
+
+#, python-format
+#~ msgid "%(desc)s cannot be of type %(type)s."
+#~ msgstr "%(desc)s لا يمكن أن يكون نوعًا من %(type)s."
+
+#, python-format
+#~ msgid "%(desc)s must be between %(min)d and %(max)d MB in size"
+#~ msgstr "%(desc)s يجب أن يُحصرحجمه بين %(min)d و %(max)d مب"
+
+#, python-format
+#~ msgid "%(desc)s must be mounted on one of %(mountpoints)s."
+#~ msgstr "%(desc)s يجب أن يكون موصولًا كواحد من %(mountpoints)s."
+
+#, python-format
+#~ msgid "%(desc)s must be within the first %(max_end)s of the disk."
+#~ msgstr "%(desc)s يجب ان تكون في ضمن اول %(max_end)s من القرص."
+
+#, python-format
+#~ msgid "%(desc)s must not be larger than %(max)dMB."
+#~ msgstr "%(desc)s يجب ألا يكون أكبر من %(max)dمب."
+
+#, python-format
+#~ msgid "%(desc)s must not be smaller than %(min)dMB."
+#~ msgstr "%(desc)s يجب ألا يكون أصغر من %(min)dمب."
+
+#, python-format
+#~ msgid ""
+#~ "%(deviceName)s may not have enough space for grub2 to embed core.img when "
+#~ "using the %(fsType)s file system on %(deviceType)s"
+#~ msgstr ""
+#~ "%(deviceName)s قد لا يحوي مساحة كافية لـ grub2 كي يضمّن core.img عند "
+#~ "استعمال نظام الملفات %(fsType)s على %(deviceType)s"
+
+#, python-format
+#~ msgid "%(freeSize)s of %(devSize)s"
+#~ msgstr "%(freeSize)s من %(devSize)s"
+
+#, python-format
+#~ msgid "%(items_selected)s of %(items_total)s mount points in %(page_name)s"
+#~ msgstr "%(items_selected)s من %(items_total)s نقاط وصل في %(page_name)s"
+
+#, python-format
+#~ msgid "%(name)s must have one of the following disklabel types: %(types)s."
+#~ msgstr "%(name)s يجب أن يكون نوع تسمية قرص كالتالي: %(types)s."
+
+#, python-format
+#~ msgid "%(productName)s %(productVersion)s INSTALLATION"
+#~ msgstr "عملية تثبيت %(productName)s %(productVersion)s"
+
+#, python-format
+#~ msgid "%(productName)s %(productVersion)s installation"
+#~ msgstr "تثبيت نظام %(productName)s %(productVersion)s"
+
+#, python-format
+#~ msgid "%(productName)s %(productVersion)s installation on host %(name)s"
+#~ msgstr "نظام %(productName)s %(productVersion)s على الخادوم %(name)s"
+
+#, python-format
+#~ msgid ""
+#~ "%(product_name)s requires %(needed_ram)s MB of memory to install, but you "
+#~ "only have %(total_ram)s MB on this machine.\n"
+#~ msgstr ""
+#~ "%(product_name)s يتطلب %(needed_ram)s مب من الذاكرة للتثبيت ، و أنت لا "
+#~ "تملك سوى %(total_ram)s مب على هذا الحاسوب.\n"
+
+#, python-format
+#~ msgid "%d Mb/s"
+#~ msgstr "%d مب/ثا"
+
+#, python-format
+#~ msgid ""
+#~ "%s The disks you've selected have the following amounts of free space:"
+#~ msgstr "%s الأقراص التي قمت بانتقائها، تتوفر فيها المساحات الفارغة التالية:"
+
+#, python-format
+#~ msgid ""
+#~ "%s is currently mounted and cannot be used for the installation. Please "
+#~ "unmount it and retry."
+#~ msgstr ""
+#~ "%s موصل حاليا ولا يمكن استعماله للتثبيت. الرجاء فصله وإعادة المحاولة."
+
+#, python-format
+#~ msgid "%s is missing. Cannot setup firewall."
+#~ msgstr "%s مفقود. لا يمكن إعداد جدار الحماية."
+
+#, python-format
+#~ msgid ""
+#~ "%s is now successfully installed and ready for you to use!\n"
+#~ "Go ahead and quit the application to start using it!"
+#~ msgstr ""
+#~ "تم تثبيت %s بنجاح وهو جاهز لتستعمله!\n"
+#~ "اذهب واخرج من التطبيق لتبدأ استعماله!"
+
+#, python-format
+#~ msgid ""
+#~ "%s is now successfully installed and ready for you to use!\n"
+#~ "Go ahead and reboot your system to start using it!"
+#~ msgstr ""
+#~ "تم تثبيت %s بنجاح وهو جاهز لتستعمله!\n"
+#~ "اذهب واعد تشغيل نظامك لتبدأ استعماله!"
+
+#, python-format
+#~ msgid "%s must be on a primary partition."
+#~ msgstr "%s يجب أن يكون في قسم رئيسي."
+
+#, python-format
+#~ msgid "%s to switch layouts."
+#~ msgstr "%s للتبديل بين المخططات."
+
+#~ msgid "({} free)"
+#~ msgstr "(%s حرة)"
+
+#~ msgid "/boot cannot be of type \"lvmlv\" on s390x"
+#~ msgstr "‎/boot لا يمكن أن يكون من نوع \"lvmlv\" على s390x"
+
+#, python-brace-format
+#~ msgid "/boot/efi must be on a device of type {type} or {another}"
+#~ msgstr "‎/boot/efi يجب أن يكون على جهاز من نوع {type} أو {another}"
+
+#~ msgid "0 GB"
+#~ msgstr "0 جب"
+
+#~ msgid "0 MB"
+#~ msgstr "0 مب"
+
+#~ msgid "1 subscription attached to the system"
+#~ msgstr "هناك اشتراك واحد مرتبط بالنظام"
+
+#~ msgctxt "GUI|Date and Time"
+#~ msgid "24-_hour"
+#~ msgstr "24-_ساعة"
+
+#~ msgctxt "GUI|Date and Time"
+#~ msgid ":"
+#~ msgstr ":"
+
+#, python-format
+#~ msgid "<b>%(count)s disk; %(size)s reclaimable space</b> (in file systems)"
+#~ msgid_plural ""
+#~ "<b>%(count)s disks; %(size)s reclaimable space</b> (in file systems)"
+#~ msgstr[0] "<b> لا أقراص، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+#~ msgstr[1] "<b> قرص واحد، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+#~ msgstr[2] "<b>قرصان اثنان، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+#~ msgstr[3] "<b>%(count)s أقراص، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+#~ msgstr[4] "<b>%(count)s قرصاً، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+#~ msgstr[5] "<b>%(count)s قرص، %(size)s يمكن استردادها</b> (في نظم الملفات)"
+
+#~ msgid ""
+#~ "<b>Pool</b > - If checked, indicates the Host Name refers to a pool of "
+#~ "servers.\n"
+#~ "\n"
+#~ "<b>NTS</b> - If checked, indicates support for Network Time Security "
+#~ "authentication."
+#~ msgstr ""
+#~ "<b>مجموعة</b > - تدل أن اسم المضيف يعود على مجموعة خوادم إذا حددت.\n"
+#~ "\n"
+#~ "<b>NTS</b > - تدل على دعم توثيق أمن وقت الشبكة إذا حددت."
+
+#~ msgid ""
+#~ "<b>Warning:</b> All storage changes made using the installer will be lost "
+#~ "when you press 'Rescan Disks'."
+#~ msgstr ""
+#~ "<b>تحذير:</b> ستخسر جميع التّغييرات التي أجريتها من خلال المُثبّت عند ضغطك "
+#~ "على زر 'أعِد فحص الأقراص'."
+
+#~ msgid ""
+#~ "<b>Warning</b>: All storage changes made using the installer will be lost "
+#~ "when you choose to format."
+#~ msgstr ""
+#~ "<b>تحذير:</b> ستخسر جميع تغييرات التخزين التي أجريتها من خلال المُثبّت "
+#~ "عندما تختار التهيئة."
+
+#, python-format
+#~ msgid ""
+#~ "<b>You don't have enough space available to install %(productName)s</b>, "
+#~ "even if you used all of the free space available on the selected disks.  "
+#~ "You could add more disks for additional space, modify your software "
+#~ "selection to install a smaller version of <b>%(productName)s</b>, or quit "
+#~ "the installer."
+#~ msgstr ""
+#~ "<b>لا تتوفّر لديك مساحة كافية لتثبيت %(productName)s</b> ، حتّى لو استخدمت "
+#~ "جميع المساحات الحرّة المتوفّرة على الأقراص المُنتقاة. يمكنك إضافة أقراصٍ أخرى "
+#~ "لتوفير مساحةٍ إضافيّة، كما يمكتك تعديل انتقاءك للبرمجيات المُراد تثبيتها و "
+#~ "ذلك بتثبيت إصدارٍ أصغر من <b>%(productName)s</b> ، أو أغلق المُثبّت."
+
+#, python-format
+#~ msgid ""
+#~ "<b>You don't have enough space available to install %s</b>.  You can "
+#~ "shrink or remove existing partitions via our guided reclaim space tool, "
+#~ "or you can adjust your partitions on your own in the custom partitioning "
+#~ "interface."
+#~ msgstr ""
+#~ "<b>لا تتوفر لديك المساحة الكافية لتثبيت %s</b>. بإمكانك تقليص أو إزالة "
+#~ "الأقسام الحاليّة بواسطة أداتنا الموجهّة للاستخلاص ، أو بإمكانك ضبط تقسيماتك "
+#~ "كما تشاء من خلال واجهة التّقسيم المخصّص."
+
+#~ msgid ""
+#~ "<span size=\"small\"><b>Example:</b> iqn.2012-09.com.example:diskarrays-"
+#~ "sn-a8675309</span>"
+#~ msgstr ""
+#~ "<span size=\"small\"><b>مثال:</b> iqn.2012-09.com.example:diskarrays-sn-"
+#~ "a8675309</span>"
+
+#~ msgid "<span size=\"small\"><b>Example:</b> squid.mysite.org:3128</span>"
+#~ msgstr "<span size=\"small\"><b>مثال:</b> squid.mysite.org:3128</span>"
+
+#~ msgid ""
+#~ "A swap partition has not been specified. To significantly improve "
+#~ "performance for most installations, it is recommended to specify a swap "
+#~ "partition."
+#~ msgstr ""
+#~ "لم يحدد قسم إبدال. لتحسين الأداء لأغلب التثبيتات، من المستحسن تحديد قسم "
+#~ "إبدال."
+
+#~ msgid "ADD A KEYBOARD LAYOUT"
+#~ msgstr "أضف مخطط لوحة مفاتيح"
+
+#~ msgid "ADD A NEW MOUNT POINT"
+#~ msgstr "أضف نقطة وصل جديدة"
+
+#~ msgid "ADD DASD STORAGE TARGET"
+#~ msgstr "أضِف هدف تخزين DASD"
+
+#~ msgid "ADD iSCSI STORAGE TARGET"
+#~ msgstr "أضِف هدف تخزين iSCSI"
+
+#~ msgid "ADD zFCP STORAGE TARGET"
+#~ msgstr "أضِف هدف تخزين zFCP"
+
+#~ msgid "ADVANCED USER CONFIGURATION"
+#~ msgstr "إعدادات المستخدم المتقدّمة"
+
+#~ msgid "AM"
+#~ msgstr "ص"
+
+#~ msgid "AM/PM Down"
+#~ msgstr "ص/م تحت"
+
+#~ msgid "AM/PM Up"
+#~ msgstr "ص/م فوق"
+
+#~ msgid "AVAILABLE SPACE"
+#~ msgstr "المساحة المتوفّرة"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "A_dd"
+#~ msgstr "أَ_ضف"
+
+#~ msgctxt "GUI|Storage"
+#~ msgid "A_utomatic"
+#~ msgstr "تل_قائي"
+
+#~ msgid "Activation Key"
+#~ msgstr "مفتاح التفعيل"
+
+#~ msgctxt "GUI|Subscription|Authetication|Activation Key"
+#~ msgid "Activation _Key"
+#~ msgstr "مفتاح تن_شيط"
+
+#~ msgid "Activation key set."
+#~ msgstr "تم تعيين مفتاح التفعيل."
+
+#~ msgid "Add"
+#~ msgstr "أضف"
+
+#~ msgctxt "GUI|Custom Partitioning"
+#~ msgid "Add"
+#~ msgstr "أضف"
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "Add EC_KD DASD..."
+#~ msgstr "أضف EC_KD DASD..."
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "Add FCo_E SAN..."
+#~ msgstr "أضِف FCo_E SAN..."
+
+#~ msgid "Add Layout"
+#~ msgstr "أضِف مخططًا"
+
+#~ msgid "Add NTP server address"
+#~ msgstr "أضف عنوان خادوم NTP"
+
+#~ msgid "Add Specialized Disk"
+#~ msgstr "أضف قرص متخصص"
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "Add _iSCSI Target..."
+#~ msgstr "أضِف هدف _iSCSI..."
+
+#~ msgid "Add a new mount point."
+#~ msgstr "أضف نقطة وصل جديدة."
+
+#~ msgid "Add a new repository."
+#~ msgstr "أضِف مستودعصا جديدًا."
+
+#~ msgctxt "GUI|User"
+#~ msgid ""
+#~ "Add ad_ministrative privileges to this user account (wheel group "
+#~ "membership)"
+#~ msgstr "أضف صلاحيات م_دير إلى حساب هذا المستخدم (عضوية مجموعة wheel)"
+
+#~ msgid "Add device"
+#~ msgstr "أضف جهازًا"
+
+#~ msgid "Additional repositories"
+#~ msgstr "مستودعات إضافية"
+
+#~ msgid "Additional software for Selected Environment"
+#~ msgstr "برمجيات إضافية للبيئة المُنتقاة"
+
+#~ msgid "Administrator"
+#~ msgstr "مدير"
+
+#, python-format
+#~ msgid "Administrator %s will be created"
+#~ msgstr "سيتم إنشاء المدير %s"
+
+#~ msgctxt "GUI|Storage"
+#~ msgid "Advanced Custom (_Blivet-GUI)"
+#~ msgstr "مخصص متقدم (_Blivet-GUI)"
+
+#~ msgctxt "GUI|Network"
+#~ msgid "Airplane Mode"
+#~ msgstr "وضع الطيران"
+
+#~ msgid "Allow root SSH login with password"
+#~ msgstr "أسمح بولوج root عبر SSH بكلمة مرور"
+
+#~ msgctxt "GUI|User"
+#~ msgid "Allow this user to run the 'sudo' command."
+#~ msgstr "اسمح لهذا المستخدم بتشغيل أمر 'sudo'."
+
+#~ msgid "Alt + Shift to switch layouts."
+#~ msgstr "Alt + Shift للتحويل بين مخططات المفاتيح."
+
+#~ msgid ""
+#~ "An error occurred during Red Hat Insights configuration. Would you like "
+#~ "to ignore this and continue with installation?"
+#~ msgstr ""
+#~ "حدث خطأ أثناء إعداد رد هات إنسايتس. هل تريد تجاهل هذا ومتابعة التثبيت؟"
+
+#~ msgid ""
+#~ "An error occurred during registration attempt triggered by the rhsm "
+#~ "kickstart command. This could have happened due to incorrect rhsm command "
+#~ "arguments or subscription infrastructure issues. Would you like to ignore "
+#~ "this and continue with installation?"
+#~ msgstr ""
+#~ "حدث خطأ أثناء محاولة التسجيل بسبب أمر rhms kickstart. قد يكون سبب حدوث "
+#~ "هذا معطيات أمر rhms خاطئة أو مشاكل بنية تحتية لخدمة الاشتراك. هل تريد "
+#~ "تجاهل هذا ومتابعة التثبيت؟"
+
+#, python-brace-format
+#~ msgid ""
+#~ "An error occurred trying to mount some or all of your system: {message}\n"
+#~ "\n"
+#~ "Some of it may be mounted under {path}."
+#~ msgstr ""
+#~ "حدث خطأ أثناء محاولة وصل بعض أو كل النظام:{message}\n"
+#~ "\n"
+#~ "بعضها قد تكون موصولة تحت {path}."
+
+#~ msgid "An error occurred while activating your storage configuration."
+#~ msgstr "وقع خطأ لدى تفعيل إعداداتك للتخزين."
+
+#~ msgid "An error occurred while resizing the device {}: {}"
+#~ msgstr "حدث خطأ أثناء تغيير حجم الجهاز {} : {}"
+
+#~ msgid "An unknown error occurred during installation.  Details are below."
+#~ msgstr "حدث خطأ غير مألوف أثناء عملية التثبيت. التفاصيل أدناه."
+
+#, python-format
+#~ msgid ""
+#~ "Anaconda is unable to create %s because the file already exists. Anaconda "
+#~ "is already running, or a previous instance of anaconda has crashed."
+#~ msgstr ""
+#~ "Anaconda غير قادرة على انشاء %s لأن الملف موجود بالفعل. Anaconda تعمل "
+#~ "حاليا أو هناك نسخة سابقة تعرضت لعطل."
+
+#~ msgid "Apple Bootstrap Partition"
+#~ msgstr "قسم تمهيد Apple"
+
+#~ msgid "Apple EFI Boot Partition"
+#~ msgstr "قسم إقلاع Apple EFI"
+
+#~ msgid ""
+#~ "Are you sure you want to delete all of the data on {}, including "
+#~ "snapshots?"
+#~ msgstr ""
+#~ "هل أنت متأكّد أنّك ترغب بحذف جميع البيانات الموجودة على {}، بما فيها "
+#~ "اللقطات الاحتياطية؟"
+
+#~ msgid ""
+#~ "Are you sure you want to delete all of the data on {}, including "
+#~ "subvolumes?"
+#~ msgstr ""
+#~ "هل أنت متأكّد من حذف جميع البيانات الموجودة على {}، بما فيها من الأقراص "
+#~ "الفرعية؟"
+
+#~ msgid "Are you sure you want to delete all of the data on {}?"
+#~ msgstr "هل أنت متأكّد أنّك ترغب بحذف جميع البيانات الموجودة على {}؟"
+
+#~ msgid ""
+#~ "Are you sure you wish to quit the\n"
+#~ "installation process?"
+#~ msgstr ""
+#~ "هل أنت متأكد من رغبتك بإنهاء\n"
+#~ "عملية التّثبيت؟"
+
+#~ msgid "As large as possible"
+#~ msgstr "أقصى ما يُمكن"
+
+#~ msgid "Assign mount points"
+#~ msgstr "حدِّد نقاط الارتباط"
+
+#~ msgid ""
+#~ "At least one of your swap devices does not have a UUID, which is common "
+#~ "in swap space created using older versions of mkswap. These devices will "
+#~ "be referred to by device path in /etc/fstab, which is not ideal since "
+#~ "device paths can change under a variety of circumstances. "
+#~ msgstr ""
+#~ "ثمّةَ جهازَ إبدالٍ (swap) واحدٍ على الأقل بدون معرف UUID، وهذا شائع في مساحات "
+#~ "الإبدال المُنشأةِ بإصدارات قديمة من mkswap. سيُشار لهذه الأجهزة بمساراتها "
+#~ "المحددة في ‎/etc/fstab، لكنَّ هذا ليس الأفضل لأن مسارات الأجهزة قد تتغير في "
+#~ "ظروف متنوعة. "
+
+#~ msgid "Attaching subscription..."
+#~ msgstr "جارٍ إرفاق الاشتراك..."
+
+#, python-format
+#~ msgid "Attempting to connect to vnc client on host %s..."
+#~ msgstr "جارٍ محاولةَ الاتصال بعميل vnc على المضيف ‎%s..."
+
+#~ msgid "Attempting to start vncconfig"
+#~ msgstr "جارٍ محاولة بدء vncconfig"
+
+#~ msgid "Authentication"
+#~ msgstr "الاستيثاق"
+
+#~ msgid "Authentication required"
+#~ msgstr "الاستيثاق مطلوب"
+
+#~ msgid "Authentication required by wireless network"
+#~ msgstr "الاستيثاق مطلوب من قبل الشبكة اللاسلكية"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "Auto-detected installation _source"
+#~ msgstr "وسائط التّثبيت المكت_شفة تلقائيًا"
+
+#~ msgid "Auto-detected source"
+#~ msgstr "وسائط التّثبيت المكت_شفة تلقائيًا"
+
+#~ msgid "Automatic"
+#~ msgstr "تلقائي"
+
+#~ msgid "Automatic partitioning selected"
+#~ msgstr "تم انتقاء التقسيم التلقائي"
+
+#, fuzzy
+#~ msgid "Available locales"
+#~ msgstr "المحليات المتاحة"
+
+#~ msgid "Available regions"
+#~ msgstr "الأقاليم المتوقرة"
+
+#, python-format
+#~ msgid "Available timezones in region %s"
+#~ msgstr "المناطق الزمنية المتوفرة في الإقليم %s"
+
+#~ msgid "BAR"
+#~ msgstr "BAR"
+
+#~ msgid "BAZ"
+#~ msgstr "BAZ"
+
+#~ msgid "BLIVET GUI PARTITIONING"
+#~ msgstr "تقسيم BLIVET مرئي"
+
+#~ msgid "Bad format of the IP address"
+#~ msgstr "تنسيق سيء لعنوان IP"
+
+#~ msgid "Bad format of the netmask"
+#~ msgstr "تنسيق سيئ لقناع الشبكة"
+
+#, fuzzy
+#~ msgid "Beta Warn"
+#~ msgstr "تحذير تجريبي"
+
+#~ msgid "Bond"
+#~ msgstr "شبكة وثاقية"
+
+#, python-format
+#~ msgid "Bond %(interface_name)s (%(list_of_ports)s) connected"
+#~ msgstr "الشبكة الوثاقية %(interface_name)s (%(list_of_ports)s) متصلة"
+
+#~ msgid "Boot"
+#~ msgstr "الإقلاع"
+
+#~ msgid ""
+#~ "Boot loader stage1 device cannot be on an iSCSI disk which is not "
+#~ "configured in iBFT."
+#~ msgstr ""
+#~ "جهاز المرحلة الأولى من محمل الإقلاع لا يمكن أن يكون على قرص iSCSI لم يعد "
+#~ "في iBFT."
+
+#~ msgid "Bridge"
+#~ msgstr "جسر"
+
+#, python-format
+#~ msgid "Bridge %(interface_name)s (%(list_of_ports)s) connected"
+#~ msgstr "الجسر %(interface_name)s (%(list_of_ports)s) متصل"
+
+#~ msgid "Btrfs"
+#~ msgstr "Btrfs"
+
+#~ msgid "Btrfs file system is not supported."
+#~ msgstr "نظام الملفات بيتر إف إس btrfs غير مدعوم."
+
+#~ msgid ""
+#~ "Btrfs partition \"{}\" has a format of \"{}\", but should have a format "
+#~ "of \"btrfs\"."
+#~ msgstr ""
+#~ "قسم Btrfs \"{}\" لديه التنسيق \"{}\"، لكن يجب أن يكون في تنسيق \"btrfs\"."
+
+#~ msgid "Btrfs partition \"{}\" is defined multiple times."
+#~ msgstr "قسم Btrfs \"{}\" معرّف عدة مرات."
+
+#~ msgid "Btrfs volume \"{}\" specified with --useexisting does not exist."
+#~ msgstr "قرص Btrfs \"{}\" الذي حدد مع ‎--useexisting غير موجود."
+
+#~ msgid ""
+#~ "Btrfs volume defined without any member devices. Either specify member "
+#~ "devices or use --useexisting."
+#~ msgstr ""
+#~ "قرص Btrfs معرف بدون أي أجهزة كأعضاء. حدد جهاز كعضو أو استعمل ‎--"
+#~ "useexisting."
+
+#~ msgid "CCW"
+#~ msgstr "CCW"
+
+#~ msgid "CD/DVD"
+#~ msgstr "قرص ليزري"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure|CHAP"
+#~ msgid "CHAP _Password:"
+#~ msgstr "كلمة م_رور CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure|Reverse CHAP"
+#~ msgid "CHAP _Password:"
+#~ msgstr "كلمة م_رور CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Login|CHAP"
+#~ msgid "CHAP _Password:"
+#~ msgstr "كلمة م_رور CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Login|Reverse CHAP"
+#~ msgid "CHAP _Password:"
+#~ msgstr "كلمة م_رور CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure|Reverse CHAP"
+#~ msgid "CHAP _User name:"
+#~ msgstr "ا_سم مستخدم CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Login|CHAP"
+#~ msgid "CHAP _User name:"
+#~ msgstr "ا_سم مستخدم CHAP:"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Login|Reverse CHAP"
+#~ msgid "CHAP _User name:"
+#~ msgstr "ا_سم مستخدم CHAP:"
+
+#~ msgid "CHAP pair"
+#~ msgstr "اقتران CHAP"
+
+#~ msgid "CHAP pair and a reverse pair"
+#~ msgstr "اقتران CHAP و الاقتران العكسي"
+
+#, python-format
+#~ msgid "CONFIGURE %(container_type)s"
+#~ msgstr "إعداد %(container_type)s"
+
+#~ msgid "CONFIGURE CONTAINER"
+#~ msgstr "هيّء الحاوية"
+
+#~ msgid "CONFIGURE MOUNT POINT"
+#~ msgstr "تهيئة نقطة الوصل"
+
+#~ msgid "CONNECT TO RED HAT"
+#~ msgstr "متصل برد هات"
+
+#~ msgid "CREATE USER"
+#~ msgstr "أنشئ مستخدمًا"
+
+#~ msgid "CUSTOMIZATION"
+#~ msgstr "التخصيص"
+
+#~ msgctxt "GUI|Network|Wireless|Configure"
+#~ msgid "C_onfigure"
+#~ msgstr "ا_ضبط"
+
+#~ msgctxt "GUI|Network|Authentication Dialog"
+#~ msgid "C_onnect"
+#~ msgstr "ات_صل"
+
+#~ msgctxt "GUI|Network|Wireless|Select Network Dialog"
+#~ msgid "C_onnect"
+#~ msgstr "ات_صل"
+
+#~ msgid "Cable unplugged"
+#~ msgstr "الشريط غير موصول"
+
+#~ msgid "Cache PVs must belong to the same VG as the cached LV"
+#~ msgstr "مخبأ PVs يجب أن ينتمي إلى نفس VG المنتمي إليها LV"
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "Cancel"
+#~ msgstr "ألغِ"
+
+#~ msgid "Cannot install to unpartitionable device \"{}\"."
+#~ msgstr "لا يمكن التثبيت إلى القرص الغير قابل للتقسيم \"{}\"."
+
+#~ msgid "Cannot set label on file system."
+#~ msgstr "لا يمكن ضبط لصيقة على نظام الملفات."
+
+#~ msgid "Capacity"
+#~ msgstr "السعة"
+
+#~ msgid ""
+#~ "Changes here will only apply to the installed system. Use the desktop's "
+#~ "tool to configure the keyboard for the installation process."
+#~ msgstr ""
+#~ "لن تطبّق هذه التّغييرات إلّا على النّظام المثبّت. استخدم أداة سطح المكتب "
+#~ "الحاليّة لتهيئة لوحة المفاتيح لاستخدامها ضمن عمليّة التّثبيت."
+
+#~ msgid "Checking image checksum"
+#~ msgstr "يجري فحص بصمة الصورة"
+
+#~ msgid "Checking software dependencies..."
+#~ msgstr "يجري فحص الاعتماديات..."
+
+#~ msgid ""
+#~ "Choose device from above to assign mount point and set format.\n"
+#~ "Formats marked with * are new formats meaning ALL DATA on the original "
+#~ "format WILL BE LOST!"
+#~ msgstr ""
+#~ "اختر جهاز من فوق لتعيين نقطة الوصل واضبط التنسيق.\n"
+#~ "التنسيقات المعلمة بـ * هي تنسيقات جديدة، تعني أن كل بيانات التنسيق "
+#~ "الأصلية ستضيع!"
+
+#~ msgid "Choose from above to assign mount point and/or set format."
+#~ msgstr "اختر من فوق لتعيين نقطة الوصل و/أو ضبط التنسيق."
+
+#~ msgid "City"
+#~ msgstr "المدينة"
+
+#~ msgid "Closest mirror"
+#~ msgstr "المرآة الأقرب"
+
+#~ msgid "Complete!"
+#~ msgstr "تم!"
+
+#~ msgctxt "GUI|Passphrase Dialog"
+#~ msgid "Con_firm:"
+#~ msgstr "أ_كّد:"
+
+#~ msgid "Configuration not saved: netmask missing in static configuration"
+#~ msgstr "لم تحفظ الإعدادات: قناع الشبكة مفقود في الإعدادات الساكنة"
+
+#~ msgid "Configure NTP"
+#~ msgstr "اضبط NTP"
+
+#~ msgid "Configure Network Time Servers"
+#~ msgstr "اضبط خوادم وقت الشبكة"
+
+#, python-format
+#~ msgid "Configure device %s"
+#~ msgstr "اضبط الجهاز %s"
+
+#, python-format
+#~ msgid "Configure device: %s"
+#~ msgstr "اضبط جهاز: %s"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "Configure proxy"
+#~ msgstr "اضبط الوسيط"
+
+#~ msgid "Configuring Red Hat subscription"
+#~ msgstr "تجري تهيئة اشتراك ريد هات"
+
+#~ msgid "Configuring addons"
+#~ msgstr "يجري ضبط الإضافات"
+
+#, python-format
+#~ msgid "Configuring device %s."
+#~ msgstr "يجري ضبط الجهاز %s."
+
+#~ msgid "Configuring installed system"
+#~ msgstr "يجري إعداد النظام المثبّت"
+
+#~ msgid "Configuring {}"
+#~ msgstr "يجري الضبط {}"
+
+#~ msgid "Confirm Password"
+#~ msgstr "أكّد كلمة المرور"
+
+#~ msgid "Connect automatically after reboot"
+#~ msgstr "اتّصل تلقائيًا بعد إعادة التّشغيل"
+
+#~ msgctxt "GUI|Subscription|Red Hat Insights"
+#~ msgid "Connect to Red Hat _Insights"
+#~ msgstr "اتصل بريدهات إنسايتس"
+
+#~ msgid "Connected"
+#~ msgstr "متصل"
+
+#~ msgid "Connected to Red Hat Insights"
+#~ msgstr "متصل بريدهات إنسايتس"
+
+#~ msgid "Connected!"
+#~ msgstr "مُتّصل!"
+
+#, python-format
+#~ msgid "Connected: %(list_of_interface_names)s"
+#~ msgstr "المتصلة: %(list_of_interface_names)s"
+
+#~ msgid "Connecting"
+#~ msgstr "يجري الاتصال"
+
+#~ msgid "Connecting..."
+#~ msgstr "يجري الاتصال..."
+
+#~ msgid ""
+#~ "Continuing with this action will reset all your partitioning selections "
+#~ "to their current on-disk state."
+#~ msgstr ""
+#~ "المضي بالأمر سيعيد كل اختياراتك للتقسيمات إلى الوضع الحالي على القرص."
+
+#~ msgid "Contract"
+#~ msgstr "عقد"
+
+#, python-format
+#~ msgid "Create a new %(container_type)s ..."
+#~ msgstr "أنشئ %(container_type)s جديدًا ..."
+
+#~ msgid "Create a new additional repository or select an existing one."
+#~ msgstr "أنشئ مستودع إضافياً أو اختر واحداً موجوداً مسبقاً."
+
+#~ msgid "Create new mount points by clicking the '+' button."
+#~ msgstr "أنشئ نقاط وصل جديدة بالنقر على زر '+'."
+
+#, python-format
+#~ msgid "Create or select %(container_type)s"
+#~ msgstr "أنشئ أو انتق %(container_type)s"
+
+#, fuzzy
+#~ msgid "Creating snapshots"
+#~ msgstr "يجري إنشاء لقطات"
+
+#~ msgid "Creating users"
+#~ msgstr "يجري إنشاء المستخدمين"
+
+#, python-format
+#~ msgid "Current host name: %s\n"
+#~ msgstr "اسم المضيف الحالي: %s\n"
+
+#, c-format
+#~ msgid "Current layout: '%s'. Add more layouts to enable switching."
+#~ msgstr "المُخطط الحالي: '%s'. أضف مُخططات أخرى لتفعيل التّبديل."
+
+#, c-format
+#~ msgid "Current layout: '%s'. Click to switch to the next layout."
+#~ msgstr "المُخطط الحالي: '%s'. انقر للتّحول إلى المُخطط التالي."
+
+#~ msgid "Custom base URL"
+#~ msgstr "URL أساسي مخصص"
+
+#~ msgid "Custom partitioning selected"
+#~ msgstr "تم انتقاء التقسيم المخصص"
+
+#~ msgid "Custom server URL"
+#~ msgstr "URL خادوم مخصص"
+
+#~ msgid "Custom software selected"
+#~ msgstr "تم انتقاء برمجيات مخصصة"
+
+#~ msgid "DASD"
+#~ msgstr "DASD"
+
+#~ msgid "DATA"
+#~ msgstr "بيانات"
+
+#~ msgid "DISK ENCRYPTION PASSPHRASE"
+#~ msgstr "عبارة المرور المشفّرة للقرص"
+
+#~ msgid "DISTRIBUTION INSTALLATION"
+#~ msgstr "تثبيت التوزيعة"
+
+#~ msgid "Default HUB title"
+#~ msgstr "عنوان HUB الافتراضي"
+
+#~ msgid "Default Route"
+#~ msgstr "المسلك الافتراضي"
+
+#~ msgid "Default spoke title"
+#~ msgstr "العنوان الافتراضي"
+
+#~ msgctxt "GUI|Reclaim Dialog"
+#~ msgid "Delete _all"
+#~ msgstr "احذف ال_كل"
+
+#~ msgctxt "GUI|Custom Partitioning|Confirm Delete Dialog"
+#~ msgid "Delete _all file systems which are only used by {}."
+#~ msgstr "احذف _كل أنظمة الملفات المستخدمة فقط من {}."
+
+#, fuzzy
+#~ msgid "Deployment complete: {}"
+#~ msgstr "تم النشر: {}"
+
+#, fuzzy
+#~ msgid "Deployment starting: {}"
+#~ msgstr "يبدأ النشر: {}"
+
+#~ msgctxt "GUI|Custom Partitioning|Add Dialog"
+#~ msgid "Desired _Capacity:"
+#~ msgstr "السّعة المر_غوبة:"
+
+#~ msgctxt "GUI|Custom Partitioning|Configure|Devices"
+#~ msgid "Desired _Capacity:"
+#~ msgstr "السّعة المر_غوبة:"
+
+#~ msgid "Device \"{}\" given in clearpart device list does not exist."
+#~ msgstr "الجهاز \"{}\" المعطى في قائمة أجهزة clearpart غير موجود."
+
+#~ msgid "Device Selection"
+#~ msgstr "اختيار الجهاز"
+
+#~ msgctxt "GUI|Custom Partitioning|Configure"
+#~ msgid "Device _Type:"
+#~ msgstr "نوع الجه_از:"
+
+#~ msgid "Device configuration"
+#~ msgstr "إعدادات الجهاز"
+
+#~ msgid "Device discovery failed."
+#~ msgstr "فشل استكشاف الجهاز."
+
+#~ msgid "Device discovery succeeded."
+#~ msgstr "نجح استكشاف الجهاز."
+
+#~ msgid "Device does not support RAID level selection {}."
+#~ msgstr "الجهاز لا يدعم مستوى RAID المحدد {}."
+
+#~ msgid "Device reconfiguration failed."
+#~ msgstr "فشل إعادة ضبط الجهاز."
+
+#~ msgid "Device removal request failed."
+#~ msgstr "فشل طلب إزالة الجهاز."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "Device with an _ISO file"
+#~ msgstr "جهاز بملف _ISO"
+
+#, fuzzy
+#~ msgid "Device(s):"
+#~ msgstr "الأجهزة:"
+
+#~ msgid "Device:"
+#~ msgstr "الجهاز:"
+
+#, python-format
+#~ msgid "Device: %s"
+#~ msgstr "الجهاز: %s"
+
+#~ msgid "Devices reconfiguration succeeded."
+#~ msgstr "نجح إعادة ضبط الجهاز."
+
+#~ msgid ""
+#~ "Disabling the root account will lock the account and disable remote "
+#~ "access with root account. This will prevent unintended administrative "
+#~ "access to the system."
+#~ msgstr ""
+#~ "تعطيل حساب root سيغلق الوصول عن بعد بحساب root. هذا سيمنع الوصول الإداري "
+#~ "غير المقصود إلى النظام."
+
+#~ msgid "Disconnected"
+#~ msgstr "مفصول"
+
+#~ msgid "Disconnecting"
+#~ msgstr "يجري قطع الاتصال"
+
+#~ msgid "Disconnecting..."
+#~ msgstr "يجري قطع الاتصال..."
+
+#~ msgid "Discovering DASD devices.  This may take a moment..."
+#~ msgstr "يجري استكشاف أجهزة DASD.  قد يأخذ فترة قصيرة..."
+
+#~ msgid "Discovering iSCSI targets.  This may take a moment..."
+#~ msgstr "يجري استكشاف iSCSI الأهداف. قد يأخذ فترة قصيرة..."
+
+#~ msgid "Discovering zFCP devices.  This may take a moment..."
+#~ msgstr "يجري استكشاف أجهزة zFCP.  قد يأخذ فترة قصيرة..."
+
+#~ msgid "Discovery login rejected."
+#~ msgstr "رُفِض ولوج الاستكشاف."
+
+#~ msgid "Disk"
+#~ msgstr "قرص"
+
+#~ msgid "Disk \"{}\" given in clearpart command does not exist."
+#~ msgstr "القرص \"{}\" المُعطى في أمر كليربارت clearpart غير موجود."
+
+#~ msgid "Disk \"{}\" given in ignoredisk command does not exist."
+#~ msgstr "القرص \"{}\" المُعطى في أمر ignoredisk غير موجود."
+
+#~ msgid "Disk \"{}\" given in nvdimm command does not exist."
+#~ msgstr "القرص \"{}\" المُعطى في أمر nvdimm غير موجود."
+
+#~ msgid "Disk \"{}\" given in part command does not exist."
+#~ msgstr "القرص \"{}\" المُعطى في أمر part غير موجود."
+
+#~ msgid "Disk \"{}\" in part command is not partitioned."
+#~ msgstr "القرص \"{}\" المعطى في أمر part غير مقسم."
+
+#~ msgid "Disk formatting complete."
+#~ msgstr "تمت تهيئة القرص."
+
+#~ msgid "Disk rescan complete."
+#~ msgstr "تم إعادة فحص القرص."
+
+#~ msgid "Disk summary goes here"
+#~ msgstr "خلاصة الاقراص تأتي إلى هنا"
+
+#~ msgid ""
+#~ "Disklabel \"{}\" given in clearpart command is not supported on this "
+#~ "platform."
+#~ msgstr ""
+#~ "عنوان القرص \"{}\" المُعطى لأمر كليربارت clearpart غير مدعوم على هذه "
+#~ "المنصة."
+
+#~ msgid "Disks left unselected here will not be touched."
+#~ msgstr "لن يتم مسّ الأقراص غير المُنتقاة هنا."
+
+#~ msgctxt "GUI|Custom Partitioning|Confirm Delete Dialog"
+#~ msgid "Do _not show this dialog for other selected file systems."
+#~ msgstr "_لا تظهر هذا الحوار لأنظمة الملفات الأخرى المحددة."
+
+#~ msgid "Do you really want to quit?"
+#~ msgstr "هل ترغب حقًا بالخروج؟"
+
+#~ msgid "Downloading group metadata..."
+#~ msgstr "يجري تحميل معلومات المجموعة..."
+
+#~ msgid "Downloading packages"
+#~ msgstr "يجري تحميل الحزم"
+
+#, python-brace-format
+#~ msgid ""
+#~ "Downloading {total_files} RPMs, {downloaded_size} / {total_size} "
+#~ "({total_percent}%) done."
+#~ msgstr ""
+#~ "يجري تحميل {total_files} حزم RPM، {downloaded_size} \\ {total_size} "
+#~ "({total_percent}٪) تم."
+
+#~ msgid "Downloading {}"
+#~ msgstr "يحمّل {}"
+
+#~ msgid "Downloading {} ({}%)"
+#~ msgstr "جار التنزيل {} ({}%)"
+
+#~ msgid "Duplicate repository names"
+#~ msgstr "أسماء المستودعات مُتكررة"
+
+#~ msgid ""
+#~ "Either a group name in the group list is invalid or groups are not "
+#~ "separated by a comma."
+#~ msgstr ""
+#~ "إما أن اسم مجموعة من قائمة المجموعات غير صحيح، أو أن المجموعات غير مفصولة "
+#~ "بفاصلة."
+
+#~ msgid "Empty"
+#~ msgstr "فارغة"
+
+#, fuzzy
+#~| msgid "Empty"
+#~ msgid "Empty URL"
+#~ msgstr "URL فارغ"
+
+#~ msgid "Empty path"
+#~ msgstr "المسار فارغ"
+
+#~ msgctxt "GUI|Custom Partitioning|Autopart Page"
+#~ msgid "Encrypt my data."
+#~ msgstr "شفر بياناتي."
+
+#~ msgid "Enterprise"
+#~ msgstr "مؤسساتي"
+
+#~ msgid "Error adding FCoE SAN."
+#~ msgstr "حدث خطأ أثناء إضافة FCoE SAN."
+
+#~ msgid "Error checking software selection"
+#~ msgstr "خطأ في التحقق من انتقاء البرمجيات"
+
+#~ msgid "Error checking storage configuration"
+#~ msgstr "خطأ في التحقق من إعدادات التخزين"
+
+#~ msgid ""
+#~ "Error checking storage configuration.  <a href=\"\">Click for details.</a>"
+#~ msgstr "خطأ عند فحص إعدادات التخزين. <a href=\"\">اضغط لمزيد التفاصيل.</a>"
+
+#~ msgid "Error setting up repositories"
+#~ msgstr "خطأ في إعداد المستودعات"
+
+#~ msgid "Escrow certificate {} requires the network."
+#~ msgstr "تتطلب شهادة الضمان {} وجود الشبكة."
+
+#~ msgid "Ethernet"
+#~ msgstr "شبكة عادية"
+
+#~ msgid "Example:"
+#~ msgstr "مثال:"
+
+#~ msgid "Extra characters in proxy URL"
+#~ msgstr "هناك حروف زائدة في عنوان الخادم الوسيط"
+
+#, python-brace-format
+#~ msgid ""
+#~ "FCP device {hba_id}\n"
+#~ "WWPN {wwpn}\n"
+#~ "LUN {lun}"
+#~ msgstr ""
+#~ "جهاز FCP {hba_id}\n"
+#~ "WWPN {wwpn}\n"
+#~ "LUN {lun}"
+
+#~ msgid "FOO"
+#~ msgstr "FOO"
+
+#~ msgid "Failed to attach subscription."
+#~ msgstr "فشل في ربط الاشتراك."
+
+#~ msgid "Failed to change a device."
+#~ msgstr "فشل في تغيير الجهاز."
+
+#~ msgid "Failed to save boot loader configuration"
+#~ msgstr "فشل في حفظ إعدادات محمّل الإقلاع"
+
+#~ msgid "Failed to set up installation source; check the NFS configuration."
+#~ msgstr "فشل في إعداد مصدر التثبيت. افحص إعدادات NFS."
+
+#~ msgid "Failed to set up installation sources; check their configurations."
+#~ msgstr "فشل في إعداد مصدر التثبيت. تأكّد من إعداداتها."
+
+#~ msgid "Fair"
+#~ msgstr "متوسطة"
+
+#~ msgid "File system type \"{}\" given in autopart command is invalid."
+#~ msgstr "نوع نظام الملفات \"{}\" المزود في أمر أوتوبارت autopart غير صحيح."
+
+#~ msgid "Firmware missing"
+#~ msgstr "البرمجيات الثابتة غير موجودة"
+
+#~ msgid "Fixed"
+#~ msgstr "ضُبطت"
+
+#~ msgid "Free"
+#~ msgstr "فارغ"
+
+#~ msgid "Free space"
+#~ msgstr "المساحة الحرّة"
+
+#~ msgid "Free space available for use."
+#~ msgstr "مساحة حرة قابلة للاستخدام."
+
+#~ msgid "Free space unavailable but reclaimable from existing partitions."
+#~ msgstr "لا تتوفر مساحة حرة لكن يمكن استخلاصها من الأقسام الموجودة بالفعل."
+
+#~ msgctxt "GUI|Storage"
+#~ msgid "Free up space by re_moving or shrinking existing partitions"
+#~ msgstr "أفرغ مسا_حة حرة بإزالة أو تقليص الأقسام الموجودة"
+
+#~ msgid "Fully numeric name is not allowed."
+#~ msgstr "الأسماء المكونة من أرقام فحسب غير مسموحة."
+
+#~ msgid "Gateway"
+#~ msgstr "البوّابة"
+
+#~ msgid "Generating initramfs"
+#~ msgstr "يجري توليد نظام الملفّات المؤقّت الإقلاعي"
+
+#~ msgid "Getting list of layouts..."
+#~ msgstr "جارٍ جلب قائمة المخططات..."
+
+#, python-format
+#~ msgid "Giving up attempting to connect after %d try!\n"
+#~ msgid_plural "Giving up attempting to connect after %d tries!\n"
+#~ msgstr[0] "آخر %d محاولة للاتصال!\n"
+#~ msgstr[1] "توجد %d محاولة أخرى فقط للاتصال!\n"
+#~ msgstr[2] "توجد %d محاولتان فقط للاتصال!\n"
+#~ msgstr[3] "توجد %d محاولات للاتصال!\n"
+#~ msgstr[4] "توجد %d محاولة للاتصال!\n"
+#~ msgstr[5] "توجد %d محاولة للاتصال!\n"
+
+#~ msgid "Good"
+#~ msgstr "جيدة"
+
+#~ msgid "Graphical installation is not available. Starting text mode."
+#~ msgstr "نمط التثبيت الرسومي غير متاح. يجري بدء النّمط النّصي."
+
+#~ msgid "Group Membership"
+#~ msgstr "عضوية المجموعة"
+
+#~ msgid "Group Name"
+#~ msgstr "اسم المجموعة"
+
+#~ msgid "Group Password"
+#~ msgstr "كلمة مرور المجموعة"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "HTTP _Proxy"
+#~ msgstr "مُلقّم _HTTP"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "H_TTPS Proxy"
+#~ msgstr "م_لقم HTTPS"
+
+#~ msgid "Hardware Address"
+#~ msgstr "عنوان العتاد"
+
+#~ msgid "Hardware error occurred"
+#~ msgstr "حدث خطأ في العتاد"
+
+#~ msgid "Help!"
+#~ msgstr "مساعدة!"
+
+#~ msgid ""
+#~ "Here we'll describe how much space is needed for the current software "
+#~ "selection."
+#~ msgstr "سنوضّح لك هنا المساحة اللّازمة للبرمجيّات المُنتقاة حاليًا."
+
+#~ msgid "Here we'll describe what your options are."
+#~ msgstr "سنوضّح هنا خياراتك."
+
+#~ msgid "Hide password."
+#~ msgstr "أخفِ كلمة المرور."
+
+#~ msgctxt "GUI|Advanced User"
+#~ msgid "Home _directory:"
+#~ msgstr "دليل الم_نزل:"
+
+#~ msgid "Host name cannot be None or an empty string."
+#~ msgstr "لا يمكن أن يكون اسم المضيف لا شيء أو فارغا."
+
+#~ msgid ""
+#~ "Host names can only contain the characters 'a-z', 'A-Z', '0-9', '-', or "
+#~ "'.', parts between periods must contain something and cannot start or end "
+#~ "with '-'."
+#~ msgstr ""
+#~ "يمكن لأسماء المضيف أن تحتوي فقط على الحروف الصغيرة من a إلى z، والكبيرة "
+#~ "من A إلى Z، والأرقام من 0 إلى 9 والشرطة '-' والنقطة '.'. على الأجزاء بين "
+#~ "النقاط أن تحوي شيئا ولا يمكن أن تبدأ أو أن تنتهي بشرطة '-'."
+
+#~ msgid "ID"
+#~ msgstr "المعرّف"
+
+#~ msgid "IMEI"
+#~ msgstr "الرقم التسلسلي IMEI"
+
+#~ msgid "INSTALLATION DESTINATION"
+#~ msgstr "وجهة التثبيت"
+
+#~ msgid "INSTALLATION OPTIONS"
+#~ msgstr "خيارات التّثبيت"
+
+#~ msgid "INSTALLATION SOURCE"
+#~ msgstr "مصدر التثبيت"
+
+#~ msgid "INSTALLATION SUMMARY"
+#~ msgstr "خلاصة التثبيت"
+
+#~ msgid "IP Address"
+#~ msgstr "عنوان آيبي"
+
+#~ msgid "IPv4 Address"
+#~ msgstr "عنوان آيبي 4"
+
+#, python-format
+#~ msgid "IPv4 address or %s for DHCP"
+#~ msgstr "عنوان آيبي 4 أو %s لأجل DHCP"
+
+#~ msgid "IPv4 gateway"
+#~ msgstr "بوّابة آيبي 4"
+
+#~ msgid "IPv4 netmask"
+#~ msgstr "قناع الشّبكة (آيبي 4)"
+
+#~ msgid "IPv6 Address"
+#~ msgstr "عنوان آيبي 6"
+
+#~ msgid "IPv6 default gateway"
+#~ msgstr "بوّابة آيبي 6 الافتراضية"
+
+#~ msgid "Identifier"
+#~ msgstr "معرّف"
+
+#, fuzzy
+#~| msgid "The password must be at least six characters long."
+#~ msgid "In FIPS mode, the passphrase must be at least {} letters long."
+#~ msgstr "يجب أن يكون طول كلمة المرور 6 رموز على الأقلّ."
+
+#~ msgid "Insights"
+#~ msgstr "إنسايتس"
+
+#~ msgid "Install additional software from a specified URL"
+#~ msgstr "ثبّت برمجيات إضافية من عنوان URL محدد"
+
+#, fuzzy
+#~| msgid "Install additional software from a NFS server"
+#~ msgid "Install additional software from an NFS server"
+#~ msgstr "ثبّت برمجيات إضافية من خادوم NFS"
+
+#~ msgid "Install additional software from another source"
+#~ msgstr "ثبّت برمجيات إضافية من مصدر آخر"
+
+#~ msgid "Install the live CD to your hard disk"
+#~ msgstr "تثبيت القرص الحي على القرص الصلب"
+
+#~ msgid "Install to Hard Drive"
+#~ msgstr "التثبيت على القرص الصلب"
+
+#~ msgid "Installation"
+#~ msgstr "التثبيت"
+
+#~ msgctxt "GUI|Spoke"
+#~ msgid "Installation _Destination"
+#~ msgstr "_وجهة التثبيت"
+
+#~ msgid "Installation source"
+#~ msgstr "مصدر التثبيت"
+
+#~ msgid "Installation source not set up"
+#~ msgstr "لم يعدّ مصدر التثبيت"
+
+#, fuzzy
+#~| msgid "Installing software {}%"
+#~ msgid "Installing software {}"
+#~ msgstr "يجري تثبيت البرمجيات {}%"
+
+#~ msgid "Installing software {}%"
+#~ msgstr "يجري تثبيت البرمجيات {}%"
+
+#, fuzzy
+#~| msgid "Installing software {}%"
+#~ msgid "Installing software..."
+#~ msgstr "يجري تثبيت البرمجيات {}%"
+
+#~ msgid "Installing the software"
+#~ msgstr "يجري تثبيت البرمجيات"
+
+#~ msgid "Installing {}"
+#~ msgstr "يثبّت {}"
+
+#~ msgid "Interconnect"
+#~ msgstr "الوصلة"
+
+#~ msgid "Interface"
+#~ msgstr "الفُتحة"
+
+#~ msgid "Invalid protocol"
+#~ msgstr "بروتوكول غير صالح"
+
+#~ msgid "Invalid proxy URL"
+#~ msgstr "عنوان خادم وسيط غير صحيح"
+
+#, python-format
+#~ msgid "Invalid proxy protocol: %s"
+#~ msgstr "بروتوكول خادم وسيط غير صحيح: %s"
+
+#~ msgid "Invalid server"
+#~ msgstr "خادوم غير صالح"
+
+#~ msgid "Invalid time source."
+#~ msgstr "مصدر زمني غير صالح."
+
+#~ msgid "KEYBOARD LAYOUT"
+#~ msgstr "مخطط لوحة المفاتيح"
+
+#~ msgid ""
+#~ "Keyboard layouts are not supported when using VNC.\n"
+#~ "However the settings will be used after the installation."
+#~ msgstr ""
+#~ "مخططات لوحة المفاتيح غير مدعومة عند استخدام الواجهة الرسومية المتصلة "
+#~ "VNC.\n"
+#~ "لكن ستُستخدم الإعدادات بعد التثبيت."
+
+#~ msgid "Kickstart insufficient"
+#~ msgstr "ملف البدء kickstart غير كافٍ"
+
+#~ msgid "LANGUAGE SUPPORT"
+#~ msgstr "دعم اللّغة"
+
+#~ msgid "LAYOUT SWITCHING OPTIONS"
+#~ msgstr "خيارات التّبديل بين المخططات"
+
+#~ msgid "LOCALIZATION"
+#~ msgstr "المحليات"
+
+#~ msgid "LUN"
+#~ msgstr "رقم الوحدة المنطقية"
+
+#~ msgid "LVM"
+#~ msgstr "LVM"
+
+#~ msgid "LVM Thin Provisioning"
+#~ msgstr "التموين الدقيق في LVM"
+
+#~ msgid "Label:"
+#~ msgstr "التسمية:"
+
+#, python-format
+#~ msgid "Label: %s"
+#~ msgstr "التسمية: %s"
+
+#~ msgid "Layout switching not configured."
+#~ msgstr "لم يتم ضبط التبديل بين المخططات."
+
+#~ msgid "Local Standard Disks"
+#~ msgstr "الأقراص المعياريّة المحليّة"
+
+#~ msgid "Local host name must not end with period '.'."
+#~ msgstr "ينبغي ألا ينتهي اسم المضيف المحلّي بنقطة '.'."
+
+#~ msgid "Local media"
+#~ msgstr "وسيط محلّي"
+
+#~ msgid "Local repositories"
+#~ msgstr "مستودعات محلية إضافية"
+
+#~ msgid "MANUAL PARTITIONING"
+#~ msgstr "التقسيم اليدوي"
+
+#~ msgid "MEDIA VERIFICATION"
+#~ msgstr "فحص الوسيط"
+
+#~ msgid "Method"
+#~ msgstr "الطريقة"
+
+#~ msgid "Missing name of the %addon section."
+#~ msgstr "اسم القسم %addon مفقود."
+
+#~ msgid "Model"
+#~ msgstr "النموذج"
+
+#~ msgid ""
+#~ "More customization options are available\n"
+#~ "after creating the mount point below."
+#~ msgstr ""
+#~ "خيارت أخرى للتخصيص متاحة\n"
+#~ "بعد إنشاء نقطة الوصل أدناه."
+
+#~ msgctxt "GUI|Custom Partitioning|Add Dialog"
+#~ msgid "Mount _Point:"
+#~ msgstr "نقطة ال_وصل:"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "Move selected layout _down"
+#~ msgstr "انقل المخطط المُنتقى لأس_فل"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "Move selected layout _up"
+#~ msgstr "انقل المخطط المُنتقى لأعل_ى"
+
+#~ msgid "NETWORK CONFIGURATION"
+#~ msgstr "إعدادات الشبكة"
+
+#~ msgid "NFS mount options"
+#~ msgstr "خيارات وصل NFS"
+
+#~ msgid "NFS server {}"
+#~ msgstr "خادم NFS {}"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "N_FS mount options:"
+#~ msgstr "خيارات وصل NF_S:"
+
+#~ msgid "Name '$' is not allowed."
+#~ msgstr "الاسم '$' غير مسموح."
+
+#, python-format
+#~ msgid "Name '%s' is invalid."
+#~ msgstr "الاسم '%s' غير صحيح."
+
+#, python-format
+#~ msgid "Name '%s' is not allowed."
+#~ msgstr "الاسم '%s' غير مسموح."
+
+#, python-format
+#~ msgid "Name cannot contain character: '%s'"
+#~ msgstr "لا يمكن أن يحتوي الاسم على حرف: '%s'"
+
+#~ msgid "Name cannot start with '-' character."
+#~ msgstr "لا يمكن بدء الاسم بحرف '-'."
+
+#~ msgid "Name of the repository"
+#~ msgstr "اسم المستودع"
+
+#~ msgid "Nameservers (comma separated)"
+#~ msgstr "أسماء الخوادم (مفرّقة بفواصل)"
+
+#~ msgid "Network Name"
+#~ msgstr "اسم الشبكة"
+
+#~ msgid "New Device"
+#~ msgstr "جهاز جديد"
+
+#~ msgid "New Selector"
+#~ msgstr "مُنتقٍ جديد"
+
+#~ msgid "No credentials (discovery authentication disabled)"
+#~ msgstr "لا يوجد تفويض (تم تعطيل كشف الاستيثاق)"
+
+#~ msgid ""
+#~ "No disks detected.  Please shut down the computer, connect at least one "
+#~ "disk, and restart to complete installation."
+#~ msgstr ""
+#~ "لم يستكشف أي قرص ، أطفئ الحاسوب من فضلك ، و قم بوصل قرص واحد على الأقل ، "
+#~ "ثم أعد التشغيل و أكمل التثبيت."
+
+#~ msgid "No disks selected."
+#~ msgstr "لم يُنتقَ أيّ قرص."
+
+#~ msgid "No host url"
+#~ msgstr "لا يوجد رابط للمضيف"
+
+#~ msgid "No network devices available"
+#~ msgstr "لا تتوفر أجهزة الشبكة"
+
+#, fuzzy
+#~| msgid "not configured"
+#~ msgid "No repository is configured."
+#~ msgstr "غير مُهيّأ"
+
+#~ msgid "No subscriptions are attached to the system"
+#~ msgstr "لا توجد اشتراكات مرتبطة بالنظام"
+
+#~ msgid "No usable disks."
+#~ msgstr "لا أقراص قابلة للاستعمال."
+
+#~ msgid "Node Name"
+#~ msgstr "اسم العُقدة"
+
+#~ msgid "None"
+#~ msgstr "لا شيء"
+
+#~ msgid "Not Specified"
+#~ msgstr "غير محدد"
+
+#~ msgid "Not connected"
+#~ msgstr "غير متصل"
+
+#~ msgid "Not connected to Red Hat Insights"
+#~ msgstr "غير متصل بريدهات إنسايتس"
+
+#~ msgid "Not enough RAM"
+#~ msgstr "ذاكرة الوصول العشوائي (RAM) لا تكفي"
+
+#~ msgid "Not enough free space on selected disks."
+#~ msgstr "لا تتوفر المساحة الكافية في الأقراص المُنتقاة."
+
+#~ msgid "Not registered."
+#~ msgstr "غير مسجَّل."
+
+#~ msgid "Not required"
+#~ msgstr "غير مطلوب"
+
+#~ msgid "Not resizeable"
+#~ msgstr "غير قابل للتحجيم"
+
+#~ msgid "Nothing selected"
+#~ msgstr "لم يُنتقَ أيّ شيء"
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "OK"
+#~ msgstr "موافق"
+
+#~ msgid ""
+#~ "Or, assign new mount points to existing partitions after selecting them "
+#~ "below."
+#~ msgstr ""
+#~ "أو ، قُم بتعيين نقاط وصلٍ جديدة على الأقسام الموجودة بعد انتقائها أدناه."
+
+#~ msgid "Order"
+#~ msgstr "أمر"
+
+#~ msgid "PM"
+#~ msgstr "مساءً"
+
+#~ msgid "PRE-RELEASE / TESTING"
+#~ msgstr "قبل الإطلاق / تجريب"
+
+#~ msgid "Parent"
+#~ msgstr "الأم"
+
+#~ msgid "Partition Scheme Options"
+#~ msgstr "خيارات مشروع التقسيم"
+
+#~ msgid ""
+#~ "Partitioning method changed - planned storage configuration changes will "
+#~ "be cancelled."
+#~ msgstr "طريقة التقسيم تغيرت - تغييرات إعدادات التخزين المخطط لها أُلغيت."
+
+#~ msgid "Password"
+#~ msgstr "كلمة المرور"
+
+#~ msgid "Password (confirm): "
+#~ msgstr "كلمة المرور (للتأكيد): "
+
+#~ msgid "Password set."
+#~ msgstr "ضُبطت كلمة المرور."
+
+#~ msgid "Password: "
+#~ msgstr "كلمة المرور: "
+
+#~ msgid "Passwords do not match!"
+#~ msgstr "كلمتا المرور غير متطابقتين!"
+
+#~ msgid ""
+#~ "Passwords or encryption keys are required to access\n"
+#~ "the wireless network"
+#~ msgstr ""
+#~ "كلمات المرور أو مفاتيح التشفير مطلوبة للمرور\n"
+#~ "إلى الشبكة اللاسلكية"
+
+#, python-format
+#~ msgid ""
+#~ "Passwords or encryption keys are required to access\n"
+#~ "the wireless network '%(network_id)s'."
+#~ msgstr ""
+#~ "كلمات المرور أو مفاتيح التشفير مطلوبة للمرور\n"
+#~ "إلى الشبكة اللاسلكية '%(network_id)s'."
+
+#, fuzzy, python-format
+#~| msgid "Paths"
+#~ msgid "Path: %s"
+#~ msgstr "مسارات"
+
+#~ msgid "Paths"
+#~ msgstr "مسارات"
+
+#~ msgid "Performing post-installation Flatpak tasks"
+#~ msgstr "يجري تهيئة مهمات Flatpak ما بعد التثبيت"
+
+#~ msgid "Performing post-installation setup tasks"
+#~ msgstr "يجري تهيئة مهمات بعد التثبيت"
+
+#~ msgid ""
+#~ "Please complete items marked with this icon before continuing to the next "
+#~ "step."
+#~ msgstr ""
+#~ "أكمل من فضلك العناصر المعلّمة بهذه الأيقونة قبل المواصلة إلى الخطوة "
+#~ "التالية."
+
+#~ msgid "Please confirm software selection"
+#~ msgstr "الرجاء تأكيد اختيار البرمجيات"
+
+#, python-format
+#~ msgid ""
+#~ "Please create a name for this %(container_type)s and select at least one "
+#~ "disk below."
+#~ msgstr ""
+#~ "اختر اسمًا من فضلك لـ %(container_type)s ثم انتقِ على الأقل قرصًا واحدًا "
+#~ "أدناه."
+
+#~ msgid ""
+#~ "Please create a name for this container and select at least one disk "
+#~ "below."
+#~ msgstr "أنشئ رجاءً اسمًا لهذا الحاوي ثم انتقِ قرصًا واحدًا على الأقل أدناه."
+
+#~ msgid "Please enable network access before connecting to Red Hat."
+#~ msgstr "رجاءً فعّل الوصول للشبكة قبل الاتصال بريدهات."
+
+#, python-format
+#~ msgid "Please manually connect your vnc client to %s to begin the install."
+#~ msgstr "رجاء اتصل يدويّاً بمستفيد vnc %s لتبدأ التثبيت."
+
+#~ msgid "Please select new root password. You will have to type it twice."
+#~ msgstr "أدخل كلمة مرور جذر جديدة. تحتاج لكتابتها مرتين."
+
+#~ msgid ""
+#~ "Please select the network interface which is connected to your FCoE "
+#~ "switch."
+#~ msgstr "انتقِ رجاءً فُتحة الشّبكة المُتّصلة بمُبدّل FCoE خاصتك."
+
+#, python-format
+#~ msgid "Please ssh install@%s to begin the install."
+#~ msgstr "قم بـ ssh install@%s من فضلك لبدء التثبيت."
+
+#~ msgid "Please wait... software metadata still loading."
+#~ msgstr "انتظر رجاءً... يجري تحميل بيانات البرمجيات."
+
+#~ msgid "Port"
+#~ msgstr "منفذ"
+
+#~ msgid "Port / Target / LUN #"
+#~ msgstr "المنفذ / الهدف / رقم الوحدة المنطقية #"
+
+#~ msgid "Ports"
+#~ msgstr "المنافذ"
+
+#~ msgid "Preparing to install"
+#~ msgstr "يجري التحضير للتثبيت"
+
+#~ msgid "Preparing transaction from installation source"
+#~ msgstr "يجري إعداد التبادلية مع مصدر التثبيت"
+
+#~ msgid "Preserve"
+#~ msgstr "احمِ"
+
+#~ msgctxt "GUI|Reclaim Dialog"
+#~ msgid "Preserve _all"
+#~ msgstr "احمِ ال_كل"
+
+#~ msgid "Press <b>Done</b> again to use the password anyway."
+#~ msgstr "اضغط <b>انتهى</b> مرة أخرى لاستخدام كلمة المرور على أي حال."
+
+#~ msgid "Press ENTER to continue"
+#~ msgstr "اضغط مفتاح \"الإدخال\" للاستمرار"
+
+#~ msgid ""
+#~ "Pressing 'OK' below will take you to the disk selection screen where you "
+#~ "will need to re-select your disks."
+#~ msgstr ""
+#~ "ستنتقل إلى شاشة انتقاء الأقراص بالضّغط على زر 'موافق' أدناه حيث أنّك مضطر "
+#~ "لإعادة انتقاء أقراصك."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "Pro_xy:"
+#~ msgstr "الوسي_ط:"
+
+#~ msgid "Probing storage..."
+#~ msgstr "التحقق من التخزين..."
+
+#~ msgid "Processing..."
+#~ msgstr "يجري التقدم..."
+
+#~ msgid "Progress"
+#~ msgstr "التقدم"
+
+#~ msgid "Provider"
+#~ msgstr "المزود"
+
+#~ msgid "Proxy authentication data duplicated"
+#~ msgstr "بيانات مصادقة الخادم الوسيط مكررة"
+
+#~ msgid "Quit (Reboot)"
+#~ msgstr "إنهاء (إعادة التشغيل)"
+
+#~ msgid "RAID"
+#~ msgstr "RAID"
+
+#~ msgid "RAID Level:"
+#~ msgstr "مستوى RAID:"
+
+#, python-format
+#~ msgid ""
+#~ "RAID sets that contain '%(desc)s' must have one of the following device "
+#~ "types: %(types)s."
+#~ msgstr ""
+#~ "RAID معد ليحتوي '%(desc)s' والتي يجب أن تكون واحدة من أنواع الأجهزة "
+#~ "التالية: %(types)s."
+
+#, python-format
+#~ msgid ""
+#~ "RAID sets that contain '%(desc)s' must have one of the following metadata "
+#~ "versions: %(metadata_versions)s."
+#~ msgstr ""
+#~ "RAID معد ليحتوي '%(desc)s' و التي يجب أن تكون واحدة من إصدارات metadata: "
+#~ "%(metadata_versions)s."
+
+#, python-format
+#~ msgid ""
+#~ "RAID sets that contain '%(desc)s' must have one of the following raid "
+#~ "levels: %(raid_level)s."
+#~ msgstr ""
+#~ "RAID معد ليحتوي '%(desc)s' والتي يجب أن تكون واحدة من مستويات raid "
+#~ "التالية: %(raid_level)s."
+
+#~ msgctxt "GUI|Custom Partitioning|Configure"
+#~ msgid "RA_ID Level:"
+#~ msgstr "مستوى RAI_D:"
+
+#~ msgid "RECLAIM DISK SPACE"
+#~ msgstr "استخلاص مساحة القرص"
+
+#~ msgid "RESCAN DISKS"
+#~ msgstr "إعادة فحص الأقراص"
+
+#~ msgid "ROOT PASSWORD"
+#~ msgstr "كلمة مرور الجذر"
+
+#~ msgid "RPM OSTree"
+#~ msgstr "RPM OSTree"
+
+#, fuzzy
+#~| msgid "RPM OSTree"
+#~ msgid "RPM OSTree Container"
+#~ msgstr "RPM OSTree"
+
+#~ msgid "Registered with account {}"
+#~ msgstr "تم التسجيل بحساب {}"
+
+#~ msgid "Registered with organization {}"
+#~ msgstr "تم التسجيل بمنظمة {}"
+
+#~ msgid "Registered."
+#~ msgstr "مسجَّل."
+
+#~ msgid "Registering..."
+#~ msgstr "يجري التسجيل..."
+
+#~ msgid "Registration failed."
+#~ msgstr "فشل التسجيل."
+
+#~ msgid "Remove the selected repository."
+#~ msgstr "أزل المستودع المُنتقى."
+
+#~ msgid "Replace Existing Linux system(s)"
+#~ msgstr "استبدل أنظمة لينكس الحالية"
+
+#~ msgid "Repo URL"
+#~ msgstr "رابط المستودع"
+
+#~ msgid "Repository URL"
+#~ msgstr "رابط المستودع"
+
+#~ msgid "Repository name conflicts with internal repository name"
+#~ msgstr "يتعارض اسم المستودع مع اسم المستودع الدّاخلي"
+
+#~ msgid "Rescue"
+#~ msgstr "إنقاذ"
+
+#~ msgid "Restoring hardware time..."
+#~ msgstr "استعادة تاريخ العتاد..."
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure|Reverse CHAP"
+#~ msgid "Reverse CHAP Pass_word:"
+#~ msgstr "كلم_ة مرور CHAP العكسي:"
+
+#~ msgid "Revert to the previous list of repositories."
+#~ msgstr "عُد إلى قائمة المستودعات السّابقة."
+
+#~ msgid "Role: {}"
+#~ msgstr "الدور: {}"
+
+#~ msgid "Root password is set"
+#~ msgstr "تم ضبط كلمة مرور الجذر"
+
+#, python-format
+#~ msgid "Run %s to unmount the system when you are finished."
+#~ msgstr "شغل %s لفصل النظام عند الانتهاء."
+
+#~ msgid "Running post-installation scripts"
+#~ msgstr "يجري تنفيذ مخطوطات بعد التثبيت"
+
+#~ msgid "Running pre-installation scripts"
+#~ msgstr "يجري تنفيذ مخطوطات قبل التثبيت"
+
+#, fuzzy
+#~| msgid "SELECTED DISKS"
+#~ msgid "SELECTED DISKS AND BOOT LOADER"
+#~ msgstr "الأقراص ومحمل الإقلاع المُنتقاة"
+
+#~ msgid "SLA: {}"
+#~ msgstr "اتفاقية مستوى الخدمة SLA: {}"
+
+#~ msgid "SOFTWARE"
+#~ msgstr "البرمجيات"
+
+#~ msgid "SOFTWARE SELECTION"
+#~ msgstr "انتقاء البرمجيات"
+
+#~ msgid "SPOKE NAME"
+#~ msgstr "الاسم المنطوق"
+
+#~ msgid ""
+#~ "SSL error while downloading the escrow certificate:\n"
+#~ "\n"
+#~ "{}"
+#~ msgstr ""
+#~ "خطأ SSL أثناء تنزيل شهادة الضمان:\n"
+#~ "\n"
+#~ "{}"
+
+#~ msgid "SUMMARY OF CHANGES"
+#~ msgstr "خلاصة التغييرات"
+
+#~ msgid "SYSTEM"
+#~ msgstr "نظام"
+
+#~ msgid "SYSTEM PURPOSE"
+#~ msgstr "غاية النظام"
+
+#~ msgid "Saving storage configuration..."
+#~ msgstr "يجري حفظ إعدادات التخزين..."
+
+#~ msgid "Scanning disks.  This may take a moment..."
+#~ msgstr "يجري فحص الأقراص. قد تأخذ قليلًا من الوقت..."
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "Searc_h"
+#~ msgstr "اب_حث"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Search"
+#~ msgid "Search _By:"
+#~ msgstr "ابح_ث بـ:"
+
+#~ msgid "Secure Boot"
+#~ msgstr "الإقلاع الآمن"
+
+#~ msgid "Security"
+#~ msgstr "امان"
+
+#~ msgid "Security Key"
+#~ msgstr "مفتاح الأمان"
+
+#~ msgid "Select a network"
+#~ msgstr "اختر شبكة"
+
+#~ msgid "Select a network to configure"
+#~ msgstr "اختر شبكة لإعدادها"
+
+#~ msgid "Select a partition scheme configuration."
+#~ msgstr "انتقِ إعدادات مشروع التقسيم."
+
+#~ msgid "Select additional language support to be installed:"
+#~ msgstr "اختر اللغات الإضافية التي ترغب بتثبيت دعمها:"
+
+#~ msgid "Select all"
+#~ msgstr "انتقِ الكل"
+
+#, fuzzy
+#~| msgctxt "GUI|Network|Add Device Dialog"
+#~| msgid "_Select the type of device you wish to add"
+#~ msgid ""
+#~ "Select all of the drives you would like the mount point to be created on."
+#~ msgstr "اختر كل الأقراص التي ترغب أن تكوّن نقطة الوصل عليهم."
+
+#~ msgid ""
+#~ "Select the device(s) you'd like to install to.  They will be left "
+#~ "untouched until you click on the main menu's \"Begin Installation\" "
+#~ "button."
+#~ msgstr ""
+#~ "انتقِ جهازًا أو أكثر ترغب بالتّثبيت عليها. لن تمسّ أجهزتك مطلقًا حتّى تضغط على "
+#~ "زر \"ابدأ التّثبيت\" ضمن القائمة الرّئيسيّة."
+
+#~ msgid "Selected Device"
+#~ msgstr "الجهاز المُنتقى"
+
+#~ msgid "Service level"
+#~ msgstr "مستوى الخدمة"
+
+#~ msgid "Setting up installation source..."
+#~ msgstr "يجري إعداد مصدر التثبيت..."
+
+#~ msgid "Setting up the installation environment"
+#~ msgstr "يجري إعداد بيئة التثبيت"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Multipath|WWID"
+#~ msgid "Show Only _Devices Containing:"
+#~ msgstr "أظهر فقط الأجهزة ال_حاوية على:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Other|ID"
+#~ msgid "Show Only _Devices Containing:"
+#~ msgstr "أظهر فقط الأجهزة ال_حاوية على:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Multipath|Vendor"
+#~ msgid "Show Only _Devices From:"
+#~ msgstr "أظهر فقط الأج_هزة من:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Other|Vendor"
+#~ msgid "Show Only _Devices From:"
+#~ msgstr "أظهر فقط الأج_هزة من:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Multipath|Interconnect"
+#~ msgid "Show Only _Devices With:"
+#~ msgstr "أظهر فقط الأجه_زة مع:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Other|Interconnect"
+#~ msgid "Show Only _Devices With:"
+#~ msgstr "أظهر فقط الأجه_زة مع:"
+
+#~ msgid "Show password."
+#~ msgstr "أظهر كلمة المرور."
+
+#~ msgctxt "GUI|Custom Partitioning|Container Dialog"
+#~ msgid "Si_ze policy:"
+#~ msgstr "سياسة الح_جم:"
+
+#~ msgid ""
+#~ "Simultaneous Multithreading (SMT) may improve performance for certain "
+#~ "workloads, but introduces several publicly disclosed security issues. You "
+#~ "can disable SMT, which may impact performance. Please read https://red.ht/"
+#~ "rhel-smt to understand potential risks and learn about ways to mitigate "
+#~ "these risks."
+#~ msgstr ""
+#~ "تقنية خيوط التنفيذ المتعددة الآنية (SMT) يمكن أن تحسن الأداء لعدد من "
+#~ "الأحمال التنفيذية، إلا أنها تجعلك عرضة لعدد من المشاكل الأمنية المعلنة. "
+#~ "بإمكانك إيقاف هذه التقنية مما سيؤثر على الأداء. رجاءً اقرأ https://red.ht/"
+#~ "rhel-smt لتفهم المخاطر المحتملة وطرق تفاديها."
+
+#~ msgid ""
+#~ "Simultaneous Multithreading (SMT) technology can provide performance "
+#~ "improvements for certain workloads, but introduces several publicly "
+#~ "disclosed security issues. You have the option of disabling SMT, which "
+#~ "may impact performance. If you choose to leave SMT enabled, please read "
+#~ "https://red.ht/rhel-smt to understand your potential risks and learn "
+#~ "about other ways to mitigate these risks."
+#~ msgstr ""
+#~ "تقنية خيوط التنفيذ المتعددة الآنية (SMT) يمكن أن تحسن الأداء لعدد من "
+#~ "الأحمال التنفيذية، إلا أنها تجعلك عرضة لعدد من المشاكل الأمنية المعلنة. "
+#~ "بإمكانك إيقاف هذه التقنية مما سيؤثر على الأداء. إذا اخترت ترك التقنية "
+#~ "مفعّلة، رجاءً اقرأ https://red.ht/rhel-smt لتفهم المخاطر المحتملة وطرق "
+#~ "تفاديها."
+
+#~ msgid "Source changed - please verify"
+#~ msgstr "تغير المصدر - يرجى التحقق"
+
+#~ msgid "Specialized & Network Disks"
+#~ msgstr "أقراص الشّبكة و الأقراص المتخصّصة"
+
+#~ msgid "Specify Repo Options"
+#~ msgstr "تخصيص خيارات المستودع"
+
+#~ msgctxt "GUI|Advanced User"
+#~ msgid "Specify a _group ID manually:"
+#~ msgstr "حدّد م_عرّف المجموعة يدويًا:"
+
+#~ msgctxt "GUI|Advanced User"
+#~ msgid "Specify a _user ID manually:"
+#~ msgstr "حدّد مع_رّف المستخدم يدويًا:"
+
+#~ msgid "Speed"
+#~ msgstr "السرعة"
+
+#~ msgid "Start VNC"
+#~ msgstr "إبدأ VNC"
+
+#~ msgid "Start date"
+#~ msgstr "تاريخ البدأ"
+
+#~ msgid "Starting VNC..."
+#~ msgstr "جاري تشغيل VNC..."
+
+#~ msgid "Starting automated install"
+#~ msgstr "يجري بدء التثبيت التلقائي"
+
+#~ msgid "Status not available"
+#~ msgstr "الحالة غير متاحة"
+
+#~ msgid "Status unknown"
+#~ msgstr "الحالة غير معروفة"
+
+#~ msgid "Status unknown (missing)"
+#~ msgstr "الحالة غير معروفة (مفقودة)"
+
+#~ msgid "Subscription attached."
+#~ msgstr "تم إرفاق الاشتراك."
+
+#, fuzzy
+#~| msgid ""
+#~| "Disklabel \"{}\" given in clearpart command is not supported on this "
+#~| "platform."
+#~ msgid "Systemd-boot is not supported on this platform"
+#~ msgstr ""
+#~ "عنوان القرص \"{}\" المُعطى لأمر كليربارت clearpart غير مدعوم على هذه "
+#~ "المنصة."
+
+#~ msgid "TOTAL SPACE"
+#~ msgstr "المساحة الكُلّية"
+
+#~ msgid "Target"
+#~ msgstr "الهدف"
+
+#~ msgid "Target WWID"
+#~ msgstr "WWID الهدف"
+
+#, python-format
+#~ msgid "Team %(interface_name)s (%(list_of_ports)s) connected"
+#~ msgstr "الفريق %(interface_name)s (%(list_of_ports)s) متصل"
+
+#~ msgid "Testing layouts configuration not available."
+#~ msgstr "اختبار إعدادات المُخططات غير متاحٍ."
+
+#~ msgid ""
+#~ "Text mode provides a limited set of installation options. It does not "
+#~ "offer custom partitioning for full control over the disk layout. Would "
+#~ "you like to use VNC mode instead?"
+#~ msgstr ""
+#~ "يقدّم النمط النصي خيارات محدودة لضبطها أثناء التثبيت. حيث أنه لا يقدّم "
+#~ "خدمات التقسيم التخصصية و التي تؤمن التحكم الكامل بالقرص . هل ترغب "
+#~ "باستخدام نمط VNC بدلًا عنه؟"
+
+#~ msgid ""
+#~ "That mount point is already in\n"
+#~ "use.  Try something else?"
+#~ msgstr ""
+#~ "نقطة الوصل مستخدمة بالفعل ،\n"
+#~ "جرب شيئًا آخر؟"
+
+#~ msgid "That mount point is already in use. Try something else?"
+#~ msgstr "نقطة الوصل مستخدمة بالفعل ، جرب شيئًا آخر؟"
+
+#~ msgid "That mount point is invalid. Try something else?"
+#~ msgstr "نقطة الوصل غير صالحة ، جرب شيئًا آخر؟"
+
+#~ msgid "The \"{}\" file system type is not supported."
+#~ msgstr "نظام الملفات من نوع \"{}\" غير مدعوم."
+
+#, python-format
+#~ msgid ""
+#~ "The %(product_name)s graphical installer requires %(needed_ram)s MB of "
+#~ "memory, but you only have %(total_ram)s MB.\n"
+#~ msgstr ""
+#~ "المثبت الرسومي %(product_name)s يتطلب %(needed_ram)s مب من الذاكرة، و أنت "
+#~ "لا تملك سوى %(total_ram)s مب.\n"
+
+#~ msgid ""
+#~ "The 'boot' area on your computer is where files needed\n"
+#~ "to start the operating system are stored."
+#~ msgstr ""
+#~ "تحوي مساحة الإقلاع على حاسوبك الملفات\n"
+#~ "اللازمة لبدء تشغيل النظام."
+
+#~ msgid ""
+#~ "The 'home' area on your computer is where all your personal\n"
+#~ "data is stored."
+#~ msgstr ""
+#~ "مساحة المنازل على حاسوبك حيث يمتلك كل مستخدم لمنزل\n"
+#~ "يحتوي على مجموع بياناته الشخصية."
+
+#~ msgid ""
+#~ "The 'root' area on your computer is where core system\n"
+#~ "files and applications are stored."
+#~ msgstr ""
+#~ "مساحة الجذر على حاسوبك و المكونة لجوهر النظام حيث\n"
+#~ "تحوي ملفات النظام و ملفات البرامج."
+
+#~ msgid ""
+#~ "The 'swap' area on your computer is used by the operating\n"
+#~ "system when running low on memory."
+#~ msgstr ""
+#~ "مساحة الإبدال على حاسوبك يستخدمها النظام عندما تكون\n"
+#~ "الذاكرة قليلة."
+
+#~ msgid ""
+#~ "The BIOS boot partition is required to enable booting\n"
+#~ "from GPT-partitioned disks on BIOS hardware."
+#~ msgstr ""
+#~ "قسم الإقلاع من نوع BIOS وهو ضروري في حال تفعيل الإقلاع\n"
+#~ "بواسطة تقنية GPT المقسمة للأقراص في إعدادات BIOS."
+
+#~ msgid "The VNC server is now running."
+#~ msgstr "خادم VNC يعمل حاليّاً."
+
+#~ msgid ""
+#~ "The following error occurred discovering iSCSI targets.  Please double "
+#~ "check your authorization information and try again."
+#~ msgstr ""
+#~ "حدثت الأخطاء التّالية أثناء محاولة استكشاف iSCSI الاهداف. أعِد رجاءً التّحقق "
+#~ "من معلومات الاستيثاق ثمّ حاول مجدّدًا."
+
+#~ msgid ""
+#~ "The following error occurred logging into the selected iSCSI node.  "
+#~ "Please double check your authorization information and try again."
+#~ msgstr ""
+#~ "حدث الخطأ التالي عند الولوج إلى عُقدة iSCSI المُنتقاة. تحقّق مرة أخرى رجاءً "
+#~ "من معلومات الاستيثاق ثمّ حاول مجدّدًا."
+
+#~ msgid ""
+#~ "The following error occurred while attempting to add an FCoE SAN.  Please "
+#~ "check your configuration and try again"
+#~ msgstr ""
+#~ "يحدث الخطأ التّالي عند محاولة إضافة FCoE SAN. تحقّق مرة أخرى رجاءً من "
+#~ "إعداداتك ثمّ حاول مجدّدًا"
+
+#~ msgid ""
+#~ "The following error was encountered while downloading the escrow "
+#~ "certificate:\n"
+#~ "\n"
+#~ "{}"
+#~ msgstr ""
+#~ "حدث الخطأ التالي أثناء تنزيل شهادة الضمان:\n"
+#~ "\n"
+#~ "{}"
+
+#~ msgid ""
+#~ "The following errors were encountered when checking your disk selection. "
+#~ "You can modify your selection or quit the installer."
+#~ msgstr ""
+#~ "حدثت الأخطاء التّالية عند فحص اختيارك للقرص. بإمكانك تعديل اختيارك أو "
+#~ "مغادرة المثبّت."
+
+#~ msgid ""
+#~ "The following errors were encountered when checking your storage "
+#~ "configuration.  You can modify your storage layout or quit the installer."
+#~ msgstr ""
+#~ "حدثت الأخطاء التّالية عند فحص إعداداتك للتخزين. بإمكانك تعديل مخطط التّخزين "
+#~ "لديك أو مغادرة المثبّت."
+
+#~ msgid ""
+#~ "The following warnings were encountered when checking your kernel "
+#~ "configuration. These are not fatal, but you may wish to make changes to "
+#~ "your kernel config."
+#~ msgstr ""
+#~ "أُطلقت التّحذيرات التّالية عند فحص إعداداتك للُبّ النظام. هي ليست خطيرة، لكن "
+#~ "يمكنك إجراء تغييرات على إعدادات لُبّ النظام لديك."
+
+#~ msgid ""
+#~ "The following warnings were encountered when checking your storage "
+#~ "configuration.  These are not fatal, but you may wish to make changes to "
+#~ "your storage layout."
+#~ msgstr ""
+#~ "أُطلقت التّحذيرات التّالية عند فحص إعداداتك للتخزين. هي ليست خطيرة، لكن "
+#~ "يمكنك إجراء تغييرات على مخطط التخزين لديك."
+
+#~ msgid "The installation cannot continue and the system will be rebooted"
+#~ msgstr "تعذر إكمال عملية التثبيت وسيتم إعادة تشغيل النظام"
+
+#, python-format
+#~ msgid ""
+#~ "The installation was stopped due to what seems to be a problem with your "
+#~ "hardware. The exact error message is:\n"
+#~ "\n"
+#~ "%s.\n"
+#~ "\n"
+#~ " The installer will now terminate."
+#~ msgstr ""
+#~ "توقف التثبيت بسبب مشكلة في العتاد. رسالة الخطأ هي:\n"
+#~ "\n"
+#~ "%s.\n"
+#~ "\n"
+#~ " سينتهي المُثبّت الآن."
+
+#~ msgid "The passphrase is empty."
+#~ msgstr "عبارة المرور فارغة."
+
+#~ msgid "The passphrase is too short"
+#~ msgstr "عبارة المرور قصيرة جدا"
+
+#~ msgid "The passphrase you have provided is weak."
+#~ msgstr "عبارة المرور التي اخترتها ضعيفة."
+
+#~ msgid "The passphrase you have provided is weak:"
+#~ msgstr "عبارة المرور التي اخترتها ضعيفة:"
+
+#~ msgid "The passphrases do not match."
+#~ msgstr "عبارتا المرور غير متطابقتان."
+
+#~ msgid "The passphrases you entered were different. Please try again."
+#~ msgstr "عبارتا المرور المدخلتان مختلفتان. رجاءً أعد المحاولة."
+
+#~ msgid "The password is empty."
+#~ msgstr "كلمة المرور فارغة."
+
+#~ msgid "The password is too short"
+#~ msgstr "كلمة المرور قصيرة جدا"
+
+#~ msgid "The password must be at least six characters long."
+#~ msgstr "يجب أن يكون طول كلمة المرور 6 رموز على الأقلّ."
+
+#~ msgid "The password was set by kickstart."
+#~ msgstr "تم تعيين كلمة المرور بواسطة kickstart."
+
+#~ msgid ""
+#~ "The password you have provided contains non-ASCII characters. You may not "
+#~ "be able to switch between keyboard layouts when typing it."
+#~ msgstr ""
+#~ "كلمة المرور التي أدخلتها تحتوي حروفا ليست أسكي (لاتينية). قد لا تتمكن من "
+#~ "تغيير من تغيير مخطط لوحة المفاتيح عند كتابتها."
+
+#~ msgid "The password you have provided is weak."
+#~ msgstr "كلمة المرور التي اخترتها ضعيفة."
+
+#~ msgid "The password you have provided is weak:"
+#~ msgstr "كلمة المرور التي اخترتها ضعيفة:"
+
+#~ msgid "The passwords do not match."
+#~ msgstr "كلمتا المرور غير متطابقتين."
+
+#~ msgid "The passwords you entered were different. Please try again."
+#~ msgstr "كلمتا المرور المدخلتان مختلفتان. رجاءً أعد المحاولة."
+
+#~ msgid ""
+#~ "The software marked for installation has the following warnings. These "
+#~ "are not fatal, but you may wish to make changes to your software "
+#~ "selections."
+#~ msgstr ""
+#~ "البرمجيات المعلّمة للتثبيت لديها التّحذيرات التّالية. هي ليست خطيرة، لكن قد "
+#~ "ترغب بإجراء تغييرات على اختياراتك للبرمجيات."
+
+#~ msgid "The system is currently not registered."
+#~ msgstr "النظام غير مسجل حالياً."
+
+#~ msgid "The volume group name \"{}\" is already in use."
+#~ msgstr "اسم مجموعة الأجزاء \"{}\" مستخدم بالفعل."
+
+#~ msgid ""
+#~ "There is a problem with your existing storage configuration or your "
+#~ "initial settings, for example a kickstart file. You must resolve this "
+#~ "matter before the installation can proceed. There is a shell available "
+#~ "for use which you can access by pressing ctrl-alt-f1 and then ctrl-b 2.\n"
+#~ "\n"
+#~ "Once you have resolved the issue you can retry the storage scan. If you "
+#~ "do not fix it you will have to exit the installer."
+#~ msgstr ""
+#~ "هناك مشكلة في إعداداتك للتخزين الحالية أو الأوّلية، مثلا ملف كيكستارت "
+#~ "kickstart. يجب أن تحل هذا الأمر قبل أن تتمكن من متابعة التثبيت. هناك صدفة "
+#~ "متاحة للاستخدام يمكنك الوصول إليها بضغط مفاتيح التحكم ctrl والتبديل alt "
+#~ "والوظيفة الأولى f1 ثم الضغط على التحكم ctrl ثم حرفي b 2.\n"
+#~ "\n"
+#~ "عندما تتمكن من حل المشكلة يمكنك إعادة محاولة مسح التخزين. إذا لم تحلها "
+#~ "فسيتعين عليك الخروج من المثبّت."
+
+#~ msgid ""
+#~ "There was a problem with your disk selection. Click here for details."
+#~ msgstr "هناك مشكلة في اختيارك للقرص. اضغط هنا للتفاصيل."
+
+#, python-format
+#~ msgid ""
+#~ "This LVM Volume Group is missing %(missingPVs)d of %(totalPVs)d physical "
+#~ "volumes. You can remove it or select a different device."
+#~ msgstr ""
+#~ "مجموعة الأقسام LVM هذه مفقودة %(missingPVs)d في %(totalPVs)d كأقسام "
+#~ "فيزيائية ، بإمكانك حذفها أو انتقِ جهازًا آخر."
+
+#~ msgid ""
+#~ "This device cannot be edited directly. You can remove it or select a "
+#~ "different device."
+#~ msgstr ""
+#~ "تعذّر تحرير هذا الجهاز بشكل مباشر. بإمكانك إزالته أو انتقاء جهازٍ آخر."
+
+#~ msgid "This device contains the installation source."
+#~ msgstr "يحتوي هذا الجهاز على مصدر التّثبيت."
+
+#~ msgid ""
+#~ "This device is encrypted and cannot be read without a valid passphrase. "
+#~ "You may unlock it below."
+#~ msgstr ""
+#~ "هذا الجهاز مشفّر و لا يمكن القراءة منه بدون عبّارة مرور سليمة. بإمكانك "
+#~ "إلغاء قفله أدناه."
+
+#~ msgid "This field is optional."
+#~ msgstr "هذا الحقل اختياري."
+
+#~ msgid "This file system may not be resized."
+#~ msgstr "لا ينبغي تغيير حجم نظام الملفات هذا."
+
+#~ msgid "This is unstable, pre-release software."
+#~ msgstr "هذه برمجيّات غير مستقرة و مصنفة كبرمجيّات ما قبل الإصدار."
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "This media is good to install from."
+#~ msgstr "هذا الوسيط صالح للتثبيت من خلاله."
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "This media is not good to install from."
+#~ msgstr "هذا الوسيط غير جيد للتثبيت من خلاله."
+
+#~ msgid "Timezone is not set."
+#~ msgstr "لم يتم ضبط المنطقة الزمنية."
+
+#~ msgid "Timezone settings"
+#~ msgstr "إعدادات المنطقة الزمنية"
+
+#~ msgid "Tip:"
+#~ msgstr "تلميح:"
+
+#~ msgid ""
+#~ "To use iSCSI disks, you must provide the address of your iSCSI target and "
+#~ "the iSCSI initiator name you've configured for your host."
+#~ msgstr ""
+#~ "لاستخدام أقراص iSCSI، يجب أن تزوّدنا بعنوان iSCSI الهدف و اسم بادئ iSCSI "
+#~ "الذي قمت بإعداده في خادومك."
+
+#~ msgid "Too short"
+#~ msgstr "قصيرة للغاية"
+
+#, python-format
+#~ msgid "Total selected space to reclaim: <b>%s</b>"
+#~ msgstr "مجمل المساحة التي سيتم استخلاصها: <b>%s</b>"
+
+#~ msgid "Type here to search."
+#~ msgstr "اكتب هنا للبحث."
+
+#~ msgid "URL has no host component"
+#~ msgstr "الرابط لا يحتوي على جزء المضيف"
+
+#~ msgid "URL of the repository"
+#~ msgstr "عنوان URL للمستودع"
+
+#~ msgid "USER SETTINGS"
+#~ msgstr "الإعدادات الشخصية"
+
+#~ msgid "Unable to create PID file"
+#~ msgstr "لا يمكن إنشاء ملف PID"
+
+#~ msgid "Unable to encrypt password: unsupported algorithm {}"
+#~ msgstr "غير قادر على تشفير كلمة المرور: خوارزمية غير مدعومة {}"
+
+#~ msgid "Unavailable"
+#~ msgstr "غير متوفر"
+
+#~ msgid "Unknown name of the %addon section."
+#~ msgstr "اسم القسم %addon غير معروف."
+
+#~ msgctxt "GUI|Network"
+#~ msgid "Unloc_k"
+#~ msgstr "ألغِ القف_ل"
+
+#~ msgid "Unmanaged"
+#~ msgstr "غير معدّة"
+
+#~ msgid "Unregistering..."
+#~ msgstr "جارٍ إلغاء التسجيل…"
+
+#~ msgid "Unregistration failed."
+#~ msgstr "فشل إلغاء التسجيل."
+
+#~ msgid "Unsupported"
+#~ msgstr "غير مدعوم"
+
+#~ msgid "Updates"
+#~ msgstr "تحديثات"
+
+#~ msgid "Usage: {}"
+#~ msgstr "الاستخدام: {}"
+
+#~ msgid "Use All Space"
+#~ msgstr "استخدم كل المساحة"
+
+#~ msgid "Use HTTP proxy"
+#~ msgstr "استعمل وسيط HTTP"
+
+#~ msgctxt "GUI|Advanced Storage|FCoE"
+#~ msgid "Use _DCB"
+#~ msgstr "استخدم _DCB"
+
+#~ msgid "Use text mode"
+#~ msgstr "إستعمل النّمط النّصي"
+
+#~ msgid "Use the credentials from discovery"
+#~ msgstr "استخدم التّفويضات من المُكتشف"
+
+#~ msgid "User and Group IDs"
+#~ msgstr "معرّفات المستخدم و المجموعة"
+
+#, python-format
+#~ msgid "VLAN %(interface_name)s (%(parent_device)s, ID %(vlanid)s) connected"
+#~ msgstr ""
+#~ "الشبكة الافتراضية %(interface_name)s (%(parent_device)s، مُعرّف %(vlanid)s) "
+#~ "متصلة"
+
+#~ msgid "VNC"
+#~ msgstr "VNC"
+
+#~ msgid "VNC Password"
+#~ msgstr "كلمة مرور VNC"
+
+#~ msgid "VPN Type"
+#~ msgstr "نوع VPN"
+
+#~ msgid "Vendor"
+#~ msgstr "المُصنع"
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "Verification finished."
+#~ msgstr "انتهى التوثيق."
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "Verifying media, please wait..."
+#~ msgstr "يجري فحص الوسائط، انتظر رجاءً..."
+
+#~ msgid "Volume"
+#~ msgstr "الجزء"
+
+#~ msgid "Volume Group"
+#~ msgstr "مجموعة الأجزاء"
+
+#, python-format
+#~ msgid "WELCOME TO %(name)s %(version)s."
+#~ msgstr "مرحبًا بكم في %(name)s %(version)s."
+
+#~ msgid "WEP"
+#~ msgstr "مفتاح WEP"
+
+#~ msgid "WPA"
+#~ msgstr "مفتاح WPA"
+
+#~ msgid "WPA2"
+#~ msgstr "مفتاح WPA2"
+
+#~ msgid "WWID"
+#~ msgstr "WWID"
+
+#~ msgid "WWPN"
+#~ msgstr "WWPN"
+
+#, python-format
+#~ msgid "Waiting for %s threads to finish"
+#~ msgstr "يجري انتظار %s حتى الانتهاء"
+
+#~ msgid "Warning checking software selection"
+#~ msgstr "تحذير في التحقق من انتقاء البرمجيات"
+
+#~ msgid "Warning checking storage configuration"
+#~ msgstr "تحذير أثناء التحقق من إعدادات التخزين"
+
+#~ msgid ""
+#~ "Warning checking storage configuration.  <a href=\"\">Click for details.</"
+#~ "a>"
+#~ msgstr ""
+#~ "تحذير عند فحص إعدادات التخزين. <a href=\"\">اضغط لمزيد التفاصيل.</a>"
+
+#~ msgid ""
+#~ "Warning: Processor has Simultaneous Multithreading (SMT) enabled.  <a "
+#~ "href=\"\">Click for details.</a>"
+#~ msgstr ""
+#~ "تحذير: التنفيذ متعدد الخيوط الآنية مفعل في معالجك. <a href=\"\">اضغط هنا "
+#~ "للتفاصيل.</a>"
+
+#~ msgid ""
+#~ "Warning: You won't be able to switch between keyboard layouts (from the "
+#~ "default one) when you decrypt your disks after install."
+#~ msgstr ""
+#~ "تحذير: لن تكون قادرًا على التّبديل بين مخطّطات لوحة المفاتيح (من الافتراضي) "
+#~ "عندما تلغِ تشفير أقراصك بعد التّثبيت."
+
+#~ msgid ""
+#~ "We'll need network access to fetch information about your location and to "
+#~ "make software updates available for you."
+#~ msgstr ""
+#~ "سنحتاج إلى ولوج إلى الشبكة وذلك لجلب معلومات عن موقعك و إتاحة تحديثات "
+#~ "البرمجيّات لك."
+
+#~ msgid "What language would you like to use during the installation process?"
+#~ msgstr "ما اللّغة التي تودّ استخدامها أثناء عمليّة التثبيت؟"
+
+#, python-format
+#~ msgid ""
+#~ "When you create mount points for your %(name)s %(version)s installation, "
+#~ "you'll be able to view their details here."
+#~ msgstr ""
+#~ "سترى التّفاصيل هنا ، عندما تنشئ نقاط وصل من أجل عمليّة تثبيت %(name)s "
+#~ "%(version)s."
+
+#~ msgid ""
+#~ "Which combination(s) would you prefer for switching between keyboard "
+#~ "layouts?"
+#~ msgstr ""
+#~ "ما هو التّركيب (أو التّركيبات) التي تفضّلها للتّبديل بين مخطّطات لوحة المفاتيح؟"
+
+#~ msgid "Which installation source would you like to use?"
+#~ msgstr "ما مصدر التّثبيت الذي ترغب باستخدامه؟"
+
+#~ msgid ""
+#~ "Which keyboard layouts would you like to use on this system?  You may "
+#~ "move any layout to the top of the list to select it as the default."
+#~ msgstr ""
+#~ "ما هي مخططات لوحة المفاتيح التي ترغب باستعمالها ضمن هذا النّظام؟ بإمكانك "
+#~ "أيضًا نقل أي مخطط لأعلى القائمة وذلك لجعله افتراضيًا."
+
+#~ msgid "Wi-Fi Networks"
+#~ msgstr "شبكات Wi-Fi"
+
+#~ msgid "Will try to connect again in 15 seconds..."
+#~ msgstr "سيحاول الاتصال ثانية في غضون ربع دقيقة..."
+
+#, python-format
+#~ msgid "Wired (%(interface_name)s) connected"
+#~ msgstr "الشبكة السّلكية (%(interface_name)s) متصلة"
+
+#, python-format
+#~ msgid "Wired (%(interface_name)s) connected\n"
+#~ msgstr "الشّبكة السّلكية (%(interface_name)s) مُتّصلة\n"
+
+#, python-format
+#~ msgid "Wired (%(interface_name)s) disconnected\n"
+#~ msgstr "الشّبكة السّلكية (%(interface_name)s) غير مُتّصلة\n"
+
+#~ msgid "Wireless"
+#~ msgstr "شبكة لاسلكية"
+
+#, python-format
+#~ msgid "Wireless connected to %(access_point)s"
+#~ msgstr "تم الاتصال لاسلكيًا إلى %(access_point)s"
+
+#~ msgid "Working"
+#~ msgstr "يجري العمل"
+
+#~ msgid "Writing network configuration"
+#~ msgstr "تجري كتابة إعدادات الشبكة"
+
+#~ msgid ""
+#~ "X was unable to start on your machine. Would you like to start VNC to "
+#~ "connect to this computer from another computer and perform a graphical "
+#~ "installation or continue with a text mode installation?"
+#~ msgstr ""
+#~ "لم يستطع خادم العرض إكس البدء على جهازك. هل ترغب في بدء VNC للاتصال بهذا "
+#~ "الحاسب من حاسب آخر وإتمام التثبيت بواجهة رسومية، أم ترغب في متابعة "
+#~ "التثبيت بواجهة نَصّيّة؟"
+
+#~ msgid ""
+#~ "You can remove or insert additional disks at this time and press 'Rescan "
+#~ "Disks' below for the changes to take effect."
+#~ msgstr ""
+#~ "بإمكانك الآن إزالة أو إضافة أقراص أُخرى ، اضغط 'أعِد فحص الأقراص' أدناه "
+#~ "لتأخذ تغييراتك تأثيرها."
+
+#~ msgid "You don't have any Linux partitions.\n"
+#~ msgstr "ليس لديك أي أقسام Linux.\n"
+
+#~ msgid ""
+#~ "You have chosen to encrypt some of your data. You will need to create a "
+#~ "passphrase that you will use to access your data when you start your "
+#~ "computer."
+#~ msgstr ""
+#~ "قد اخترت تشفير بعض بياناتك. ستضطر إلى إنشاء عبّارة مرور و التي ستستخدمها "
+#~ "للنّفاذ إلى بياناتك عند بدء تشغيل حاسوبك."
+
+#~ msgid ""
+#~ "You have chosen to skip boot loader installation. Your system may not be "
+#~ "bootable."
+#~ msgstr "لقد اخترت تخطي تثبيت محمّل الإقلاع. قد يصبح جهازك غير قابل للإقلاع."
+
+#~ msgid "You have no working NTP server configured"
+#~ msgstr "لم يتم ضبط خادم NTP عامل"
+
+#, python-format
+#~ msgid ""
+#~ "You haven't created any mount points for your %(product)s %(version)s "
+#~ "installation yet.  You can:"
+#~ msgstr ""
+#~ "لم تقُم بإنشاء أي نقاط وصل من أجل عملية تثبيت %(product)s %(version)s حتّى "
+#~ "الآن. بإمكانك:"
+
+#~ msgid ""
+#~ "You may <a href=\"\">go back to the main menu</a> to complete other\n"
+#~ "installation options while this scan completes."
+#~ msgstr ""
+#~ "تستطيع <a href=\"\">الذهاب إلى القائمة الرّئيسيّة</a> لتستكمل خيارات\n"
+#~ "التّثبيت الأُخرى بينما ينهي الفحص عمله."
+
+#~ msgid "You may add a keyboard layout by selecting it below:"
+#~ msgstr "يمكنك إضافة مخطط لوحة مفاتيح عند انتقائه من القائمة أدناه:"
+
+#~ msgid "You need to set up networking first if you want to use NTP"
+#~ msgstr "يتحتم عليك إعداد الشبكة قبل استخدام NTP"
+
+#~ msgid "You will have to press <b>Done</b> twice to confirm it."
+#~ msgstr "سيتعيّن عليك الضغط على <b>انتهى</b> مرتين للتأكيد على الأمر."
+
+#, python-format
+#~ msgid "Your %s must be on a separate partition or LV."
+#~ msgstr "%s يجب أن يكون على قسم جزء منطقي منفصل."
+
+#~ msgid ""
+#~ "Your customizations will result in the following changes taking effect "
+#~ "after you return to the main menu and begin installation:"
+#~ msgstr ""
+#~ "ستأخذ تخصيصاتك تأثيرها إن شاء الله بعد عودتك إلى القائمة الرّئيسيّة ثم بدء "
+#~ "التّثبيت:"
+
+#~ msgctxt "GUI|Advanced Storage|FCoE"
+#~ msgid "_Add FCoE Disk(s)"
+#~ msgstr "أضِ_ف أقراص FCoE"
+
+#~ msgctxt "GUI|Storage"
+#~ msgid "_Add a disk..."
+#~ msgstr "أ_ضِف قرصًا..."
+
+#~ msgctxt "GUI|Custom Partitioning|Add Dialog"
+#~ msgid "_Add mount point"
+#~ msgstr "أ_ضف نقطة وصل"
+
+#~ msgctxt "GUI|Advanced User"
+#~ msgid "_Add user to the following groups:"
+#~ msgstr "أضِف المست_خدم إلى المجموعات التّالية:"
+
+#~ msgctxt "GUI|User"
+#~ msgid "_Advanced..."
+#~ msgstr "مت_قدم..."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Auto-detected installation media:"
+#~ msgstr "وسائط التّثبيت المكت_شفة تلقائيًا:"
+
+#~ msgctxt "GUI|Custom Partitioning|Add Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغ"
+
+#~ msgctxt "GUI|Custom Partitioning|Configure Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغ"
+
+#~ msgctxt "GUI|Custom Partitioning|Confirm Delete Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغ"
+
+#~ msgctxt "GUI|Custom Partitioning|Container Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغ"
+
+#~ msgctxt "GUI|Network|Wireless|Configure"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغِ"
+
+#~ msgctxt "GUI|Network|Wireless|Select Network Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغِ"
+
+#~ msgctxt "GUI|Software Source|Media Check Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغِ"
+
+#~ msgctxt "GUI|Software Source|Proxy Dialog"
+#~ msgid "_Cancel"
+#~ msgstr "_ألغ"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Choose an ISO"
+#~ msgstr "ا_ختر ملف ISO"
+
+#~ msgctxt "GUI|Date and Time"
+#~ msgid "_City:"
+#~ msgstr "الم_دينة:"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "_Configuration URL"
+#~ msgstr "راب_ط التهيئة"
+
+#~ msgctxt "GUI|Network|Mobile Broadband"
+#~ msgid "_Configure..."
+#~ msgstr "ت_هيئة..."
+
+#~ msgctxt "GUI|Network|VPN"
+#~ msgid "_Configure..."
+#~ msgstr "ت_هيئة..."
+
+#~ msgctxt "GUI|Network|Wireless"
+#~ msgid "_Configure..."
+#~ msgstr "ت_هيئة..."
+
+#~ msgctxt "GUI|User"
+#~ msgid "_Confirm password"
+#~ msgstr "أكّ_د كلمة المرور"
+
+#~ msgctxt "GUI|Password"
+#~ msgid "_Confirm:"
+#~ msgstr "_تأكيد:"
+
+#~ msgctxt "GUI|Spoke"
+#~ msgid "_Connect to Red Hat"
+#~ msgstr "ا_تصل بريدهات"
+
+#~ msgctxt "GUI|Custom Partitioning|Confirm Delete Dialog"
+#~ msgid "_Delete It"
+#~ msgstr "اح_ذفه"
+
+#~ msgctxt "GUI|Custom Partitioning"
+#~ msgid "_Discard All Changes"
+#~ msgstr "ا_مسح كل التغييرات"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure"
+#~ msgid "_Discovery Authentication Type:"
+#~ msgstr "نوع استي_ثاق الاستكشاف:"
+
+#~ msgctxt "GUI|Software Source|Proxy Dialog"
+#~ msgid "_Enable HTTP Proxy"
+#~ msgstr "تفع_يل ملقّم HTTP"
+
+#~ msgctxt "GUI|Storage Detailed Error Dialog"
+#~ msgid "_Exit Installer"
+#~ msgstr "ال_خروج من المثبّت"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "_FTP Proxy"
+#~ msgstr "_ملقم FTP"
+
+#~ msgctxt "GUI|Spoke"
+#~ msgid "_Installation Source"
+#~ msgstr "_مصدر التثبيت"
+
+#~ msgctxt "GUI|Network|Secrets Dialog"
+#~ msgid "_Key:"
+#~ msgstr "ال_مفتاح:"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "_Method"
+#~ msgstr "ال_طريقة"
+
+#~ msgctxt "GUI|Storage|Error Dialog"
+#~ msgid "_Modify Disk Selection"
+#~ msgstr "_تعديل اختيار القرص"
+
+#~ msgctxt "GUI|Software Selection|Error Dialog"
+#~ msgid "_Modify Software Source"
+#~ msgstr "تع_ديل مصدر البرمجيات"
+
+#~ msgctxt "GUI|Storage|Error Dialog"
+#~ msgid "_Modify Storage Layout"
+#~ msgstr "_عدّل مخطط التخزين"
+
+#~ msgctxt "GUI|Custom Partitioning|Configure"
+#~ msgid "_Modify..."
+#~ msgstr "ع_دّل..."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Mount options:"
+#~ msgstr "خيارات و_صل :"
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "_Multipath Devices"
+#~ msgstr "الأجهزة متع_دّدة المسارات"
+
+#~ msgctxt "GUI|Custom Partitioning|Container Dialog"
+#~ msgid "_Name:"
+#~ msgstr "ال_اسم:"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Name:"
+#~ msgstr "ال_اسم:"
+
+#~ msgctxt "GUI|Date and Time"
+#~ msgid "_Network Time"
+#~ msgstr "وقت الشبكة"
+
+#~ msgctxt "GUI|Software Source|Proxy Dialog"
+#~ msgid "_OK"
+#~ msgstr "مواف_ق"
+
+#~ msgctxt "GUI|Storage|Warning Dialog"
+#~ msgid "_OK"
+#~ msgstr "_موافق"
+
+#~ msgctxt "GUI|Summary|Warning Dialog"
+#~ msgid "_OK"
+#~ msgstr "_موافق"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_On the network:"
+#~ msgstr "على ال_شّبكة:"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "_Options"
+#~ msgstr "_خيارات"
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "_Other SAN Devices"
+#~ msgstr "أجهزة SAN أخ_رى"
+
+#~ msgctxt "GUI|Custom Partitioning|Encrypted"
+#~ msgid "_Passphrase:"
+#~ msgstr "عبّار_ة المرور:"
+
+#~ msgctxt "GUI|User"
+#~ msgid "_Password"
+#~ msgstr "ك_لمة المرور"
+
+#~ msgctxt "GUI|Network|Secrets Dialog"
+#~ msgid "_Password:"
+#~ msgstr "ك_لمة المرور:"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Path:"
+#~ msgstr "م_سار:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Search|Port Target LUN"
+#~ msgid "_Port:"
+#~ msgstr "الم_نفذ:"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "_Preview layout"
+#~ msgstr "اع_رض مخططًا"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Proxy setup..."
+#~ msgstr "إع_داد الملقّم..."
+
+#~ msgctxt "GUI|Software Selection|Error Dialog"
+#~ msgid "_Quit"
+#~ msgstr "_أغلق"
+
+#~ msgctxt "GUI|Storage|Error Dialog"
+#~ msgid "_Quit"
+#~ msgstr "_أغلق"
+
+#~ msgctxt "GUI|Date and Time"
+#~ msgid "_Region:"
+#~ msgstr "الإ_قليم:"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Remove"
+#~ msgstr "أ_زِل"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "_Remove layout"
+#~ msgstr "أزِل مخ_ططًا"
+
+#~ msgctxt "GUI|Password"
+#~ msgid "_Root Password:"
+#~ msgstr "كلمة مرور ال_جذر:"
+
+#~ msgctxt "GUI|Network|Wireless"
+#~ msgid "_Select network"
+#~ msgstr "اختر _شبكة"
+
+#~ msgctxt "GUI|Network|Add Device Dialog"
+#~ msgid "_Select the type of device you wish to add"
+#~ msgstr "انت_قِ نوع الجهاز الذي ترغب بإضافته"
+
+#~ msgctxt "GUI|Selected Disks Dialog"
+#~ msgid "_Set as Boot Device"
+#~ msgstr "ا_ضبطه كجهاز إقلاع"
+
+#~ msgctxt "GUI|Network|Proxy"
+#~ msgid "_Socks Host"
+#~ msgstr "خادوم _Socks"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure|Start"
+#~ msgid "_Start Discovery"
+#~ msgstr "ا_بدأ الاستكشاف"
+
+#~ msgctxt "GUI|Network|Wireless"
+#~ msgid "_Stop Hotspot..."
+#~ msgstr "أو_قف Hotspot..."
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure"
+#~ msgid "_Target IP Address:"
+#~ msgstr "عنوان IP ال_هدف:"
+
+#~ msgctxt "GUI|Installation Destination|Filter|Search|Port Target LUN"
+#~ msgid "_Target:"
+#~ msgstr "ال_هدف:"
+
+#~ msgctxt "GUI|Keyboard Layout"
+#~ msgid "_Test the layout configuration below:"
+#~ msgstr "ا_ختبر إعدادات المخطط أدناه:"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_URL:"
+#~ msgstr "_عنوان ‏URL:"
+
+#~ msgctxt "GUI|Custom Partitioning|Encrypted"
+#~ msgid "_Unlock"
+#~ msgstr "ألغِ الق_فل"
+
+#~ msgctxt "GUI|Network|Wireless"
+#~ msgid "_Use as Hotspot..."
+#~ msgstr "اس_تخدم كـ Hotspot..."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_Verify"
+#~ msgstr "ا_فحص"
+
+#~ msgctxt "GUI|Installation Destination|Filter"
+#~ msgid "_zSeries Devices"
+#~ msgstr "أجهزة _zSeries"
+
+#~ msgid "checking status"
+#~ msgstr "جارٍ فحص الحالة"
+
+#~ msgid "container"
+#~ msgstr "حاوي"
+
+#~ msgid "disk free"
+#~ msgstr "حر من القرص"
+
+#~ msgid "empty password"
+#~ msgstr "كلمة مرور فارغة"
+
+#~ msgid "fs free"
+#~ msgstr "حر من نظام الملفات"
+
+#~ msgctxt "GUI|Advanced Storage|iSCSI|Configure"
+#~ msgid "iSCSI _Initiator Name:"
+#~ msgstr "ا_سم بادئ iSCSI:"
+
+#~ msgid "malformed URL, cannot parse it."
+#~ msgstr "لا يمكن معالجة الرابط فهو معطوب."
+
+#~ msgid "not configured"
+#~ msgstr "غير مُهيّأ"
+
+#~ msgid "status: not working"
+#~ msgstr "الحالة: متوقف"
+
+#~ msgid "status: working"
+#~ msgstr "الحالة: جارٍ العمل"
+
+#~ msgid "summary"
+#~ msgstr "خلاصة"
+
+#~ msgid "testing status..."
+#~ msgstr "يجري فحص الحالة..."
+
+#~ msgid "unknown"
+#~ msgstr "مجهول"
+
+#~ msgid "unplugged"
+#~ msgstr "غير موصول"
+
+#, fuzzy
+#~ msgid "wheel, my-team (1245), project-x (29935)"
+#~ msgstr "wheel, my-team (1245), project-x (29935)"
+
+#~ msgid "{} free"
+#~ msgstr "{} حرّة"
+
+#~ msgid "{} subscriptions attached to the system"
+#~ msgstr "هناك {} اشتراك/اشتراكات مرتبطة بالنظام"
+
+#~ msgid "{}. {}"
+#~ msgstr "{}. {}"
+
+#~ msgid "Verifying {}"
+#~ msgstr "يجري التحقق من {}"
+
+#, fuzzy
+#~| msgid "Not enough free space on selected disks."
+#~ msgid "There is not enough space on the disks to install. "
+#~ msgstr "لا تتوفر المساحة الكافية في الأقراص المُنتقاة."
+
+#, fuzzy
+#~| msgid "Not enough free space on selected disks."
+#~ msgid "No existing partitions on the selected disks."
+#~ msgstr "لا تتوفر المساحة الكافية في الأقراص المُنتقاة."
+
+#~ msgid "Starting Install to Hard Drive"
+#~ msgstr "بدء التثبيت إلى القرص الصلب"
+
+#, fuzzy
+#~| msgid "Action"
+#~ msgid "Action: $0"
+#~ msgstr "نشاط"
+
+#, fuzzy
+#~| msgid "Error"
+#~ msgid "Error: $0"
+#~ msgstr "خطأ"
+
+#, fuzzy
+#~| msgid "Welcome to Fedora"
+#~ msgid "Welcome to Fedora!"
+#~ msgstr "مرحبًا بكم في فيدورا"
+
+#, fuzzy
+#~| msgid "Options"
+#~ msgid "Kernel Options"
+#~ msgstr "الخيارات"
+
+#, fuzzy
+#~| msgid "Storage options"
+#~ msgid "Kernel options"
+#~ msgstr "خيارات التخزين"
+
+#, fuzzy
+#~| msgctxt "GUI|Custom Partitioning|Add Dialog"
+#~| msgid "_Add mount point"
+#~ msgid "Custom mount point"
+#~ msgstr "أ_ضف نقطة وصل"
+
+#~ msgid "Downloading package metadata..."
+#~ msgstr "يجري تحميل معلومات الحزم..."
+
+#~ msgid "Starting package installation process"
+#~ msgstr "يجري بدء عملية تثبيت الحزمة"
+
+#~ msgid "Checking disks"
+#~ msgstr "يجري فحص الأقراص"
+
+#~ msgid "Detect disks"
+#~ msgstr "اكشف الأقراص"
+
+#~ msgid "Detecting disks"
+#~ msgstr "يجري كشف الأقراص"
+
+#~ msgid "Installation destination"
+#~ msgstr "وجهة التثبيت"
+
+#~ msgid "Local standard disk"
+#~ msgstr "القرص المعياري المحلي"
+
+#~ msgid "Local standard disks"
+#~ msgstr "الأقراص المعياريّة المحليّة"
+
+#~ msgid "Select multiple disks"
+#~ msgstr "اختر عدة أقراص"
+
+#~ msgid "Select no disk"
+#~ msgstr "لا تختر أي قرص"
+
+#~ msgid "Try Fedora"
+#~ msgstr "جرّب فيدورا"
+
+#~ msgid "Use the "
+#~ msgstr "استعمل "
+
+#~ msgid "Welcome to the Anaconda installer"
+#~ msgstr "مرحبا بك إلى مُثبّت أناكوندا"
+
+#~ msgid ""
+#~ "You are currently running Fedora from live media.\n"
+#~ "You can install Fedora now, or choose \"Install to Hard Drive\" in the "
+#~ "Activities Overview at any later time."
+#~ msgstr ""
+#~ "تقوم حاليًا بتشغيل فيدورا من الوسيط الحي.\n"
+#~ "بإمكانك تثبيت فيدورا الآن ، أو اختر \"ثبّت إلى القرص الصلب\" من معرض "
+#~ "الأنشطة في أي وقت لاحقًا خلال التّشغيل."
+
+#~ msgid ""
+#~ "You can choose \"Install to Hard Drive\"\n"
+#~ "in the Activities Overview at any later time."
+#~ msgstr ""
+#~ "بإمكانك اختيار \"ثبّت إلى القرص الصلب\"\n"
+#~ "من معرض الأنشطة في أي وقت لاحقًا خلال التّشغيل."
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "D_evice:"
+#~ msgstr "الج_هاز:"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "_ISO file:"
+#~ msgstr "مل_ف ISO:"
+
+#~ msgid "Error setting up software source"
+#~ msgstr "خطأ أثناء إعداد مصدر البرمجيات"
+
+#~ msgid ""
+#~ "Failed to set up installation source; check the repo url and proxy "
+#~ "settings."
+#~ msgstr ""
+#~ "فشل في إعداد مصدر التثبيت، افحص رابط المستودع و إعدادات الخادم الوسيط."
+
+#~ msgid "URL for the repository, without protocol."
+#~ msgstr "رابط المستودع، بدون بروتوكول."
+
+#~ msgid "URL of proxy in the form of protocol://host:[port]"
+#~ msgstr "رابط المُلقّم بالصّيغة protocol://host:[المنفذ]"
+
+#~ msgid "Optional proxy password."
+#~ msgstr "كلمة مرور المُلقّم الاختياري"
+
+#~ msgid "Protocol for the repository URL."
+#~ msgstr "بروتوكول رابط المستودع"
+
+#~ msgctxt "GUI|Software Source"
+#~ msgid "Pass_word:"
+#~ msgstr "كلمة الم_رور:"
+
+#~ msgid "Select one or more disks this device may reside on."
+#~ msgstr "انتقِ قرصًا أو أكثر لإقامة هذا الجهاز عليه."
+
+#, fuzzy
+#~| msgid "Installation"
+#~ msgid "Payload installation"
+#~ msgstr "التثبيت"
+
+#, fuzzy
+#~| msgid "Installation"
+#~ msgid "Boot loader installation"
+#~ msgstr "التثبيت"
+
+#, fuzzy
+#~| msgid "Selected Device"
+#~ msgid "Discover disks"
+#~ msgstr "الجهاز المُنتقى"
+
+#, fuzzy
+#~| msgid "No disks selected"
+#~ msgid "$0 (of $1) disk selected"
+#~ msgid_plural "$0 (of $1) disks selected"
+#~ msgstr[0] "لم يُنتقَ أيّ قرص"
+#~ msgstr[1] "لم يُنتقَ أيّ قرص"
+#~ msgstr[2] "لم يُنتقَ أيّ قرص"
+#~ msgstr[3] "لم يُنتقَ أيّ قرص"
+#~ msgstr[4] "لم يُنتقَ أيّ قرص"
+#~ msgstr[5] "لم يُنتقَ أيّ قرص"
+
+#~ msgid "Failed to set up installation source"
+#~ msgstr "فشل في ضبط مصدر التثبيت"
+
+#~ msgid "Error downloading package metadata"
+#~ msgstr "خطأ في تنزيل معلومات الحزم"
+
+#, fuzzy
+#~| msgctxt "GUI|Network|Add Device Dialog"
+#~| msgid "_Select the type of device you wish to add"
+#~ msgid "Select the language you would like to use."
+#~ msgstr "انت_قِ نوع الجهاز الذي ترغب بإضافته"
+
+#, fuzzy
+#~| msgid "Installation source"
+#~ msgid "Installation progress"
+#~ msgstr "مصدر التثبيت"
+
+#, fuzzy
+#~| msgid "Installation source"
+#~ msgid "Installation language"
+#~ msgstr "مصدر التثبيت"
+
+#, fuzzy
+#~| msgid ""
+#~| "Select the device(s) you'd like to install to.  They will be left "
+#~| "untouched until you click on the main menu's \"Begin Installation\" "
+#~| "button."
+#~ msgid ""
+#~ "Select the device(s) you would like to install to. They will be left "
+#~ "untouched until you click on the main menu's 'Begin installation' button."
+#~ msgstr ""
+#~ "انتقِ جهازًا أو أكثر ترغب بالتّثبيت عليها. لن تمسّ أجهزتك مطلقًا حتّى تضغط على "
+#~ "زر \"ابدأ التّثبيت\" ضمن القائمة الرّئيسيّة."
+
+#, fuzzy
+#~| msgid "PRE-RELEASE / TESTING"
+#~ msgid "PRE-RELEASE/TESTING"
+#~ msgstr "قبل الإطلاق / تجريب"
+
+#, fuzzy
+#~| msgid "Installation source"
+#~ msgid "Installation summary"
+#~ msgstr "مصدر التثبيت"
+
+#, fuzzy
+#~| msgid "%s timezone"
+#~ msgid "Time & Date"
+#~ msgstr "المنطقة الزمنية %s"
+
+#, fuzzy
+#~| msgid "Software selection"
+#~ msgid "Software Selection"
+#~ msgstr "انتقاء البرمجيات"
+
+#, fuzzy
+#~| msgid "Network Name"
+#~ msgid "Network & Host name"
+#~ msgstr "اسم الشبكة"
+
+#, fuzzy
+#~| msgid ""
+#~| "Please complete items marked with this icon before continuing to the "
+#~| "next step."
+#~ msgid ""
+#~ "Please complete items marked with this icon before continuing to the next "
+#~ "step"
+#~ msgstr ""
+#~ "أكمل من فضلك العناصر المعلّمة بهذه الأيقونة قبل المواصلة إلى الخطوة "
+#~ "التالية."
+
+#, fuzzy
+#~| msgctxt "GUI|Date and Time"
+#~| msgid "_Network Time"
+#~ msgid "Network time"
+#~ msgstr "وقت الشبكة"
+
+#, fuzzy
+#~| msgctxt "GUI|Date and Time"
+#~| msgid "_Network Time"
+#~ msgid "Use network time"
+#~ msgstr "وقت الشبكة"
+
+#, fuzzy
+#~| msgctxt "GUI|User"
+#~| msgid "_Confirm password"
+#~ msgid "Confirm root password"
+#~ msgstr "أكّ_د كلمة المرور"
+
+#, fuzzy
+#~| msgid "Network Name"
+#~ msgid "Network & Host Name"
+#~ msgstr "اسم الشبكة"
+
+#, fuzzy
+#~| msgctxt "GUI|Software Source|Media Check Dialog"
+#~| msgid "_Done"
+#~ msgid "Done"
+#~ msgstr "_تمّ"
+
+#~ msgid "Unsupported Hardware Detected"
+#~ msgstr "تم اكتشاف عتاد غير مدعوم"
+
+#~ msgctxt "GUI|Welcome|Unsupported Hardware Dialog"
+#~ msgid "_Quit"
+#~ msgstr "_أغلق"
+
+#~ msgctxt "GUI|Welcome|Unsupported Hardware Dialog"
+#~ msgid "_Continue"
+#~ msgstr "ا_ستمر"
+
+#~ msgid "Root account is disabled."
+#~ msgstr "تم تعطيل حساب الجذر."
+
+#~ msgid "Password is set."
+#~ msgstr "تم ضبط كلمة المرور."
+
+#~ msgid "Password is not set."
+#~ msgstr "لم تضبط كلمة المرور."
+
+#, fuzzy
+#~| msgid "Ethernet"
+#~ msgid "Other"
+#~ msgstr "شبكة عادية"
+
+#, fuzzy
+#~| msgid "Port"
+#~ msgid "Portable"
+#~ msgstr "منفذ"
+
+#, fuzzy
+#~| msgid "Action"
+#~ msgid "Docking station"
+#~ msgstr "نشاط"
+
+#, fuzzy
+#~| msgctxt "GUI|User"
+#~| msgid "_Advanced..."
+#~ msgid "Advanced TCA"
+#~ msgstr "مت_قدم..."
+
+#, fuzzy
+#~| msgid "Enabled"
+#~ msgid "Tablet"
+#~ msgstr "مفعّل"
+
+#, fuzzy
+#~| msgid "IPv4 gateway"
+#~ msgid "IoT gateway"
+#~ msgstr "بوّابة آيبي 4"
+
+#, fuzzy
+#~| msgid "Preserve"
+#~ msgid "Present"
+#~ msgstr "احمِ"
+
+#, fuzzy
+#~| msgid "Not connected"
+#~ msgid "Not synchronized"
+#~ msgstr "غير متصل"
+
+#, fuzzy
+#~| msgid "Root password is not set"
+#~ msgid "Old password not accepted"
+#~ msgstr "كلمة مرور الجذر غير مضبوطة"
+
+#, fuzzy
+#~| msgid "Configure device %s"
+#~ msgid "Failed to change password"
+#~ msgstr "اضبط الجهاز %s"
+
+#, fuzzy
+#~| msgid "Root password is not set"
+#~ msgid "New password was not accepted"
+#~ msgstr "كلمة مرور الجذر غير مضبوطة"
+
+#, fuzzy
+#~| msgid "Invalid timezone"
+#~ msgid "Invalid file permissions"
+#~ msgstr "منطقة زمنية خاطئة"
+
+#, fuzzy
+#~| msgid "Password is not set."
+#~ msgid "Password not accepted"
+#~ msgstr "لم تضبط كلمة المرور."
+
+#~ msgid "Add and mark for usage NTP servers"
+#~ msgstr "أضف علامة لاستخدامها في خواديم NTP"
+
+#~ msgid "Use"
+#~ msgstr "استخدم"
+
+#~ msgid ""
+#~ "The root account is used for administering the system.  Enter a password "
+#~ "for the root user."
+#~ msgstr "يُستعمل الحساب الجذري لإدارة النّظام. أدخل كلمة مرور للمستخدم الجذري."
+
+#~ msgid "Error checking software dependencies"
+#~ msgstr "خطأ في فحص اعتماديات البرمجيات"
+
+#~ msgid "Slaves"
+#~ msgstr "الثانويات"
+
+#~ msgid "eg: \"20 GB\", \"500mb\" (minus the quotation marks)"
+#~ msgstr "مثال: \"20 GB\", \"500mb\" (أزل علامات الاقتباس)"
+
+#~ msgid "DEFAULT TITLE"
+#~ msgstr "العنوان الافتراضي"
+
+#~ msgctxt "GUI|Network|Wireless"
+#~ msgid "_Network Name"
+#~ msgstr "اسم ال_ِبكة"
+
+#~ msgid "Generating updated storage configuration"
+#~ msgstr "يجري توليد إعدادات التخزين المحدّث"

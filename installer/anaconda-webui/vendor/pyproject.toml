@@ -1,0 +1,113 @@
+[tool.mypy]
+follow_imports = 'silent'  # https://github.com/python-lsp/pylsp-mypy/issues/81
+scripts_are_modules = true  # allow checking all scripts in one invocation
+explicit_package_bases = true
+mypy_path = 'test:test/helpers:test/common:bots'
+exclude = [
+    "bots"
+]
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    # run without bots checked out
+    "machine.*",
+    "testvm",
+]
+[tool.ruff]
+exclude = [
+    ".git/",
+    "modules/",
+    "node_modules/",
+]
+
+# we want 118, but fix tests first
+# line-length = 118
+line-length = 149
+src = []
+
+[tool.ruff.lint]
+select = [
+    "A",       # flake8-builtins
+    "B",       # flake8-bugbear
+    "C4",      # flake8-comprehensions
+    "D300",    # pydocstyle: Forbid ''' in docstrings
+    "DTZ",     # flake8-datetimez
+    "E",       # pycodestyle
+    "EXE",     # flake8-executable
+    "F",       # pyflakes
+    "FBT",     # flake8-boolean-trap
+    "G",       # flake8-logging-format
+    "I",       # isort
+    "ICN",     # flake8-import-conventions
+    "ISC",     # flake8-implicit-str-concat
+    "PLE",     # pylint errors
+    "PGH",     # pygrep-hooks
+    "RSE",     # flake8-raise
+    "RUF",     # ruff rules
+    "T10",     # flake8-debugger
+    "TCH",     # flake8-type-checking
+    "UP032",   # f-string
+    "W",       # warnings (mostly whitespace)
+    "YTT",     # flake8-2020
+]
+ignore = [
+    "E402",   # Module level import not at top of file"
+    "E741",   # ambiguous variable name
+    "FBT002", # Boolean default value in function definition
+    "FBT003", # Boolean positional value in function call
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+    "RUF100", # Unused `noqa` directive (used by flake8)
+]
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.isort]
+known-first-party = ["cockpit"]
+
+[tool.vulture]
+ignore_names = [
+   "test[A-Z0-9]*",
+   "setUpClass",
+   "machine_class",
+   "provision",
+   "wait_poweroff",
+   "_domain",
+   "_testBackendTranslations_partition_disk",
+   "_testBasic_partition_disk",
+   "_testBtrfsSubvolumes_partition_disk",
+   "_testDiskSelectionLVM_partition_disk",
+   "_testDuplicateDeviceNames_partition_disk",
+   "_testEncryptedHomeSecondDisk_partition_disk",
+   "_testEncryptedUnlockBTRFSonLUKS_partition_disk",
+   "_testEncryptedUnlockLUKSonRAID_partition_disk",
+   "_testEncryptedUnlockRAIDonLUKS_partition_disk",
+   "_testEncryptedUnlockStratis_partition_disk",
+   "_testEncryptedUnlock_partition_disk",
+   "_testExtendedPartition_partition_disk",
+   "_testHomeReuseFedoraEncrypted_partition_disk",
+   "_testLVMOnRAID_partition_disk",
+   "_testLVM_partition_disk",
+   "_testMBRParttable_partition_disk",
+   "_testMultipleDisks_partition_disk",
+   "_testMultipleRoots_partition_disk",
+   "_testNonLinuxSystem_partition_disk",
+   "_testNoRootMountPoint_partition_disk",
+   "_testPayloadSizeCheck_partition_disk",
+   "_testPreserveHome_partition_disk",
+   "_testRAID0Scenario_0_partition_disk",
+   "_testReclaimExt4onLUKS_partition_disk",
+   "_testReclaimSpaceDeleteBtrfsSubvolumes_partition_disk",
+   "_testReclaimSpaceOptional_partition_disk",
+   "_testReclaimSpaceShrinkBtrfsSubvolumes_partition_disk",
+   "_testReclaimSpaceWindows_partition_disk",
+   "_testReformatBtrfsVolume_partition_disk",
+   "_testStratis_partition_disk",
+   "_testUnusableFormats_partition_disk",
+   "_testVfatWithoutESP_partition_disk",
+   "_testWindows_partition_disk",
+   "_testWindowsSingleDisk_partition_disk",
+   "_testWindowsSingleDiskHomeReuse_partition_disk",
+]

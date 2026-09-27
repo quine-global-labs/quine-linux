@@ -1,0 +1,19 @@
+/*
+ * Copyright (C) 2023 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+.pf-v6-c-empty-state__content {
+    width: 100%;
+}
+
+.anaconda-screen-progress-status {
+    &-success .pf-v6-c-empty-state__icon {
+        color: var(--pf-t--global--icon--color--status--success--default);
+    }
+
+    &-danger .pf-v6-c-empty-state__icon {
+        color: var(--pf-t--global--icon--color--status--danger--default);
+    }
+
+    gap: max(8rem, 5vw) !important;
+}

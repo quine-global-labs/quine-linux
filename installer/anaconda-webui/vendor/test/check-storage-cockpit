@@ -1,0 +1,1082 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2024 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+from anacondalib import VirtInstallMachineCase, disk_images, pixel_tests_ignore, run_boot
+from installer import Installer
+from review import Review
+from storage import EFI_PARTITION_DEFAULT_SIZE_MB, Storage
+from storagelib import StorageCase  # pylint: disable=import-error
+from testlib import nondestructive, skipImage, test_main  # pylint: disable=import-error
+from utils import pretend_live_workstation_iso
+
+
+@nondestructive
+class TestStorageCockpitIntegration(VirtInstallMachineCase, StorageCase):
+    def reachCockpitStorage(self):
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.wait_scenario_visible("use-configured-storage", False)
+        s.check_disk_selected("vda")
+        s.enter_cockpit_storage()
+
+    def cockpitCreateBootloaderPartitions(self):
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 524, "type": "efi", "mount_point": "/boot/efi"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+    def testBasicLiveISO(self):
+        """
+        Description:
+            Test that the 'Modify storage' button is available on the first page
+            of the installer when using a live ISO.
+
+        References:
+            - https://bugzilla.redhat.com/show_bug.cgi?id=2336488
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+
+        pretend_live_workstation_iso(self, i, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.check_disk_selected("vda")
+        s.enter_cockpit_storage()
+
+    def testEncryptedUnlock(self):
+        """
+        Description:
+            Test installation on an encrypted partition created in Cockpit storage
+
+        Expected results:
+            - An encrypted partition can be created and used as the root mount point
+            - An encrypted partition can be reformatted in Cockpit storage and reused
+            - The partition can be deleted in Cockpit storage
+
+        References:
+            - https://bugzilla.redhat.com/show_bug.cgi?id=2354497
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        dev = "vda"
+
+        self.reachCockpitStorage()
+        self.cockpitCreateBootloaderPartitions()
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        self.dialog({
+            "type": "ext4", "mount_point": "/",
+            "crypto": self.default_crypto_type,
+            "passphrase": "redhat",
+            "passphrase2": "redhat",
+        })
+
+        s.exit_cockpit_storage()
+
+        s.check_scenario_selected("use-configured-storage")
+
+        # Check that choosing another storage scenario without diving into that,
+        # preserves the visibility of "Use configured storage"
+        s.set_scenario("erase-all")
+        s.wait_scenario_available("use-configured-storage")
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        r.check_disk_row(dev, "/", "vda3", "14.5 GB", False, None, True)
+
+        # Exit the cockpit-storage iframe
+        i.reach_on_sidebar(i.steps.INSTALLATION_METHOD)
+        s.enter_cockpit_storage()
+
+        # Format the partition again with 'Reuse existing encryption'
+        # Check that cockpit sends us the information also after re-formatting (rhbz#2354497)
+        self.click_dropdown(self.card_row("Storage", 4), "Format")
+        self.dialog_wait_open()
+        self.dialog_set_val("type", "ext4")
+        self.dialog_set_val("mount_point", "/")
+        self.dialog_set_val("old_passphrase", "redhat")
+        b.set_checked("#dialog-confirm", val=True)
+        self.dialog_apply()
+        self.dialog_wait_close()
+
+        s.exit_cockpit_storage()
+
+        # Do not crash if encrypted device got deleted
+        s.enter_cockpit_storage()
+
+        self.click_dropdown(self.card_row("Storage", 4), "Delete")
+        b.set_checked("#dialog-confirm", val=True)
+        self.dialog_apply()
+        b.wait_not_present(self.card_row("Storage", name="vda3"))
+
+        s.exit_cockpit_storage()
+
+    def _createLVMVolumes(self, browser, dev, vgname, root_size=6010):
+        self.reachCockpitStorage()
+        self.cockpitCreateBootloaderPartitions()
+
+        self.click_devices_dropdown("Create LVM2 volume group")
+        self.dialog({"name": vgname, "disks": {dev: True}})
+
+        self.click_card_row("Storage", name=vgname)
+
+        browser.click(self.card_button("LVM2 logical volumes", "Create new logical volume"))
+        self.dialog({"name": "root", "size": root_size})
+        self.click_card_row("LVM2 logical volumes", 1)
+        self.click_card_dropdown("Unformatted data", "Format")
+        self.dialog({"type": "ext4", "mount_point": "/"})
+
+        browser.click(self.card_parent_link())
+
+        browser.click(self.card_button("LVM2 logical volumes", "Create new logical volume"))
+        self.dialog({"name": "home", "size": 8120})
+        self.click_card_row("LVM2 logical volumes", 1)
+        self.click_card_dropdown("Unformatted data", "Format")
+        self.dialog({"type": "ext4", "mount_point": "/home"})
+
+        browser.click(self.card_parent_link())
+
+        browser.click(self.card_button("LVM2 logical volumes", "Create new logical volume"))
+        self.dialog({"name": "swap", "size": 377})
+        self.click_card_row("LVM2 logical volumes", 3)
+        self.click_card_dropdown("Unformatted data", "Format")
+        self.dialog({"type": "swap"})
+
+    def testLVM(self):
+        """
+        Description:
+            Test installation on an LVM volume created in Cockpit storage
+
+        Expected results:
+            - An LVM volume can be created and used for the root mount point
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createLVMVolumes(b, "/dev/vda", "fedoravg")
+
+        # Exit the cockpit-storage iframe
+        b.switch_to_top()
+
+        def checkStorageReview(prefix=""):
+            disk = "vda"
+            r.check_disk(disk, "16.1 GB vda (Virtio Block Device)", prefix=prefix)
+            r.check_disk_row(disk, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False, "efi", prefix=prefix)
+            r.check_disk_row(disk, "/boot", "vda2", "1.07 GB", False, prefix=prefix)
+            r.check_disk_row(disk, "/", "vda3, LVM", "6.01 GB", False, prefix=prefix)
+            r.check_disk_row(disk, "/home", "vda3, LVM", "8.12 GB", False, prefix=prefix)
+            r.check_disk_row(disk, "swap", "vda3, LVM", "377 MB", False, prefix=prefix)
+
+        s.return_to_installation()
+
+        # verify storage layout review in Cockpit storage exit dialog
+        checkStorageReview(prefix="#cockpit-storage-integration-check-storage-dialog")
+        b.assert_pixels(
+            "#cockpit-storage-integration-check-storage-dialog",
+            "cockpit-storage-integration-check-storage-dialog-LVM",
+            ignore=pixel_tests_ignore,
+        )
+        s.return_to_installation_confirm()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        checkStorageReview()
+
+    def _testStandardPartition(self, rootfs_format):
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        dev = "vda"
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.wait_scenario_visible("use-configured-storage", False)
+        s.check_disk_selected("vda")
+        s.enter_cockpit_storage()
+
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 100, "type": "efi", "mount_point": "/boot/efi"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        self.dialog({"type": rootfs_format, "mount_point": "/"})
+
+        b.switch_to_top()
+
+        def checkStorageReview(prefix=""):
+            r.check_disk(dev, "16.1 GB vda (Virtio Block Device)", prefix=prefix)
+            r.check_disk_row(dev, "/boot/efi", "vda1", "99.6 MB", False, "efi", prefix=prefix)
+            r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False, prefix=prefix)
+            r.check_disk_row(dev, "/", "vda3", "14.9 GB", False, prefix=prefix)
+
+        s.return_to_installation()
+        checkStorageReview(prefix="#cockpit-storage-integration-check-storage-dialog")
+        s.return_to_installation_confirm()
+
+        i.reach(i.steps.REVIEW)
+        checkStorageReview()
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot/efi auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot auto noauto 0 0" in fstab)
+
+    def testStandardPartitionExt4(self):
+        """
+        Description:
+            Test installation on an ext4 partition created in Cockpit storage
+
+        Expected results:
+            - An ext4 partition can be created and used for the root mount point
+        """
+        self._testStandardPartition("ext4")
+
+    def testStandardPartitionXFS(self):
+        """
+        Description:
+            Test installation on an XFS partition created in Cockpit storage"
+
+        Expected results:
+            - An xfs partition can be created and used for the root mount point
+        """
+        self._testStandardPartition("xfs")
+
+    def testMissingBootEfiPartition(self):
+        """
+        Description:
+            Test that a storage layout without /boot/efi shows a backend validation
+            error
+
+        Expected results:
+            - The check storage dialog shows backend validation errors
+
+        References:
+            - https://bugzilla.redhat.com/show_bug.cgi?id=2406021
+        """
+        b = self.browser
+        s = Storage(b, self.machine)
+
+        self.reachCockpitStorage()
+
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"type": "ext4", "mount_point": "/"})
+
+        b.switch_to_top()
+        s.return_to_installation("EFI System Partition must be mounted on one of /boot/efi")
+        b.wait_in_text("#cockpit-storage-integration-check-storage-dialog", "Storage requirements not met")
+
+    def testPayloadSizeCheckExt4(self):
+        """
+        Description:
+            Test free space check on partitions with XFS filesystem"
+
+        Expected results:
+            - A warning about insufficient space is showed to the user on the review screen
+            - The warning prevents continuing with the installation
+            - There are hints beside the checked mount points in case of failed check
+            - The link for changing partitioning layout moves user to the right page
+        """
+        self._testPayloadSizeCheck("ext4")
+
+    def testPayloadSizeCheckXFS(self):
+        """
+        Description:
+            Test free space check on partitions with ext4 filesystem"
+
+        Expected results:
+            - A warning about insufficient space is showed to the user on the review screen
+            - The warning prevents continuing with the installation
+            - There are hints beside the checked mount points in case of failed check
+            - The link for changing partitioning layout moves user to the right page
+        """
+        self._testPayloadSizeCheck("xfs")
+
+    def _testPayloadSizeCheck(self, rootfs_format):
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        dev = "vda"
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.wait_scenario_visible("use-configured-storage", False)
+        s.check_disk_selected(dev)
+        s.enter_cockpit_storage()
+
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 100, "type": "efi", "mount_point": "/boot/efi"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"size": 1000, "type": "ext4", "mount_point": "/boot"})
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        self.dialog({"size": 1300, "type": rootfs_format, "mount_point": "/"})
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        r.check_size_error()
+        # The value starts with 1 (is non-zero)
+        r.check_available_size_error_value("1")
+
+        # check that there is a hint with required size beside the device
+        r.check_disk(dev, f"16.1 GB {dev} (Virtio Block Device)")
+        r.check_disk_row(dev, "/", f"{dev}3", "1.30 GB", False)
+        r.check_disk_mount_point_helper_text(dev, "/", "Needs at least")
+
+        i.check_next_disabled()
+
+        # Test going back from the alert to the proper page
+        b.click(f"#{i.steps.REVIEW}-change-partition-layout")
+
+        s.wait_scenario_available("use-configured-storage")
+
+    def testPayloadSizeCheckBtrfs(self):
+        """
+        Description:
+            Test free space check on partitions with btrfs filesystem"
+
+        Expected results:
+            - A warning about insufficient space is showed to the user on the review screen
+            - The warning prevents continuing with the installation
+            - There are hints beside the checked mount points in case of failed check
+            - The link for changing partitioning layout moves user to the right page
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createBtrfsSubvolumes(b, vol_size=1700)
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        r.check_size_error()
+        # The value starts with 1 (is non-zero)
+        r.check_available_size_error_value("1")
+
+        # check that there is a hint with required size beside the device
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/", "vda3", "1.70 GB", False)
+        r.check_disk_mount_point_helper_text(dev, "/", "Needs at least")
+
+        i.check_next_disabled()
+
+    def testPayloadSizeCheckLVM(self):
+        """
+        Description:
+            Test free space check on partitions on LVM logical volume"
+
+        Expected results:
+            - A warning about insufficient space is showed to the user on the review screen
+            - The warning prevents continuing with the installation
+            - There are hints beside the checked mount points in case of failed check
+            - The link for changing partitioning layout moves user to the right page
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createLVMVolumes(b, "/dev/vda", "fedoravg", root_size=1700)
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        r.check_size_error()
+        # The value starts with 1 (is non-zero)
+        r.check_available_size_error_value("1")
+
+        # check that there is a hint with required size beside the device
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/", "vda3, LVM", "1.70 GB", False)
+        r.check_disk_mount_point_helper_text(dev, "/", "Needs at least")
+
+        i.check_next_disabled()
+
+    def testBtrfsTopLevelVolume(self):
+        """
+        Description:
+            Test installation on a btrfs top-level volume created in Cockpit storage
+
+        Expected results:
+            - A btrfs top-level volume can be created and used for the root mount point
+            - The review screen shows the correct mount points
+            - The fstab file is updated correctly
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.wait_scenario_visible("use-configured-storage", False)
+        s.check_disk_selected("vda")
+        s.enter_cockpit_storage()
+
+        self.cockpitCreateBootloaderPartitions()
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        self.dialog({"type": "btrfs", "mount_point": "/"})
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda3", "14.5 GB", False)
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot/efi auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot auto noauto,subvol=/ 0 0" in fstab)
+
+    def _createBtrfsSubvolumes(self, browser, vol_size=None):
+        self.reachCockpitStorage()
+        self.cockpitCreateBootloaderPartitions()
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        if vol_size:
+            self.dialog({"type": "btrfs", "size": vol_size})
+        else:
+            self.dialog({"type": "btrfs"})
+
+        self.click_card_row("Storage", name="top-level")
+
+        browser.click(self.card_button("btrfs subvolume", "Create subvolume"))
+        self.dialog({"name": "root", "mount_point": "/"})
+
+        browser.click(self.card_button("btrfs subvolume", "Create subvolume"))
+        self.dialog({"name": "unused"})
+
+        browser.click(self.card_button("btrfs subvolume", "Create subvolume"))
+        self.dialog({"name": "home", "mount_point": "/home"})
+
+    def testBtrfsSubvolumes(self):
+        """
+        Description:
+            Test installation on a btrfs subvolume created in Cockpit storage
+
+        Expected results:
+            - A btrfs subvolume can be created and used for the root and home mount points
+            - The review screen shows the correct mount points
+            - The fstab file is updated correctly
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createBtrfsSubvolumes(b)
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda3", "14.5 GB", False)
+        r.check_disk_row(dev, "/home", "vda3", "14.5 GB", False)
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot/efi auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot btrfs noauto,subvol=root 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/home btrfs noauto,subvol=home 0 0" in fstab)
+
+    def testBtrfsAndMountPointAssignment(self):
+        """
+        Description:
+            Test installation on a btrfs subvolume created in Cockpit storage by
+            selecting these in the Mount Point Assignment screen
+
+        Expected results:
+            - A btrfs subvolume can be created and used through mount point assignment screen for the root and home mount points
+            - The review screen shows the correct mount points
+            - The fstab file is updated correctly
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createBtrfsSubvolumes(b)
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("mount-point-mapping")
+
+        i.next(next_page=i.steps.CUSTOM_MOUNT_POINT)
+
+        s.check_mountpoint_row(1, "/", "root", False, "btrfs")
+        s.check_mountpoint_row(2, "/boot/efi", "vda1", False, "EFI System Partition")
+        s.check_mountpoint_row(3, "/boot", "vda2", False, "ext4")
+        s.check_mountpoint_row(4, "/home", "home", False, "btrfs")
+
+        s.select_mountpoint_row_reformat(1)
+        s.select_mountpoint_row_reformat(3)
+        s.select_mountpoint_row_reformat(4, False)
+
+        s.check_mountpoint_row(1, "/", "root", True, "btrfs")
+        s.check_mountpoint_row(2, "/boot/efi", "vda1", False, "EFI System Partition")
+        s.check_mountpoint_row(3, "/boot", "vda2", True, "ext4")
+        s.check_mountpoint_row(4, "/home", "home", False, "btrfs")
+
+        i.next(should_fail=True)
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", True, "ext4")
+        r.check_disk_row(dev, "/", "vda3", "14.5 GB", True, "btrfs subvolume")
+        r.check_disk_row(dev, "/home", "vda3", "14.5 GB", False)
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot/efi auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot btrfs noauto,subvol=root 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/home btrfs noauto,subvol=home 0 0" in fstab)
+
+    def _createStratisPool(self, browser, poolname="fedorapool", passphrase=None):
+        self.reachCockpitStorage()
+        self.cockpitCreateBootloaderPartitions()
+
+        self.click_devices_dropdown("Create Stratis pool")
+        pool_dialog = {
+            "name": poolname,
+            "disks": {"/dev/vda": True},
+            "overprov.on": False,
+        }
+        if passphrase:
+            pool_dialog.update({
+                "encrypt_pass.on": True,
+                "passphrase": passphrase,
+                "passphrase2": passphrase,
+            })
+        self.dialog(pool_dialog)
+
+        self.click_card_row("Storage", name=poolname)
+
+        browser.click(self.card_button("Stratis filesystems", "Create new filesystem"))
+        self.dialog({"name": "root", "size": 5000, "mount_point": "/"})
+
+        browser.click(self.card_button("Stratis filesystems", "Create new filesystem"))
+        self.dialog({"name": "home", "size": 5000, "mount_point": "/home"})
+
+    def testStratis(self):
+        """
+        Description:
+            Test installation on a Stratis pool and filesystems created in Cockpit storage
+
+        Expected results:
+            - A Stratis pool and filesystems can be created and used for the root and home mount points
+            - The review screen shows the correct mount points and devices
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createStratisPool(b)
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda3, Stratis", fs_type="stratis xfs")
+        r.check_disk_row(dev, "/home", "vda3, Stratis", fs_type="stratis xfs")
+
+    def testStratisEncrypted(self):
+        """
+        Description:
+            Test installation on an encrypted Stratis pool created in Cockpit storage
+
+        Expected results:
+            - An encrypted Stratis pool and filesystems can be created and used
+              for the root and home mount points
+            - Cockpit passes the passphrase to the installer so that the pool can
+              be used without an explicit unlock step
+            - The review screen shows the devices as encrypted
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        self._createStratisPool(b, passphrase="redhat")
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot/efi", "vda1", EFI_PARTITION_DEFAULT_SIZE_MB, False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda3, Stratis", fs_type="stratis xfs", is_encrypted=True)
+        r.check_disk_row(dev, "/home", "vda3, Stratis", fs_type="stratis xfs", is_encrypted=True)
+
+    @disk_images([("", 15), ("", 15), ("", 15)])
+    def testRAIDUnsupportedNesting(self):
+        """
+        Description:
+            Check that partitions created on a RAID device which is on top of partitions are considered unsupported
+
+        References:
+            - https://issues.redhat.com/browse/INSTALLER-4141
+
+        TODO:
+            This logic is currently implemented in the frontend, but it should be moved to the backend
+            Once this is moved to backend we should implement a unit test for this and we can remove the Web UI test
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.select_disks([("vdb", True), ("vda", True), ("vdc", True)])
+
+        s.enter_cockpit_storage()
+
+        # Create ESP and boot partitions on vda
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 100, "type": "efi", "mount_point": "/boot/efi"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+        # Create partitions for the RAID device on vdb and vdc
+        self.click_dropdown(self.card_row("Storage", 5), "Create partition table")
+        self.dialog({"type": "gpt"})
+        self.click_dropdown(self.card_row("Storage", 6), "Create partition")
+        self.dialog({"type": "empty"})
+
+        self.click_dropdown(self.card_row("Storage", 7), "Create partition table")
+        self.dialog({"type": "gpt"})
+        self.click_dropdown(self.card_row("Storage", 8), "Create partition")
+        self.dialog({"type": "empty"})
+
+        # Create RAID0 on vda3, vdb1, and vdc1
+        self.click_dropdown(self.card_header("Storage"), "Create MDRAID device")
+        self.dialog_wait_open()
+        self.dialog_set_val("level", "raid0")
+        self.dialog_set_val("disks", {"/dev/vdb1": True, "/dev/vdc1": True})
+        self.dialog_set_val("name", "SOMERAID")
+        self.dialog_apply()
+        self.dialog_wait_close()
+        b.wait_visible(self.card_row("Storage", name="/dev/md/SOMERAID"))
+
+        # Create / partition on the RAID device
+        self.click_dropdown(self.card_row("Storage", name="/dev/md/SOMERAID"), "Create partition table")
+        self.dialog({"type": "gpt"})
+        self.click_dropdown(self.card_row("Storage", 10), "Create partition")
+        self.dialog({"type": "ext4", "mount_point": "/"})
+
+        # Exit the cockpit-storage iframe and return to installation
+        b.switch_to_top()
+        s.return_to_installation("Invalid RAID configuration detected.")
+
+    @skipImage("Flaky: FIXME: INSTALLER-4917", "*")
+    @disk_images([("", 15), ("", 15), ("", 15)])
+    @run_boot("bios", "efi")
+    def testUnsupportedBootloaderOnMDRAID(self):
+        """
+        Description:
+            Check that the installer does not support bootloader partitions on MDRAID devices
+
+        Expected results:
+            - The installer should show an error message when trying to use a bootloader partition on a MDRAID device
+            - The installer should block the user from proceeding with the installation
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+
+        self.addCleanup(m.execute, "mdadm --zero-superblock /dev/vda /dev/vdb /dev/vdc")
+        self.addCleanup(m.execute, "mdadm --stop /dev/md/SOMERAID")
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.select_disks([("vdb", True), ("vda", True), ("vdc", True)])
+
+        s.enter_cockpit_storage()
+
+        # Create RAID device on vda, vdb, and vdc
+        self.click_dropdown(self.card_header("Storage"), "Create MDRAID device")
+        self.dialog_wait_open()
+        self.dialog_set_val("level", "raid0")
+        self.dialog_set_val("disks", {"/dev/vda": True, "/dev/vdb": True, "/dev/vdc": True})
+        self.dialog_set_val("name", "SOMERAID")
+        self.dialog_apply()
+        self.dialog_wait_close()
+
+        # Create bootloader and /boot partitions on vda
+        # Create ESP, /boot and / partitions on the RAID device
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition table")
+        self.dialog({"type": "gpt"})
+        self.click_dropdown(self.card_row("Storage", 5), "Create partition")
+        if self.is_efi:
+            self.dialog({"size": 100, "type": "efi", "mount_point": "/boot/efi"})
+        else:
+            self.dialog({"size": 1, "type": "biosboot"})
+        self.click_dropdown(self.card_row("Storage", 6), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+        self.click_dropdown(self.card_row("Storage", 7), "Create partition")
+        self.dialog({"type": "ext4", "mount_point": "/"})
+
+        # Exit the cockpit-storage iframe and return to installation
+        b.switch_to_top()
+        bootloaderType = "efi" if self.is_efi else "biosboot"
+        s.return_to_installation(
+            f"'{bootloaderType}' partition on MDRAID device SOMERAID found. Bootloader partitions on MDRAID devices are not supported."
+        )
+
+    def _createRAID(self, disks, level, name):
+        """ Create a RAID device with the given disks, level and name """
+
+        b = self.browser
+
+        self.click_dropdown(self.card_header("Storage"), "Create MDRAID device")
+        self.dialog_wait_open()
+        self.dialog_set_val("level", level)
+        self.dialog_set_val("disks", disks)
+        self.dialog_set_val("name", name)
+        self.dialog_apply()
+        self.dialog_wait_close()
+
+        b.wait_visible(self.card_row("Storage", name=f"md/{name}"))
+
+    def _delete_storage(self, index):
+        """ Delete the storage device with the given index """
+
+        b = self.browser
+
+        self.click_dropdown(self.card_row("Storage", index), "Delete")
+        self.dialog_apply()
+        self.dialog_wait_close()
+
+        b.wait_not_present(self.card_row("Storage", index))
+
+    @disk_images([("", 15), ("", 15), ("", 15)])
+    def testCalculateSelectedDisksRAID(self):
+        """
+        Description:
+            Verify that the disk selection changes when creating a RAID device
+
+        Expected results:
+            - The disk selection should be updated to include the RAID device and exclude the member disks when the RAID device is created
+            - The disk selection should be updated to include the member disks and exclude the RAID device when the RAID device is deleted
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        s = Storage(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.select_disks([("vdb", True), ("vda", True), ("vdc", True)])
+
+        s.enter_cockpit_storage()
+
+        # Create RAID device on vda, vdb, and vdc
+        self._createRAID({"/dev/vda": True, "/dev/vdb": True, "/dev/vdc": True}, "raid0", "SOMERAID")
+
+        s.exit_cockpit_storage()
+
+        s.check_disk_selected("MDRAID-SOMERAID")
+
+        s.enter_cockpit_storage()
+
+        # Delete RAID device and expect the disk selection to be set back to the parent disks
+        self._delete_storage(4)
+
+        s.exit_cockpit_storage()
+
+        for disk in ["vda", "vdb", "vdc"]:
+            s.check_disk_selected(disk)
+
+        # Do the same for RAID device with 2 disks
+        s.enter_cockpit_storage()
+
+        # Create RAID device on vda, vdb
+        self._createRAID({"/dev/vda": True, "/dev/vdb": True}, "raid0", "SOMERAID")
+
+        s.exit_cockpit_storage()
+
+        s.check_disk_selected("MDRAID-SOMERAID")
+        s.check_disk_selected("vdc")
+
+        # Delete RAID device and expect the disk selection to be set back to the parent disks
+        s.enter_cockpit_storage()
+
+        self._delete_storage(4)
+
+        s.exit_cockpit_storage()
+
+        for disk in ["vda", "vdb", "vdc"]:
+            s.check_disk_selected(disk)
+
+        s.enter_cockpit_storage()
+
+        # Create RAID device on vda, vdb, and vdc, then delete it and create a new one with another name
+        # before returning to installation
+        self._createRAID({"/dev/vda": True, "/dev/vdb": True, "/dev/vdc": True}, "raid0", "SOMERAID")
+
+        b.switch_to_top()
+        s.return_to_installation()
+        s.return_to_installation_cancel()
+
+        b.switch_to_frame("cockpit-storage")
+        self._delete_storage(4)
+
+        self._createRAID({"/dev/vda": True, "/dev/vdb": True, "/dev/vdc": True}, "raid0", "SOMERAID2")
+
+        s.exit_cockpit_storage()
+        s.check_disk_selected("MDRAID-SOMERAID2")
+
+        s.enter_cockpit_storage()
+
+        # Delete it for the test cleanup
+        self._delete_storage(4)
+
+
+    @disk_images([("", 15), ("", 15)])
+    def testFormattedDiskRootfs(self):
+        """
+        Description:
+            Test that a formatted disk can be used as the root filesystem
+
+        Expected results:
+            - The disk can be formatted and used as the root filesystem
+            - The review screen should show the correct mount points
+            - The fstab file should be updated correctly
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+
+        s.select_disks([("vdb", True), ("vda", True)])
+
+        s.enter_cockpit_storage()
+
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.confirm()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 100, "type": "efi", "mount_point": "/boot/efi"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+        self.click_dropdown(self.card_row("Storage", 4), "Create partition")
+        self.dialog({"type": "ext4", "mount_point": "/"})
+
+        self.click_dropdown(self.card_row("Storage", 5), "Format")
+        self.dialog({"type": "ext4", "mount_point": "/home"})
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        dev = "vda"
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+        r.check_disk_row(dev, "/boot/efi", "vda1", "99.6 MB", False)
+        r.check_disk_row(dev, "/boot", "vda2", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda3", "14.9 GB", False)
+        dev = "vdb"
+        r.check_disk(dev, "16.1 GB vdb (Virtio Block Device)")
+        r.check_disk_row(dev, "/home", "", "16.1 GB", False)
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot/efi auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot/home auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot auto noauto 0 0" in fstab)
+
+        # Check that mount point assignment also works
+        i.reach_on_sidebar(i.steps.INSTALLATION_METHOD)
+        s.select_mountpoint([("vda", True), ("vdb", True)])
+
+        s.select_mountpoint_row_device(1, "vda3")
+        s.select_mountpoint_row_device(2, "vda1")
+        s.select_mountpoint_row_device(3, "vda2")
+        s.add_mountpoint_row()
+        s.select_mountpoint_row_device(4, "vdb")
+        s.select_mountpoint_row_mountpoint(4, "/home")
+
+    # https://fedoraproject.org/wiki/Changes/Anaconda_Drop_Support_UEFI_on_MBR
+    # Fedora installer has phased out support for booting in UEFI mode on MBR-partitioned disks.
+    @run_boot("bios")
+    def testMBRParttable(self):
+        """
+        Description:
+            Test that a MBR formatted disk can be used for the installation
+
+        Expected results:
+            - The 'Use configured storage' scenario should be available when using a MBR formatted disk
+            - The review screen shows the correct mount points
+            - The fstab file should be updated correctly
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="use-configured-storage")
+        s = Storage(b, m)
+        r = Review(b, m)
+
+        dev = "vda"
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.wait_scenario_visible("use-configured-storage", False)
+        s.check_disk_selected(dev)
+        s.enter_cockpit_storage()
+
+        self.click_dropdown(self.card_row("Storage", 1), "Create partition table")
+        self.dialog_set_val("type", "dos")
+        self.dialog_apply()
+        self.dialog_wait_close()
+
+        self.click_dropdown(self.card_row("Storage", 2), "Create partition")
+        self.dialog({"size": 1070, "type": "ext4", "mount_point": "/boot"})
+
+        self.click_dropdown(self.card_row("Storage", 3), "Create partition")
+        self.dialog({"type": "btrfs", "mount_point": "/"})
+
+        s.exit_cockpit_storage()
+
+        s.set_scenario("use-configured-storage")
+
+        i.reach(i.steps.REVIEW)
+
+        # verify review screen
+        r.check_disk(dev, "16.1 GB vda (Virtio Block Device)")
+
+        r.check_disk_row(dev, "/boot", "vda1", "1.07 GB", False)
+        r.check_disk_row(dev, "/", "vda2", "15.0 GB", False)
+
+        # Check fstab
+        fstab = m.execute("cat /etc/fstab")
+        self.assertTrue("/mnt/sysroot/boot auto noauto 0 0" in fstab)
+        self.assertTrue("/mnt/sysroot auto noauto,subvol=/ 0 0" in fstab)
+
+
+if __name__ == '__main__':
+    test_main()

@@ -1,0 +1,362 @@
+/*
+ * Copyright (C) 2022 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+import cockpit from "cockpit";
+
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Alert } from "@patternfly/react-core/dist/esm/components/Alert/index.js";
+import { Button } from "@patternfly/react-core/dist/esm/components/Button/index.js";
+import { Checkbox } from "@patternfly/react-core/dist/esm/components/Checkbox/index.js";
+import { DescriptionList } from "@patternfly/react-core/dist/esm/components/DescriptionList/index.js";
+import { Label } from "@patternfly/react-core/dist/esm/components/Label/index.js";
+import { useWizardContext, useWizardFooter } from "@patternfly/react-core/dist/esm/components/Wizard/index.js";
+import { Flex, FlexItem } from "@patternfly/react-core/dist/esm/layouts/Flex/index.js";
+
+import { getDeviceChildren } from "../../helpers/storage.js";
+
+import {
+    OsReleaseContext,
+    PageContext,
+    PayloadContext,
+    StorageContext,
+    UserInterfaceContext,
+} from "../../contexts/Common.jsx";
+
+import {
+    useOriginalDevices,
+    usePlannedActions,
+} from "../../hooks/Storage.jsx";
+
+import { EmptyStatePanel } from "cockpit-components-empty-state";
+
+import { AnacondaWizardFooter } from "../AnacondaWizardFooter.jsx";
+import { DateAndTimeReviewDescription } from "../datetime/index.js";
+import { usePageComplete as useDatetimePageComplete } from "../datetime/usePageComplete.js";
+import { InstallationLanguageReviewDescription } from "../localization/index.js";
+import { usePageComplete as useLocalizationPageComplete } from "../localization/usePageComplete.js";
+import { usePageComplete as useSoftwarePageComplete } from "../software/usePageComplete.js";
+import {
+    StorageInstallationReviewSummary,
+    StorageScenarioReviewDescription,
+} from "../storage/index.js";
+import { useScenario } from "../storage/installation-method/InstallationScenario.jsx";
+import { usePageComplete as useStorageInstallationPageComplete } from "../storage/installation-method/usePageComplete.jsx";
+import { AccountsReviewDescription } from "../users/index.js";
+import { usePageComplete as useUsersPageComplete } from "../users/usePageComplete.jsx";
+import { ReviewDescriptionListItem } from "./Common.jsx";
+import { HostnameRow } from "./Hostname.jsx";
+
+import "./ReviewConfiguration.scss";
+
+const _ = cockpit.gettext;
+const SCREEN_ID = "anaconda-screen-review";
+
+const IncompleteStepIndicator = () => (
+    <Label isCompact status="danger">
+        {_("incomplete")}
+    </Label>
+);
+
+const ReviewDescriptionList = ({ children }) => {
+    return (
+        <DescriptionList
+          isHorizontal
+          horizontalTermWidthModifier={{
+              "2xl": "20ch",
+              default: "12ch",
+              lg: "20ch",
+              md: "20ch",
+              sm: "15ch",
+              xl: "20ch",
+          }}
+        >
+            {children}
+        </DescriptionList>
+    );
+};
+
+export const ReviewConfiguration = ({ autoProceedBlockedRef, automatedInstall, goToProgressPage, pauseAtSummary }) => {
+    const osRelease = useContext(OsReleaseContext);
+    const userInterfaceConfig = useContext(UserInterfaceContext);
+    const hiddenScreens = userInterfaceConfig.hidden_webui_pages || [];
+    const { goToStepById } = useWizardContext();
+    const { appliedPartitioning } = useContext(StorageContext);
+    const languagePageHidden = hiddenScreens.includes("anaconda-screen-language");
+    const localizationComplete = useLocalizationPageComplete({ automatedInstall, isHidden: languagePageHidden });
+    const datetimePageHidden = hiddenScreens.includes("anaconda-screen-date-time");
+    const datetimeComplete = useDatetimePageComplete({ automatedInstall, isHidden: datetimePageHidden });
+    const { environments, selection, type: payloadType } = useContext(PayloadContext) ?? {};
+    const softwarePageHidden =
+        payloadType !== "DNF" || hiddenScreens.includes("anaconda-screen-software-selection");
+    const softwareSelectionComplete = useSoftwarePageComplete({ automatedInstall, isHidden: softwarePageHidden });
+    const {
+        complete: storageComplete,
+        validationPending: storageValidationPending,
+    } = useStorageInstallationPageComplete();
+    const accountsPageHidden = hiddenScreens.includes("anaconda-screen-accounts");
+    const usersComplete = useUsersPageComplete({ isHidden: accountsPageHidden });
+
+    const pages = [
+        { complete: localizationComplete, id: "anaconda-screen-language" },
+        { complete: datetimeComplete, id: "anaconda-screen-date-time" },
+        { complete: softwareSelectionComplete, id: "anaconda-screen-software-selection" },
+        { complete: storageComplete, id: "anaconda-screen-method" },
+        { complete: usersComplete, id: "anaconda-screen-accounts" },
+    ];
+    const reviewValidationPending = pages.some(p => p.complete === undefined);
+    const allValidatedReviewPagesComplete = pages.every(p => p.complete === true);
+    const firstIncompleteStepId = !reviewValidationPending
+        ? (pages.find(p => p.complete !== true)?.id ?? null)
+        : null;
+
+    const jumpToFirstIncomplete = () => {
+        if (!firstIncompleteStepId) {
+            return;
+        }
+        goToStepById(firstIncompleteStepId);
+    };
+
+    // Auto-proceed to installation when kickstart is used without inst.pauseatsummary.
+    // This is a one-shot check: once validations complete and any issue is found
+    // (incomplete pages), auto-proceed is permanently disabled so the user must
+    // manually click "Begin installation" after fixing the issue.
+    // Storage warnings do NOT block auto-proceed, matching GTK/TUI behavior.
+    useEffect(() => {
+        if (!automatedInstall || pauseAtSummary || autoProceedBlockedRef.current) {
+            return;
+        }
+        // Wait until all validations have finished
+        if (reviewValidationPending || storageValidationPending) {
+            return;
+        }
+        if (allValidatedReviewPagesComplete) {
+            goToProgressPage();
+        } else {
+            autoProceedBlockedRef.current = true;
+        }
+    }, [automatedInstall, goToProgressPage, pauseAtSummary, allValidatedReviewPagesComplete, storageValidationPending,
+        autoProceedBlockedRef, reviewValidationPending]);
+
+    // Display custom footer
+    const getFooter = useMemo(() => (
+        <CustomFooter goToProgressPage={goToProgressPage} pageValidationOk={allValidatedReviewPagesComplete && !reviewValidationPending} />
+    ), [allValidatedReviewPagesComplete, goToProgressPage, reviewValidationPending]);
+    useWizardFooter(getFooter);
+
+    const languageDescription = localizationComplete
+        ? <InstallationLanguageReviewDescription />
+        : <IncompleteStepIndicator />;
+
+    const timezoneDescription = datetimeComplete
+        ? <DateAndTimeReviewDescription />
+        : <IncompleteStepIndicator />;
+
+    const installationScenarioDescription = <StorageScenarioReviewDescription />;
+
+    const softwareDescription = useMemo(() => {
+        if (!softwareSelectionComplete) {
+            return <IncompleteStepIndicator />;
+        }
+        const envId = selection?.environment;
+        if (!envId) {
+            return "";
+        }
+        const env = environments?.find(e => e.id === envId);
+        return env?.name || envId;
+    }, [softwareSelectionComplete, environments, selection?.environment]);
+
+    const storageDescription = (
+        <Flex direction={{ default: "column" }} spaceItems={{ default: "spaceItemsSm" }}>
+            {!storageComplete && (
+                <FlexItem>
+                    <IncompleteStepIndicator />
+                </FlexItem>
+            )}
+            {appliedPartitioning && <StorageInstallationReviewSummary />}
+        </Flex>
+    );
+
+    const accountDescription = usersComplete
+        ? <AccountsReviewDescription />
+        : <IncompleteStepIndicator />;
+
+    return (
+        <Flex spaceItems={{ default: "spaceItemsMd" }} direction={{ default: "column" }}>
+            {reviewValidationPending
+                ? (
+                    <FlexItem id={`${SCREEN_ID}-validation-loading`}>
+                        <EmptyStatePanel
+                          loading
+                          title={_("Checking installation configuration...")}
+                        />
+                    </FlexItem>
+                )
+                : (
+                    <>
+                        {firstIncompleteStepId &&
+                        <FlexItem>
+                            <Alert
+                              id={`${SCREEN_ID}-incomplete-configuration`}
+                              actionLinks={(
+                                  <Button
+                                    id={`${SCREEN_ID}-go-first-incomplete`}
+                                    variant="link"
+                                    isInline
+                                    onClick={jumpToFirstIncomplete}
+                                  >
+                                      {_("Jump to first incomplete step")}
+                                  </Button>
+                              )}
+                              isInline
+                              title={_("Configuration is incomplete")}
+                              variant="danger"
+                            >
+                                {_("Some installation steps still need to be completed before you can continue.")}
+                            </Alert>
+                        </FlexItem>}
+                        <FlexItem>
+                            <ReviewDescriptionList>
+                                <ReviewDescriptionList>
+                                    <ReviewDescriptionListItem
+                                      id={`${SCREEN_ID}-target-operating-system`}
+                                      term={_("Operating system")}
+                                      description={osRelease.PRETTY_NAME}
+                                    />
+                                </ReviewDescriptionList>
+                            </ReviewDescriptionList>
+                        </FlexItem>
+                        <FlexItem>
+                            <ReviewDescriptionList>
+                                <ReviewDescriptionList>
+                                    <ReviewDescriptionListItem
+                                      id={`${SCREEN_ID}-target-system-language`}
+                                      term={_("Language")}
+                                      description={languageDescription}
+                                    />
+                                </ReviewDescriptionList>
+                                {!hiddenScreens.includes("anaconda-screen-date-time") &&
+                                <ReviewDescriptionListItem
+                                  id={`${SCREEN_ID}-target-system-timezone`}
+                                  term={_("Timezone")}
+                                  description={timezoneDescription}
+                                />}
+                                {!softwarePageHidden &&
+                                <ReviewDescriptionListItem
+                                  id={`${SCREEN_ID}-target-system-software`}
+                                  term={_("Software selection")}
+                                  description={softwareDescription}
+                                />}
+                                {!accountsPageHidden &&
+                                <ReviewDescriptionList>
+                                    <ReviewDescriptionListItem
+                                      id={`${SCREEN_ID}-target-system-account`}
+                                      term={_("Account")}
+                                      description={accountDescription}
+                                    />
+                                </ReviewDescriptionList>}
+                                <ReviewDescriptionList>
+                                    <HostnameRow />
+                                </ReviewDescriptionList>
+                            </ReviewDescriptionList>
+                        </FlexItem>
+                        <FlexItem>
+                            <ReviewDescriptionList>
+                                {appliedPartitioning &&
+                                <ReviewDescriptionList>
+                                    <ReviewDescriptionListItem
+                                      id={`${SCREEN_ID}-target-system-mode`}
+                                      term={_("Installation type")}
+                                      description={installationScenarioDescription}
+                                    />
+                                </ReviewDescriptionList>}
+                                <ReviewDescriptionList>
+                                    <ReviewDescriptionListItem
+                                      id={`${SCREEN_ID}-target-storage`}
+                                      term={_("Storage")}
+                                      description={storageDescription}
+                                    />
+                                </ReviewDescriptionList>
+                            </ReviewDescriptionList>
+                        </FlexItem>
+                    </>
+                )}
+        </Flex>
+    );
+};
+
+const useConfirmationCheckboxLabel = () => {
+    const [scenarioConfirmationLabel, setScenarioConfirmationLabel] = useState(null);
+    const originalDevices = useOriginalDevices();
+    const plannedActions = usePlannedActions();
+    const { diskSelection } = useContext(StorageContext);
+    const usableDisks = diskSelection.usableDisks;
+    const selectedDisks = diskSelection.selectedDisks;
+
+    const relevantDevices = selectedDisks
+            .map(disk => getDeviceChildren({ device: disk, deviceData: originalDevices }))
+            .flat(Infinity);
+    const deviceHasAction = (actionType, device) => plannedActions.find(action => action["device-id"].v === device && action["action-type"].v === actionType);
+    const deletedDevices = relevantDevices.filter(device => deviceHasAction("destroy", device));
+    const resizedDevices = relevantDevices.filter(device => deviceHasAction("resize", device));
+
+    const allDevicesDeleted = deletedDevices.length > 0 && deletedDevices.length === relevantDevices.length;
+    const someDevicesDeleted = deletedDevices.length > 0 && deletedDevices.length < relevantDevices.length;
+    const someDevicesResized = resizedDevices.length > 0;
+
+    useEffect(() => {
+        const allDevicesDeletedText = cockpit.ngettext(
+            "I understand that all existing data will be erased",
+            "I understand that all existing data will be erased from the selected disks",
+            usableDisks.length
+        );
+
+        const someDevicesDeletedText = _("I understand that some existing data will be erased");
+        const someDevicesResizedText = _("I understand that some partitions will be modified");
+
+        if (allDevicesDeleted) {
+            setScenarioConfirmationLabel(allDevicesDeletedText);
+        } else if (someDevicesDeleted) {
+            setScenarioConfirmationLabel(someDevicesDeletedText);
+        } else if (someDevicesResized) {
+            setScenarioConfirmationLabel(someDevicesResizedText);
+        } else {
+            setScenarioConfirmationLabel("");
+        }
+    }, [allDevicesDeleted, someDevicesDeleted, someDevicesResized, usableDisks.length]);
+
+    return scenarioConfirmationLabel;
+};
+
+const CustomFooter = ({ goToProgressPage, pageValidationOk }) => {
+    const { setIsFormValid } = useContext(PageContext) ?? {};
+    const { getButtonLabel } = useScenario();
+    const buttonLabel = getButtonLabel?.();
+    const scenarioConfirmationLabel = useConfirmationCheckboxLabel();
+    const installationIsClean = scenarioConfirmationLabel === "";
+    const [isConfirmed, setIsConfirmed] = useState(false);
+
+    const confirmationCheckbox = (
+        !installationIsClean &&
+        <Checkbox
+          id={SCREEN_ID + "-next-confirmation-checkbox"}
+          label={scenarioConfirmationLabel}
+          isChecked={isConfirmed}
+          onChange={(_event, checked) => setIsConfirmed(checked)}
+        />
+    );
+
+    useEffect(() => {
+        const isConfirmationValid = isConfirmed || installationIsClean;
+        setIsFormValid(isConfirmationValid && pageValidationOk);
+    }, [setIsFormValid, isConfirmed, installationIsClean, pageValidationOk]);
+
+    return (
+        <AnacondaWizardFooter
+          footerHelperText={confirmationCheckbox}
+          nextButtonText={buttonLabel}
+          nextButtonVariant={!installationIsClean ? "warning" : "primary"}
+          onNext={() => goToProgressPage()}
+        />
+    );
+};

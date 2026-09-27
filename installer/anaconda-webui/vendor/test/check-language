@@ -1,0 +1,292 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2021 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+from anacondalib import VirtInstallMachineCase, disk_images, pixel_tests_ignore
+from installer import Installer
+from language import Language
+from review import Review
+from storage import Storage
+from testlib import nondestructive, test_main  # pylint: disable=import-error
+
+
+@nondestructive
+class TestLanguage(VirtInstallMachineCase):
+
+    def setUp(self):
+        super().setUp()
+
+        # Switching to a language might produce these messages, which seem to be harmless.
+        self.allow_journal_messages("Error .* data: Connection reset by peer")
+
+    def testOtherDefault(self):
+        """
+        Description:
+            Test that backend language selection is picked up by the WebUI
+
+        Expected results:
+            - The WebUI selected language is set to the backend selected language
+            - The WebUI is translated
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        lang = Language(b, m)
+
+        # Set the language in the localization module to German before opening the page
+        lang.dbus_set_language("de_DE.UTF-8")
+
+        i.open()
+
+        # Expect the backend set language to be preselected and the WebUI translated
+        lang.check_selected_locale("de_DE")
+        b.wait_in_text("h2", "Willkommen. Lassen Sie uns nun Fedora Linux installieren.")
+
+    def _testBackendTranslations_partition_disk(self):
+        b = self.browser
+        m = self.machine
+        s = Storage(b, m)
+
+        s.partition_disk("/dev/vda", [("10GiB", "lvmpv")])
+        s.partition_disk("/dev/vdb", [("10GiB", "lvmpv")])
+
+        # Create VG on LUKS with the two available disks
+        m.execute("""
+        vgcreate -y vg /dev/vda1 /dev/vdb1
+        lvcreate -y -n lv -l 100%FREE vg
+        mkfs.ext4 -F /dev/vg/lv
+        vgchange -a n vg
+        """)
+
+    @disk_images([("", 15), ("", 15)])
+    def testBackendTranslations(self):
+        """
+        Description:
+            Test that strings from the backend are translated when displayed in the WebUI
+
+        Expected results:
+            - Strings from the backend are translated when displayed in the WebUI
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        s = Storage(b, m)
+        lang = Language(b, m)
+
+        i.open()
+        lang.select_locale("de_DE")
+
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.set_scenario("erase-all")
+
+        i.reach(i.steps.STORAGE_CONFIGURATION)
+        i.next(should_fail=True)
+        b.wait_in_text(
+            "#anaconda-screen-storage-configuration-step-notification",
+            "Ausgewählte Datenträger vda enthalten die Datenträgergruppe 'vg', die auch weitere nicht ausgewählte Datenträger verwendet"
+        )
+
+    def testLanguageSwitching(self):
+        """
+        Description:
+            Test that the language selection is working correctly
+
+        Expected results:
+            - The languages can be filtered by English and native names
+            - RTL languages are displayed correctly
+            - 'lang' attribute is set (rhbz#2355246)
+
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        l = Language(b, m)
+
+        i.open()
+
+        # Expect the default language - this is en at this point - adjust the test when better guess is implemented
+        b.wait_in_text("h2", "Welcome. Let's install Fedora Linux now.")
+
+        l.check_selected_locale("en_US")
+
+        # Assert that search bar starts empty.
+        assert l.get_locale_search() == ""
+        # b.wait_visible(f".{i.steps.LANGUAGE}-menu.pf-m-invalid")
+
+        # Check that the language menu shows all menu entries when clicking the toggle button
+        l.locale_option_visible('en_US')
+        l.locale_option_visible('de_DE')
+        l.locale_option_visible('cs_CZ', is_common=False)
+
+        # Check filtering on English names
+        l.input_locale_search('cze')
+        l.locale_option_visible('en_US', False)
+        l.locale_option_visible('de_DE', False)
+        l.locale_option_visible('cs_CZ', is_common=False)
+
+        # Check filtering on native names
+        l.input_locale_search('Deutsch')
+        l.locale_option_visible('en_US', False)
+        l.locale_option_visible('de_DE')
+        l.locale_option_visible('cs_CZ', False)
+        l.input_locale_search('')
+
+        # Select the 'German' language
+        l.select_locale("de_DE")
+        l.check_selected_keyboard("de (nodeadkeys)")
+
+        # Pixel test the language step
+        b.assert_pixels(
+            "#app",
+            "language-step-basic",
+            # HACK pf-v6-c-menu__item-text is ignored because some of our CI infrastructure is
+            # missing CJK and Cyrillic fonts..
+            ignore=[*pixel_tests_ignore, ".pf-v6-c-menu__item-text"],
+        )
+
+        b.wait_in_text("h2", "Willkommen. Lassen Sie uns nun Fedora Linux installieren.")
+        # TODO: Add checks for plural translations when these are present
+
+        # Check that the language is updated in the backend
+        # TODO: Check that error messages from the backend show up translated
+        language_new = l.dbus_get_language()
+        self.assertIn('string "de_DE.UTF-8"', language_new)
+
+        # Expect language direction to be set to RTL for selected languages
+        l.select_locale("he_IL", is_common=False)
+        b.wait_attr("html", "dir", "rtl")
+        b.wait_attr("html", "lang", "he")
+
+        # Expect language direction to be set to LTR when switching to EN_US from RTL language
+        # as this has special handling
+        l.select_locale("en_US", locale_name="English (United States)")
+        b.wait_attr("html", "dir", "ltr")
+
+        l.select_locale("de_DE")
+        b.wait_attr("html", "dir", "ltr")
+        b.wait_attr("html", "lang", "de")
+
+        # Check one locale with underscore in HTML / Web locale name
+        l.select_locale("zh_TW", locale_name="繁體中文 (台灣)", is_common=False)
+        b.wait_attr("html", "dir", "ltr")
+        b.wait_attr("html", "lang", "zh-tw")
+
+    def testUnknownLanguage(self):
+        """
+        Description:
+            Test that the installer can handle unknown languages
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        l = Language(b, m)
+        r = Review(b, m)
+
+        i.open()
+        # Set language to Macedonian that is now in the installer translated languages
+        # Go to review page after it
+        l.dbus_set_language("kk_KK.UTF-8")
+        i.reach(i.steps.REVIEW)
+
+        # test the language selected
+        r.check_language("kk_KK.UTF-8")
+
+    def testKeyboardLayoutSelection(self):
+        """
+        Description:
+            Test that the multi-keyboard layout selection is working correctly
+
+        Expected results:
+            - The default keyboard selection is 'English (US)'
+            - The user can add multiple keyboard layouts
+            - The user can reorder the layout selection
+            - Language changes set sensible keyboard defaults for the selected language
+            - Non-ASCII keyboards show appropriate warnings when set as default
+            - The user can make any keyboard layout the default
+            - The default keyboard layout is used for virtual console (LUKS password) and shown as such in
+              the disk encryption screen
+        """
+
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m)
+        l = Language(b, m)
+        s = Storage(b, m)
+
+        # Ensure test runs in English to avoid translation issues
+        l.dbus_set_language("en_US.UTF-8")
+        i.open()
+
+        # Verify we're in English
+        b.wait_in_text("h2", "Welcome. Let's install Fedora Linux now.")
+
+        l.check_selected_keyboard("us")
+        l.check_selected_keyboards_on_device("us")
+
+        # Changing language should set sensible keyboard defaults
+        l.input_locale_search('Russian')
+        l.select_locale("ru_RU")
+        l.check_selected_keyboard("us")
+        l.check_selected_keyboard("ru")
+        l.check_selected_keyboards_on_device(["us", "ru"], expected_variants=["", ""])
+
+        # Reset language back to English for the rest of the test
+        l.input_locale_search("English")
+        l.select_locale("en_US")
+        l.check_selected_keyboard("ru", present=False)
+        l.check_selected_keyboards_on_device("us")
+
+        # Select a second keyboard layout (it gets appended)
+        l.select_keyboard("de__nodeadkeys_", "German (no dead keys)", is_common=True)
+        l.check_selected_keyboard("us")
+        l.check_selected_keyboard("de (nodeadkeys)")
+        l.check_selected_keyboards_on_device(["us", "de"], expected_variants=["", "nodeadkeys"])
+
+        # Select non-ASCII keyboard warning
+        l.select_keyboard("ara", "Arabic", is_common=True)
+        l.check_selected_keyboard("us")
+        l.check_selected_keyboard("de (nodeadkeys)")
+        l.check_selected_keyboard("ara")
+        l.check_selected_keyboards_on_device(["us", "de", "ara"], expected_variants=["", "nodeadkeys", ""])
+
+        # Make Arabic keyboard the default (current) to trigger the ASCII warning
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-open-button")
+        l.browser.wait_visible(f"#{l._step}-change-system-keyboard-layout-modal")
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-make-current-2")
+        l.browser.wait_visible(f"#{l._step}-change-system-keyboard-layout-modal .pf-v6-c-alert")
+
+        # Test moving keyboard up/down (reordering)
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-move-up-2")
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-save-button")
+        l.browser.wait_not_present(f"#{l._step}-change-system-keyboard-layout-modal")
+        # Verify the order: Arabic (default), German, US
+        l.check_selected_keyboard("us")
+        l.check_selected_keyboard("de")
+        l.check_selected_keyboard("ara")
+        l.check_selected_keyboards_on_device(["ara", "de", "us"], expected_variants=["", "nodeadkeys", ""])
+
+        # Create a valid selection to test disk encryption
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-open-button")
+        l.browser.wait_in_text(f"#{l._step}-change-system-keyboard-layout-modal-list li:nth-child(1)", "ara")
+        l.browser.wait_in_text(f"#{l._step}-change-system-keyboard-layout-modal-list li:nth-child(2)", "de")
+        l.browser.wait_in_text(f"#{l._step}-change-system-keyboard-layout-modal-list li:nth-child(3)", "us")
+        l.browser.wait_visible(f"#{l._step}-change-system-keyboard-layout-modal")
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-make-current-1")
+        l.browser.wait_not_present(f"#{l._step}-change-system-keyboard-layout-modal .pf-v6-c-alert")
+        l.browser.click(f"#{l._step}-change-system-keyboard-layout-modal-save-button")
+        l.browser.wait_not_present(f"#{l._step}-change-system-keyboard-layout-modal")
+        l.check_selected_keyboards_on_device(["de", "ara", "us"], expected_variants=["nodeadkeys", "", ""])
+
+        # Test disk encryption integration
+        # Navigate to disk encryption screen
+        i.reach(i.steps.INSTALLATION_METHOD)
+        s.set_scenario("erase-all")
+        i.reach(i.steps.STORAGE_CONFIGURATION)
+        s.set_encryption_selected(True)
+        s.check_disk_encryption_keyboard_layout("de-nodeadkeys")
+
+
+if __name__ == '__main__':
+    test_main()

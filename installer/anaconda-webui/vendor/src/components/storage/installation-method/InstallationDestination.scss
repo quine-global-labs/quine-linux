@@ -1,0 +1,29 @@
+/*
+ * Copyright (C) 2023 Red Hat, Inc.
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+.anaconda-screen-method-selector {
+  .anaconda-screen-method-disk-selector {
+    width: 50%;
+  }
+
+  .pf-v6-c-form__section-title {
+    font-size: var(--pf-t--global--font--size--md);
+  }
+}
+
+// Add some border to the disk selection menu
+.anaconda-screen-method-disk-selection-stack {
+  border: var(--pf-t--global--border--width--regular) solid var(--pf-t--global--border--color--default);
+  border-radius: var(--pf-t--global--border--radius--small);
+
+  .anaconda-screen-method-disk-selection-rescan {
+    margin-top: var(--pf-t--global--spacer--md);
+    margin-bottom: var(--pf-t--global--spacer--md);
+    align-self: center;
+  }
+
+  .pf-v6-c-empty-state__body {
+    margin-block-start: 0;
+  }
+}

@@ -1,0 +1,121 @@
+#!/usr/bin/python3
+#
+# Copyright (C) 2024 Red Hat, Inc.
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+import os
+
+from anacondalib import INSTALLER_VM_MEMORY_MB, VirtInstallMachineCase, disk_images, run_boot
+from installer import Installer
+from progress import Progress
+from storage import Storage
+from testlib import test_main, timeout  # pylint: disable=import-error
+from utils import pretend_default_scheme
+
+TEST_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(TEST_DIR)
+BOTS_DIR = f'{ROOT_DIR}/bots'
+
+
+class TestStorageHomeReuse_E2E(VirtInstallMachineCase):
+    provision = {"machine1": {"memory_mb": INSTALLER_VM_MEMORY_MB}}
+
+    def _remove_unknown_mountpoints(self):
+        # Remove the /var subvolume from the default btrfs layout
+        # as /var/ is not default mount point in Fedora which results in
+        # the 'Reinstall Fedora' option to get hidden
+        # Also remove /var/ mount point from /etc/fstab
+        self.machine.execute("""
+            mount /dev/vda3 /mnt;
+            btrfs subvolume delete /mnt/var/lib/machines;
+            btrfs subvolume delete /mnt/var;
+            sed -i '/var/d' /mnt/root/etc/fstab;
+            umount /mnt
+        """)
+
+    def install(self, needs_confirmation):
+        b = self.browser
+        m = self.machine
+
+        i = Installer(b, m)
+        p = Progress(b)
+
+        i.begin_installation(button_text="Reinstall Fedora", needs_confirmation=needs_confirmation)
+        with b.wait_timeout(300):
+            p.wait_done()
+
+        self.handleReboot()
+
+    def verifyHomeReuse(self, root_file, home_file):
+        # root_file shouldn't exist, home_file should exist
+        m = self.machine
+
+        home_preserved = m.execute(f"if [ -e /home/{home_file} ] ; then echo pass ; fi")
+        assert home_preserved
+        root_formatted = m.execute(f"if [ ! -e /{root_file} ] ; then echo pass ; fi")
+        assert root_formatted
+
+    def verifyHomeMountOpts(self, opts):
+        m = self.machine
+
+        opts_found = m.execute("grep /home /etc/fstab | tr -s ' ' | cut -d ' ' -f 4")
+        assert opts_found == opts
+
+    def _testBasic_partition_disk(self):
+        m = self.machine
+        disk = "/dev/vda"
+
+        old_root_file = "old_root_file"
+        old_home_file = "old_home_file"
+
+        self.home_mount_options = m.execute(f"""
+        # Mark existing root by a file
+        mkdir /m
+        mount -o subvol=root,compress=zstd:1 {disk}3 /m
+        grep /home /m/etc/fstab | tr -s ' ' | cut -d ' ' -f 4
+        touch /m/{old_root_file}
+        umount /m
+        # Mark existing home by a file
+        mount -o subvol=home,compress=zstd:1 {disk}3 /m
+        touch /m/{old_home_file}
+        umount /m
+        rmdir /m
+        """)
+
+        self._remove_unknown_mountpoints()
+
+    @run_boot("bios")
+    @disk_images([("fedora-rawhide", 15)])
+    @timeout(1200)
+    def testBasic(self):
+        """
+        Description:
+            Test the home reuse scenario with a standard Fedora pre-existing installation
+
+        Expected results:
+            - The installer should allow the user to reuse the home partition
+            - The installed system should have the home partition mounted with the correct options
+        """
+        b = self.browser
+        m = self.machine
+        i = Installer(b, m, scenario="home-reuse")
+        s = Storage(b, m)
+
+        old_root_file = "old_root_file"
+        old_home_file = "old_home_file"
+
+        pretend_default_scheme(self, "BTRFS")
+
+        i.open()
+        i.reach(i.steps.INSTALLATION_METHOD)
+
+        s.set_scenario("home-reuse")
+        i.reach(i.steps.REVIEW)
+
+        self.install(needs_confirmation=True)
+        self.verifyHomeReuse(old_root_file, old_home_file)
+        self.verifyHomeMountOpts(self.home_mount_options)
+
+
+if __name__ == '__main__':
+    test_main()
