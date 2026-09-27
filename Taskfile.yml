@@ -46,8 +46,19 @@ tasks:
     desc: >-
       Build a bootable install ISO from the local quine-linux image, via
       bootc-image-builder. Output lands in {{.OUTPUT_DIR}}/bootiso/install.iso.
-    deps: [build-image]
+    preconditions:
+      - sh: |
+          case "$(uname -m)" in x86_64|amd64) a=amd64 ;; aarch64|arm64) a=arm64 ;; *) a="$(uname -m)" ;; esac
+          [ "$a" = "{{.TARGET_ARCH}}" ]
+        msg: >-
+          ISO builds need a host of architecture {{.TARGET_ARCH}}. This one is
+          {{ARCH}}, and bootc-image-builder's cross-arch mode fails partway
+          (it runs the image for inspection, which needs emulation inside
+          its own container). Build the ISO on an x86_64 machine, e.g. the
+          Aurora box.
     cmds:
+      # Not a dep: deps run before preconditions, and this should fail fast.
+      - task: build-image
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
@@ -57,7 +68,6 @@ tasks:
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
-        --target-arch {{.TARGET_ARCH}}
         --type iso localhost/{{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootiso/install.iso"
@@ -77,8 +87,19 @@ tasks:
       image to install the quine-linux bootc image, via
       bootc-image-builder's `bootc-installer` type. Output lands in
       {{.OUTPUT_DIR}}/bootc-installer/install.iso.
-    deps: [build-image]
+    preconditions:
+      - sh: |
+          case "$(uname -m)" in x86_64|amd64) a=amd64 ;; aarch64|arm64) a=arm64 ;; *) a="$(uname -m)" ;; esac
+          [ "$a" = "{{.TARGET_ARCH}}" ]
+        msg: >-
+          ISO builds need a host of architecture {{.TARGET_ARCH}}. This one is
+          {{ARCH}}, and bootc-image-builder's cross-arch mode fails partway
+          (it runs the image for inspection, which needs emulation inside
+          its own container). Build the ISO on an x86_64 machine, e.g. the
+          Aurora box.
     cmds:
+      # Not a dep: deps run before preconditions, and this should fail fast.
+      - task: build-image
       - task: build-installer-image
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
@@ -89,7 +110,6 @@ tasks:
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
-        --target-arch {{.TARGET_ARCH}}
         --type bootc-installer
         --installer-payload-ref localhost/{{.IMAGE}}
         localhost/{{.INSTALLER_IMAGE}}
