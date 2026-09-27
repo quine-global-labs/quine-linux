@@ -30,7 +30,7 @@ everywhere else. All current upstream feature work happens on the WebUI, so
 that's the one to fork:
 
 - https://github.com/rhinstaller/anaconda-webui, forked to
-  https://github.com/philip-peterson/anaconda-webui
+  https://github.com/philip-peterson/quine-anaconda-webui
 
 `installer/Containerfile` depends on `anaconda-webui` explicitly (not just
 the bare `anaconda` metapackage) so the UI doesn't depend on incidentally
@@ -39,34 +39,46 @@ matching a release-identity package.
 ## Workflow
 
 1. **Fork** `rhinstaller/anaconda-webui` to
-   `philip-peterson/anaconda-webui` on GitHub, make your panel/control
+   `philip-peterson/quine-anaconda-webui` on GitHub, make your panel/control
    changes there.
 2. **Get it built as an RPM your installer container can `dnf install`.**
-   Recommended: a Fedora COPR project.
-   - Create the COPR project `philip-peterson/quine-anaconda-webui`
-     (https://copr.fedorainfracloud.org/), point it at
-     `philip-peterson/anaconda-webui` (branch or a webhook), let COPR build
-     it against the Fedora release Aurora currently tracks.
-   - That name is already wired in as the `COPR_REPO` default in
-     `Taskfile.yml` and `installer/Containerfile`. Using a different COPR
-     project name means overriding `COPR_REPO=` on the `task` invocations
-     below instead.
-   - This publishes your fork's source and build logs on COPR's
-     infrastructure (marking a project "unlisted" hides it from browsing,
-     not from direct access) -- worth knowing before you push anything you
-     wouldn't want visible outside this machine.
+   The fork's own Forgejo Actions workflow does this, as a self-hosted
+   stand-in for COPR: `.forgejo/workflows/rpm.yml` runs
+   `.forgejo/build-rpm.sh` in a fresh `fedora:rawhide` container (upstream's
+   `make srpm`, then `rpmbuild`) and uploads the RPM to the forge's package
+   registry. Setup, once:
+   - Host the fork on `forge.quinefoundation.com` (Forgejo Actions only runs
+     for repos on the forge), under the account the package should be
+     published as -- the `quine` org by default
+     (`quine/quine-anaconda-webui`).
+   - Add a repo secret `RPM_UPLOAD_TOKEN`: an access token for that account
+     with `write:package` scope, from a user
+     allowed to publish packages for that org.
+   - The result is served at
+     `https://forge.quinefoundation.com/api/packages/quine/rpm.repo`,
+     already wired in as the `RPM_REPO_URL` default in `Taskfile.yml`.
+     Publishing under a different owner means overriding `RPM_REPO_URL=` on
+     the `task` invocations below.
+
+   Versioning: the build fetches upstream's tags so `git describe` yields
+   e.g. `86.3.gabcdef0` (3 commits past upstream 86), and the Release is
+   `<run number>.quine`, so each build is a new version that sorts above
+   Fedora's own. The installer also gives this repo dnf `priority=10`, so
+   it wins even when Fedora ships a newer upstream release.
 3. **Build the installer image and ISO:**
    ```sh
    task build-installer-iso
    ```
    This builds the quine-linux OS image (if needed), builds
-   `installer/Containerfile` with the `philip-peterson/quine-anaconda-webui`
-   COPR repo enabled, and produces `output/bootc-installer/install.iso`.
-4. **Iterate:** push a change to your fork, wait for COPR to rebuild, rerun
-   `task build-installer-iso` -- podman/task will rebuild the installer
-   layer to pick up the new RPM.
+   `installer/Containerfile` with that repo enabled, and produces
+   `output/bootc-installer/install.iso`. `RPM_REPO_URL=` (empty) builds
+   with stock Fedora `anaconda-webui` instead.
+4. **Iterate:** push a change to your fork, wait for its RPM workflow,
+   rerun `task build-installer-iso`. The Taskfile passes a checksum of the
+   repo's metadata into the build, so a newly published RPM invalidates
+   the cached `dnf install` layer and gets picked up.
 
-## Local alternative (no COPR)
+## Local alternative (no forge)
 
 If you'd rather not publish the fork anywhere: build the RPM locally with
 `mock` targeting the same Fedora release/arch as the installer base,

@@ -6,15 +6,25 @@
 
 FROM quay.io/fedora/fedora-bootc:rawhide
 
-# Set to your COPR project (e.g. "yourname/quine-anaconda") holding a build
-# of your patched anaconda-webui fork. Override at build time with
-# --build-arg COPR_REPO=... instead of editing this file.
-ARG COPR_REPO
+# URL of a dnf .repo file for the repository holding a build of the patched
+# anaconda-webui fork -- by default the Forgejo RPM registry its CI publishes
+# to (see docs/patched-anaconda-installer.md). Override at build time with
+# --build-arg RPM_REPO_URL=...; empty means stock Fedora anaconda-webui.
+ARG RPM_REPO_URL
+# Set by the Taskfile to the repo metadata's checksum; only here so a newly
+# published RPM invalidates the build cache for the layer below.
+ARG RPM_REPO_REV
 
+# priority=10 (default 99) makes dnf take anaconda-webui from that repo even
+# when Fedora's own build is newer. Forgejo signs the repo metadata but not
+# the RPMs themselves, so verify the signed metadata (which carries each
+# package's checksum) instead of per-package signatures.
 RUN set -eux; \
-    dnf install -y dnf-plugins-core; \
-    if [ -n "${COPR_REPO}" ]; then \
-      dnf copr enable -y "${COPR_REPO}"; \
+    echo "anaconda-webui repo rev: ${RPM_REPO_REV:-none}"; \
+    if [ -n "${RPM_REPO_URL}" ]; then \
+      curl -fsSL "${RPM_REPO_URL}" -o /etc/yum.repos.d/quine-anaconda.repo; \
+      sed -i 's/^gpgcheck=.*/gpgcheck=0/' /etc/yum.repos.d/quine-anaconda.repo; \
+      printf '\nrepo_gpgcheck=1\npriority=10\n' >> /etc/yum.repos.d/quine-anaconda.repo; \
     fi; \
     dnf install -y \
       anaconda-webui \
