@@ -12,6 +12,10 @@ vars:
   # bootc-image-builder now lives in github.com/osbuild/image-builder and is
   # published here; quay.io/centos-bootc/bootc-image-builder is frozen.
   BIB_IMAGE: ghcr.io/osbuild/bootc-image-builder:latest
+  # Aurora is amd64-only (and the kmod stage hardcodes x86_64), so pin it
+  # explicitly; otherwise an arm64 host (e.g. Apple Silicon) builds for arm64.
+  PLATFORM: linux/amd64
+  TARGET_ARCH: amd64
   SKOPEO_IMAGE: quay.io/skopeo/stable:latest
   # bootc-image-builder reads images from a containers-storage mounted at
   # /var/lib/containers/storage. Under podman that's root's real store; docker
@@ -33,7 +37,7 @@ tasks:
       this lands in root's containers-storage, which bootc and
       bootc-image-builder read; under docker, the ISO tasks copy it over).
     cmds:
-      - sudo {{.CONTAINER_RUNTIME}} build -t {{.IMAGE}} -f Containerfile .
+      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.IMAGE}} -f Containerfile .
     sources:
       - Containerfile
       - overlay/**/*
@@ -54,6 +58,7 @@ tasks:
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
+        --target-arch {{.TARGET_ARCH}}
         --type iso localhost/{{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootiso/install.iso"
@@ -66,7 +71,7 @@ tasks:
       {{.COPR_REPO}} COPR project; override with
       `task build-installer-image COPR_REPO=you/other-project`.
     cmds:
-      - sudo {{.CONTAINER_RUNTIME}} build -t {{.INSTALLER_IMAGE}} --build-arg COPR_REPO={{.COPR_REPO}} -f installer/Containerfile installer/
+      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} --build-arg COPR_REPO={{.COPR_REPO}} -f installer/Containerfile installer/
     sources:
       - installer/Containerfile
 
@@ -90,6 +95,7 @@ tasks:
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
+        --target-arch {{.TARGET_ARCH}}
         --type bootc-installer
         --bootc-installer-payload-ref localhost/{{.IMAGE}}
         localhost/{{.INSTALLER_IMAGE}}
