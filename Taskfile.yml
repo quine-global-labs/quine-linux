@@ -3,6 +3,16 @@ version: '3'
 vars:
   IMAGE: quine-linux
   INSTALLER_IMAGE: quine-installer
+  # Stage 0: our Aurora fork (the stage-0/ submodule), built with its own
+  # Justfile. AURORA_TAG picks the stream (stable/latest/testing) and is also
+  # the local tag the image gets.
+  AURORA_TAG: stable
+  STAGE0_IMAGE: localhost/aurora:{{.AURORA_TAG}}
+  # What stage 1 (Containerfile) builds FROM. Defaults to stage 0; override to
+  # skip stage 0 and build on a prebuilt image, e.g.
+  # `task build-image BASE_IMAGE=ghcr.io/ublue-os/aurora:stable` (the only
+  # option on macOS, where stage 0's buildah build can't run).
+  BASE_IMAGE: '{{.STAGE0_IMAGE}}'
   OUTPUT_DIR: '{{.ROOT_DIR}}/output'
   # Root is needed for the container builds and bootc; skip {{.SUDO}} when already
   # root (e.g. on a CI runner, which may not have {{.SUDO}} at all).
@@ -34,17 +44,60 @@ tasks:
       - task --list
     silent: true
 
+  build-base:
+    desc: >-
+      Stage 0: build our Aurora fork from the stage-0/ submodule with its own
+      `just build`, as root, into {{.STAGE0_IMAGE}}. Needs a Linux host with
+      buildah, cpp, just (>= 1.46), skopeo, jq, yq and cosign. Skipped when
+      stage-0/ is unchanged and the image exists; use --force to rebuild
+      anyway (e.g. to pick up upstream kernel and package updates, which
+      Aurora's build resolves at build time).
+    preconditions:
+      - sh: '[ "$(uname -s)" = Linux ]'
+        msg: >-
+          Stage 0 (Aurora's own buildah build) only runs on Linux. To build
+          on stock upstream Aurora instead, pass
+          BASE_IMAGE=ghcr.io/ublue-os/aurora:{{.AURORA_TAG}}.
+      - sh: 'for t in buildah cpp just skopeo jq yq cosign; do command -v "$t" >/dev/null || { echo "missing: $t"; exit 1; }; done'
+        msg: 'Stage 0 needs buildah, cpp, just (>= 1.46), skopeo, jq, yq and cosign on PATH.'
+    dir: stage-0
+    cmds:
+      # sudo resets PATH (just/yq/cosign often live in ~/.local/bin or brew),
+      # and git refuses to read a repo owned by another user unless told it's
+      # safe; Aurora's Justfile runs `git status` / `git rev-parse` here.
+      - >-
+        {{.SUDO}} env "PATH=$PATH"
+        GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*'
+        ${GITHUB_TOKEN:+"GITHUB_TOKEN=$GITHUB_TOKEN"}
+        just build --image aurora --tag {{.AURORA_TAG}} --flavor main
+      # buildah builds into root's containers-storage; docker needs it copied
+      # into its daemon for stage 1 to build FROM it.
+      - cmd: '{{.SUDO}} skopeo copy containers-storage:{{.STAGE0_IMAGE}} docker-daemon:{{.STAGE0_IMAGE}}'
+        if: '[ "{{.CONTAINER_RUNTIME}}" != podman ]'
+    # Relative to dir (stage-0/): the fork's whole checked-out tree.
+    sources:
+      - '**/*'
+    status:
+      - '{{.SUDO}} {{.CONTAINER_RUNTIME}} image inspect {{.STAGE0_IMAGE}} >/dev/null 2>&1'
+
   build-image:
     desc: >-
-      Build the quine-linux bootc container image, as root (under podman
-      this lands in root's containers-storage, which bootc and
+      Stage 1: build the quine-linux bootc container image on top of
+      BASE_IMAGE (stage 0 by default, built first if needed), as root
+      (under podman this lands in root's containers-storage, which bootc and
       bootc-image-builder read; under docker, the ISO tasks copy it over).
     cmds:
-      - '{{.SUDO}} {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.IMAGE}} -f Containerfile .'
+      - task: build-base
+        if: '[ "{{.BASE_IMAGE}}" = "{{.STAGE0_IMAGE}}" ]'
+      - >-
+        {{.SUDO}} {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}}
+        --build-arg BASE_IMAGE={{.BASE_IMAGE}}
+        -t {{.IMAGE}} -f Containerfile .
     sources:
       - Containerfile
       - overlay/**/*
       - patches/**/*
+      - stage-0/**/*
 
   build-iso:
     desc: >-

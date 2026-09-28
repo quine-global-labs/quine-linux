@@ -4,16 +4,35 @@ Quine distro of Linux based on uBlue Aurora
 
 ## Building
 
-`Containerfile` builds a custom bootc image on top of `ghcr.io/ublue-os/aurora:stable`,
-layering in everything under `overlay/`, plus a `kmod-builder` stage that
-compiles the CS8409 mic-fix kernel module (see
-[Hardware-specific patches](#hardware-specific-patches) below).
+The image is built in two stages:
+
+- **Stage 0: `stage-0/`**, a git submodule holding our fork of
+  [Aurora](https://github.com/ublue-os/aurora). It's built with Aurora's own
+  `just build` into `localhost/aurora:stable`. Changes that have to happen
+  *inside* Aurora's build (its package set, build scripts, the Kinoite base
+  it starts from) go here, as commits on the fork; bump the submodule to ship
+  them. Needs a Linux host with buildah, cpp, just (>= 1.46), skopeo, jq, yq
+  and cosign.
+- **Stage 1: `Containerfile`**, which builds the quine-linux bootc image on
+  top of stage 0, layering in everything under `overlay/`, plus a
+  `kmod-builder` stage that compiles the CS8409 mic-fix kernel module (see
+  [Hardware-specific patches](#hardware-specific-patches) below). Anything a
+  `RUN` step on top of Aurora can do belongs here, not in stage 0.
+
+Clone with `git clone --recurse-submodules`, or run
+`git submodule update --init` in an existing checkout.
 
 [`Taskfile.yml`](Taskfile.yml) (requires [`task`](https://taskfile.dev)) is
 the supported way to drive all of this — run `task` with no arguments to
 list what's available. Notably:
 
-- `task build-image` — builds the image locally, as root, with podman, or
+- `task build-base` — builds stage 0. It's skipped when `stage-0/` is
+  unchanged and the image exists. Run `task build-base --force` to rebuild
+  anyway, e.g. to pick up upstream kernel and package updates, which Aurora's
+  build resolves at build time.
+- `task build-image` — builds stage 0 if needed, then stage 1. To skip stage 0
+  and build on stock upstream Aurora (the only option on macOS), pass
+  `BASE_IMAGE=ghcr.io/ublue-os/aurora:stable`. Builds locally, as root, with podman, or
   docker if podman isn't installed (force either with
   `CONTAINER_RUNTIME=docker|podman`). Every task below works with either;
   under docker, images are copied via skopeo into a
@@ -37,7 +56,8 @@ list what's available. Notably:
 Equivalently, by hand:
 
 ```sh
-podman build -t quine-linux -f Containerfile .
+(cd stage-0 && sudo just build --image aurora --tag stable --flavor main)
+sudo podman build -t quine-linux -f Containerfile .
 ```
 
 An ISO can then be generated from the built image with `bootc-image-builder`

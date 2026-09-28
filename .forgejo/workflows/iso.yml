@@ -6,7 +6,9 @@ name: Installer ISO
 #
 # Runs on a runner labelled `iso-builder`: bootc-image-builder needs an
 # x86_64 host with root podman (the job runs as root, or with sudo) and
-# ~30 GB of free disk.
+# ~30 GB of free disk. Stage 0 (the stage-0/ Aurora fork) also needs
+# buildah, cpp, skopeo and jq from the runner's distro; just, yq and cosign
+# are fetched below.
 #
 # Secrets: MINIO_ACCESS_KEY, MINIO_SECRET_KEY.
 # Variables (optional): MINIO_ENDPOINT (default https://s3.quineglobal.com),
@@ -28,14 +30,20 @@ env:
 jobs:
   iso:
     runs-on: iso-builder
-    timeout-minutes: 180
+    timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-      - name: Install task and mc
+      - name: Install task, mc, just, yq and cosign
         run: |
           mkdir -p "$HOME/.local/bin"
           curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b "$HOME/.local/bin"
+          curl -fsSL https://just.systems/install.sh | bash -s -- --to "$HOME/.local/bin"
+          curl -fsSL -o "$HOME/.local/bin/yq" https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          curl -fsSL -o "$HOME/.local/bin/cosign" https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+          chmod +x "$HOME/.local/bin/yq" "$HOME/.local/bin/cosign"
           curl -fsSL -o "$HOME/.local/bin/mc" https://dl.min.io/client/mc/release/linux-amd64/mc
           chmod +x "$HOME/.local/bin/mc"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
