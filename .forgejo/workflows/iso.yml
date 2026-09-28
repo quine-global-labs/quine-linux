@@ -1,0 +1,61 @@
+name: Installer ISO
+
+# Builds the installer ISO (`task build-installer-iso`) and uploads it to
+# MinIO as <bucket>/installer/<commit>/install.iso and
+# <bucket>/installer/latest/install.iso.
+#
+# Runs on a runner labelled `iso-builder`: bootc-image-builder needs an
+# x86_64 host with root podman (the job runs as root, or with sudo) and
+# ~30 GB of free disk.
+#
+# Secrets: MINIO_ACCESS_KEY, MINIO_SECRET_KEY.
+# Variables (optional): MINIO_ENDPOINT (default https://s3.quineglobal.com),
+# MINIO_BUCKET (default quine-linux).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: iso-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
+  MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
+
+jobs:
+  iso:
+    runs-on: iso-builder
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install task and mc
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b "$HOME/.local/bin"
+          curl -fsSL -o "$HOME/.local/bin/mc" https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x "$HOME/.local/bin/mc"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Build installer ISO
+        run: task build-installer-iso CONTAINER_RUNTIME=podman
+
+      - name: Upload to MinIO
+        env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        run: |
+          iso=output/bootc-installer/install.iso
+          ls -lh "$iso"
+          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+          mc mb --ignore-existing "store/${MINIO_BUCKET}"
+          dest="store/${MINIO_BUCKET}/installer"
+          mc cp "$iso" "${dest}/${GITHUB_SHA}/install.iso"
+          mc cp "${dest}/${GITHUB_SHA}/install.iso" "${dest}/latest/install.iso"
+
+      - name: Clean up build output
+        if: always()
+        run: rm -rf output

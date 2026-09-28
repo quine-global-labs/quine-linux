@@ -3,7 +3,11 @@ version: '3'
 vars:
   IMAGE: quine-linux
   INSTALLER_IMAGE: quine-installer
-  OUTPUT_DIR: ./output
+  OUTPUT_DIR: '{{.ROOT_DIR}}/output'
+  # Root is needed for the container builds and bootc; skip {{.SUDO}} when already
+  # root (e.g. on a CI runner, which may not have {{.SUDO}} at all).
+  SUDO:
+    sh: '[ "$(id -u)" = 0 ] || echo sudo'
   # Any docker-CLI-compatible runtime works for plain builds. Prefers podman,
   # falls back to docker; override with CONTAINER_RUNTIME=... (env or task var).
   CONTAINER_RUNTIME:
@@ -36,7 +40,7 @@ tasks:
       this lands in root's containers-storage, which bootc and
       bootc-image-builder read; under docker, the ISO tasks copy it over).
     cmds:
-      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.IMAGE}} -f Containerfile .
+      - '{{.SUDO}} {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.IMAGE}} -f Containerfile .'
     sources:
       - Containerfile
       - overlay/**/*
@@ -63,7 +67,7 @@ tasks:
         vars: { IMAGES: "{{.IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
       - >-
-        sudo {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
+        {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
@@ -79,7 +83,7 @@ tasks:
       is separate from the quine-linux OS image itself. Defaults to the
       anaconda-webui built from installer/anaconda-webui/vendor/.
     cmds:
-      - sudo {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} -f installer/Containerfile installer/
+      - '{{.SUDO}} {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} -f installer/Containerfile installer/'
 
   build-installer-iso:
     desc: >-
@@ -105,7 +109,7 @@ tasks:
         vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
       - >-
-        sudo {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
+        {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
         -v {{.OUTPUT_DIR}}:/output
         -v {{.STORAGE}}:/var/lib/containers/storage
@@ -127,7 +131,7 @@ tasks:
     cmds:
       - for: { var: IMAGES }
         cmd: >-
-          sudo {{.CONTAINER_RUNTIME}} run --rm --privileged
+          {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged
           -v /var/run/docker.sock:/var/run/docker.sock
           -v {{.STORAGE}}:/var/lib/containers/storage
           {{.SKOPEO_IMAGE}}
@@ -149,10 +153,10 @@ tasks:
     cmds:
       # bootc reads the host's own containers-storage, i.e. podman's (which
       # every bootc host ships), so a docker-built image is loaded into it.
-      - cmd: sudo docker save {{.IMAGE}} | sudo podman load
+      - cmd: '{{.SUDO}} docker save {{.IMAGE}} | {{.SUDO}} podman load'
         platforms: [linux]
         if: '[ "{{.CONTAINER_RUNTIME}}" != podman ]'
-      - sudo bootc switch --transport containers-storage localhost/{{.IMAGE}}
+      - '{{.SUDO}} bootc switch --transport containers-storage localhost/{{.IMAGE}}'
       - bootc status --booted
       - echo "Staged localhost/{{.IMAGE}} for next boot. Run task test:boot when ready to reboot into it."
 
@@ -161,7 +165,7 @@ tasks:
     prompt: This will reboot this machine into the locally-built {{.IMAGE}} image. Continue?
     deps: [test:stage]
     cmds:
-      - sudo systemctl reboot
+      - '{{.SUDO}} systemctl reboot'
 
   revert:
     desc: >-
@@ -171,5 +175,5 @@ tasks:
       rpm-ostree always keep the prior deployment around for exactly this.
     prompt: This will reboot this machine back into the previous deployment. Continue?
     cmds:
-      - sudo bootc rollback
-      - sudo systemctl reboot
+      - '{{.SUDO}} bootc rollback'
+      - '{{.SUDO}} systemctl reboot'
