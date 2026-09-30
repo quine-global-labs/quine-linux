@@ -114,3 +114,18 @@ anywhere else in this repo:
   and current verification status.
 - `patches/snd-hda-codec-cs8409/` — the vendored driver source and patch
   backing that fix, built into `Containerfile`'s `kmod-builder` stage.
+- [`docs/imac19-2-speaker-fix.md`](docs/imac19-2-speaker-fix.md) — the
+  internal speakers on iMac19,2 producing no sound at all; investigation and
+  prior-art writeup, no fix packaged yet.
+
+## Software fork directions
+
+Write-ups of problems found on this image that point at a fork/patch of an
+upstream project, kept here before anyone's had time to act on them:
+
+- [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
+  — active: how to get a forked/patched Anaconda into the install ISO.
+- [`docs/chromium-dbus-singleton-activation.md`](docs/chromium-dbus-singleton-activation.md)
+  — not started: Chromium lacks D-Bus activation, so KDE + Flatpak can't
+  dedupe a slow-starting launch, and repeated launcher clicks stack up full
+  duplicate browser instances instead of forwarding to the existing one.
