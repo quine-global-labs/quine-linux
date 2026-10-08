@@ -160,7 +160,7 @@ copyright notice — so it stays short and makes no legal claim.
 `Taskfile.yml`, as the first line:
 
 ```yaml
-# Part of Quine OS. See GUIDELINES.md in the quine-linux repo for conventions.
+# Part of Quine Linux. See GUIDELINES.md in the quine-linux repo for conventions.
 version: "3"
 ```
 
@@ -168,7 +168,7 @@ version: "3"
 any file-specific build-rationale comment already there):
 
 ```go
-// Part of Quine OS. See GUIDELINES.md in the quine-linux repo for conventions.
+// Part of Quine Linux. See GUIDELINES.md in the quine-linux repo for conventions.
 package main
 ```
 
