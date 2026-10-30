@@ -10,7 +10,8 @@ name: Installer ISO
 # buildah, cpp, skopeo and jq from the runner's distro; just, yq and cosign
 # are fetched below.
 #
-# Secrets: MINIO_ACCESS_KEY, MINIO_SECRET_KEY.
+# Secret: MINIO_SECRET_KEY. MINIO_ACCESS_KEY is a variable or a secret (it's
+# just the MinIO user's name, `quine-linux`).
 # Variables (optional): MINIO_ENDPOINT (default https://s3.quineglobal.com),
 # MINIO_BUCKET (default quine-linux).
 
@@ -53,7 +54,7 @@ jobs:
 
       - name: Upload to MinIO
         env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
           iso=output/bootc-installer/install.iso
