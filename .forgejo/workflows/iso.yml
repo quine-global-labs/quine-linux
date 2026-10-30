@@ -38,20 +38,22 @@ jobs:
           submodules: true
 
       - name: Install task, mc, just, yq and cosign
+        # Only what the runner doesn't already have: runner-x86-linux has
+        # all five from nixpkgs (petersweb-infra, hosts/runner-x86-linux).
+        # dl.min.io's mc answers 410 Gone, so a runner without mc needs one
+        # installed.
         run: |
-          mkdir -p "$HOME/.local/bin"
-          curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b "$HOME/.local/bin"
-          # --force: on a host-mode runner $HOME outlives the job, and
-          # just's installer won't overwrite the previous run's binary.
-          # env -u: the installer sends $GITHUB_TOKEN to GitHub, and here
-          # that's Forgejo's token, which GitHub rejects (401/410).
-          curl -fsSL https://just.systems/install.sh | env -u GITHUB_TOKEN bash -s -- --force --to "$HOME/.local/bin"
-          curl -fsSL -o "$HOME/.local/bin/yq" https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          curl -fsSL -o "$HOME/.local/bin/cosign" https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
-          chmod +x "$HOME/.local/bin/yq" "$HOME/.local/bin/cosign"
-          curl -fsSL -o "$HOME/.local/bin/mc" https://dl.min.io/client/mc/release/linux-amd64/mc
-          chmod +x "$HOME/.local/bin/mc"
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          bin="$HOME/.local/bin"
+          mkdir -p "$bin"
+          have() { command -v "$1" >/dev/null; }
+          have task || curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b "$bin"
+          # --force: on a host-mode runner $HOME outlives the job.
+          have just || curl -fsSL https://just.systems/install.sh | bash -s -- --force --to "$bin"
+          have yq || { curl -fsSL -o "$bin/yq" https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && chmod +x "$bin/yq"; }
+          have cosign || { curl -fsSL -o "$bin/cosign" https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 && chmod +x "$bin/cosign"; }
+          have mc || { curl -fsSL -o "$bin/mc" https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x "$bin/mc"; }
+          echo "$bin" >> "$GITHUB_PATH"
+          for t in task just yq cosign mc; do printf '%s: ' "$t"; command -v "$t"; done
 
       - name: Build installer ISO
         run: task build-installer-iso CONTAINER_RUNTIME=podman
