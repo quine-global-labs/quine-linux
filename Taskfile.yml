@@ -167,6 +167,10 @@ tasks:
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
+      # --rootfs: bootc-image-builder takes the default root filesystem from
+      # the installer image, and fedora-bootc:rawhide declares none ("missing
+      # required info: DefaultRootFs"). btrfs is what the payload declares
+      # (Aurora's /usr/lib/bootc/install/20-aurora.toml).
       - >-
         {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
@@ -174,6 +178,7 @@ tasks:
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
         --type bootc-installer
+        --rootfs btrfs
         --installer-payload-ref localhost/{{.IMAGE}}
         localhost/{{.INSTALLER_IMAGE}}
     generates:
