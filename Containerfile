@@ -1,9 +1,9 @@
-# Stage 1 of the build. BASE_IMAGE is stage 0: our Aurora fork, built from the
-# stage-0/ submodule by `task build-base` into root's containers-storage. Its
-# pin is the submodule commit. Pass e.g.
+# Built on our Aurora fork (quine-global-labs/aurora), which its own workflow
+# builds and publishes to this forge's registry. Pass e.g.
 # --build-arg BASE_IMAGE=ghcr.io/ublue-os/aurora:stable to build on stock
-# upstream Aurora instead.
-ARG BASE_IMAGE=localhost/aurora:stable
+# upstream Aurora instead, or localhost/aurora:stable for a local build of
+# the fork.
+ARG BASE_IMAGE=forge.quinefoundation.com/quine-global-labs/aurora:stable
 
 # --- Builds the out-of-tree snd-hda-codec-cs8409 module (iMac19,2 mic fix). ---
 # See docs/imac19-2-mic-fix.md and patches/snd-hda-codec-cs8409/ for the full
