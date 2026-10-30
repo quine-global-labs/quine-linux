@@ -65,10 +65,16 @@ tasks:
       # sudo resets PATH (just/yq/cosign often live in ~/.local/bin or brew),
       # and git refuses to read a repo owned by another user unless told it's
       # safe; Aurora's Justfile runs `git status` / `git rev-parse` here.
+      # Aurora reads its own past tags from ghcr.io/$GITHUB_REPOSITORY_OWNER,
+      # and hands $GITHUB_TOKEN to GitHub's API. On Forgejo Actions those are
+      # this org and a Forgejo token, so: always ublue-os, and the token only
+      # when the job runs on GitHub.
       - >-
-        {{.SUDO}} env "PATH=$PATH"
+        {{.SUDO}} env
+        $([ "${GITHUB_SERVER_URL:-https://github.com}" = https://github.com ] || echo -u GITHUB_TOKEN)
+        "PATH=$PATH" GITHUB_REPOSITORY_OWNER=ublue-os
         GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0='*'
-        ${GITHUB_TOKEN:+"GITHUB_TOKEN=$GITHUB_TOKEN"}
+        $([ "${GITHUB_SERVER_URL:-https://github.com}" = https://github.com ] && [ -n "${GITHUB_TOKEN:-}" ] && echo "GITHUB_TOKEN=$GITHUB_TOKEN")
         just build --image aurora --tag {{.AURORA_TAG}} --flavor main
       # buildah builds into root's containers-storage; docker needs it copied
       # into its daemon for stage 1 to build FROM it.
