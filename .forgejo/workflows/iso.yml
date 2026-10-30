@@ -55,6 +55,24 @@ jobs:
           echo "$bin" >> "$GITHUB_PATH"
           for t in task just yq cosign mc; do printf '%s: ' "$t"; command -v "$t"; done
 
+      - name: Pull base images
+        # Before the builds, with retries: quay.io's CDN cuts off multi-GB
+        # layers now and then ("unexpected EOF"), and a pull inside
+        # `buildah build` gives up after one reconnect. Already-pulled
+        # images cost only a manifest check. Stage 0's own bases (Aurora's
+        # image-versions.yml) aren't listed: Aurora pins them by digest.
+        run: |
+          for img in \
+            quay.io/fedora/fedora-bootc:rawhide \
+            registry.fedoraproject.org/fedora:rawhide \
+            ghcr.io/osbuild/bootc-image-builder:latest; do
+            for try in 1 2 3 4 5; do
+              podman pull --retry 5 --retry-delay 20s -q "$img" && break
+              [ "$try" != 5 ] || exit 1
+              echo "retrying $img in 30s"; sleep 30
+            done
+          done
+
       - name: Build installer ISO
         run: task build-installer-iso CONTAINER_RUNTIME=podman
 
