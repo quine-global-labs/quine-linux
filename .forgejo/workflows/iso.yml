@@ -81,8 +81,8 @@ jobs:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
-          # bootc-image-builder names the folder after its export, not the
-          # image type (it wasn't output/bootc-installer/), so look for it.
+          # Normally output/bootiso/: bootc-image-builder names the folder
+          # after its export, not the image type, so look rather than assume.
           iso=$(find output -name install.iso -print -quit)
           [ -n "$iso" ] || { echo "no install.iso under output/:"; find output -maxdepth 2; exit 1; }
           echo "ISO: $iso"

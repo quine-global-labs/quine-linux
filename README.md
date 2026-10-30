@@ -41,7 +41,7 @@ list what's available. Notably:
   `bootc-image-builder`, landing in `output/bootiso/install.iso`.
 - `task build-installer-iso` — builds an install ISO using a custom
   Anaconda installer environment (`installer/Containerfile`) instead of
-  stock Fedora's, landing in `output/bootc-installer/install.iso`. See
+  stock Fedora's, landing in `output/bootiso/install.iso`. See
   [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
   for forking/patching Anaconda itself.
 - `task test:stage` / `task test:boot` — stage the locally-built image as

@@ -48,7 +48,7 @@ matching a release-identity package.
    `installer/Containerfile` builds the vendored source with upstream's own
    `make install` (the same step Fedora's RPM runs), installs stock Fedora
    `anaconda-webui` for its dependencies, and copies the built files over
-   it. The ISO lands in `output/bootc-installer/install.iso`.
+   it. The ISO lands in `output/bootiso/install.iso`.
 3. **Iterate:** edit, rerun. The build stage is cached until something in
    `vendor/` changes.
 
