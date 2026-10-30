@@ -81,7 +81,11 @@ jobs:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         run: |
-          iso=output/bootc-installer/install.iso
+          # bootc-image-builder names the folder after its export, not the
+          # image type (it wasn't output/bootc-installer/), so look for it.
+          iso=$(find output -name install.iso -print -quit)
+          [ -n "$iso" ] || { echo "no install.iso under output/:"; find output -maxdepth 2; exit 1; }
+          echo "ISO: $iso"
           ls -lh "$iso"
           mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc mb --ignore-existing "store/${MINIO_BUCKET}"
