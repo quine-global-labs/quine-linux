@@ -43,7 +43,9 @@ jobs:
           curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b "$HOME/.local/bin"
           # --force: on a host-mode runner $HOME outlives the job, and
           # just's installer won't overwrite the previous run's binary.
-          curl -fsSL https://just.systems/install.sh | bash -s -- --force --to "$HOME/.local/bin"
+          # env -u: the installer sends $GITHUB_TOKEN to GitHub, and here
+          # that's Forgejo's token, which GitHub rejects (401/410).
+          curl -fsSL https://just.systems/install.sh | env -u GITHUB_TOKEN bash -s -- --force --to "$HOME/.local/bin"
           curl -fsSL -o "$HOME/.local/bin/yq" https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           curl -fsSL -o "$HOME/.local/bin/cosign" https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
           chmod +x "$HOME/.local/bin/yq" "$HOME/.local/bin/cosign"
