@@ -11,6 +11,10 @@ name: Image and installer ISO
 # hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
 # root podman and ~30 GB of free disk.
 #
+# Upstream images (Fedora's, bootc-image-builder) are vendored into
+# forge.quinefoundation.com/quine-global-labs/mirror/ first, and pulled
+# from there (.forgejo/vendor-images.sh).
+#
 # Secrets: REGISTRY_TOKEN (a Forgejo token with package write access),
 # MINIO_SECRET_KEY. MINIO_ACCESS_KEY is a variable or a secret (it's just the
 # MinIO user's name, `quine-linux`).
@@ -70,11 +74,23 @@ jobs:
           REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
         run: printf %s "$REGISTRY_TOKEN" | podman login "$REGISTRY" -u "$REGISTRY_USER" --password-stdin
 
+      - name: Vendor upstream images
+        # Into the forge's mirror/ (.forgejo/vendor-images.sh), which the
+        # pulls below then read: the installer's two bases
+        # (installer/Containerfile) and bootc-image-builder (Taskfile.yml).
+        run: |
+          .forgejo/vendor-images.sh \
+            quay.io/fedora/fedora-bootc:rawhide \
+            registry.fedoraproject.org/fedora:rawhide \
+            ghcr.io/osbuild/bootc-image-builder:latest
+
       - name: Pull base images
         # Before the builds, with retries: quay.io's CDN cuts off multi-GB
         # layers now and then ("unexpected EOF"), and a pull inside
         # `buildah build` gives up after one reconnect. Already-pulled
-        # images cost only a manifest check.
+        # images cost only a manifest check. The upstream ones come from the
+        # forge's mirror/ when it has them (runner-x86-linux's
+        # registries.conf).
         run: |
           for img in \
             "$BASE_IMAGE" \
