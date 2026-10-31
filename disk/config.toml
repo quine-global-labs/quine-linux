@@ -1,0 +1,8 @@
+# bootc-image-builder's config for the disk image (task build-disk-image).
+# No user: the image has none, so plasma-setup (Aurora's, enabled by
+# default) creates the first one at first boot. Root's minimum size only;
+# a qcow2 is sparse, so the download is the size of what's written, not 64
+# GiB.
+[[customizations.filesystem]]
+mountpoint = "/"
+minsize = "64 GiB"

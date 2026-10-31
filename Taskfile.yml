@@ -5,9 +5,8 @@ vars:
   INSTALLER_IMAGE: quine-installer
   # What the Containerfile builds FROM: our Aurora fork
   # (quine-global-labs/aurora), built and published by that repo's workflow.
-  # It's private: `podman login forge.quinefoundation.com` first. Override
-  # with a local build of the fork (BASE_IMAGE=localhost/aurora:stable, see
-  # README) or stock upstream (BASE_IMAGE=ghcr.io/ublue-os/aurora:stable).
+  # Override with a local build of the fork (BASE_IMAGE=localhost/aurora:stable,
+  # see README) or stock upstream (BASE_IMAGE=ghcr.io/ublue-os/aurora:stable).
   BASE_IMAGE: forge.quinefoundation.com/quine-global-labs/aurora:stable
   OUTPUT_DIR: '{{.ROOT_DIR}}/output'
   # Root is needed for the container builds and bootc; skip {{.SUDO}} when already
@@ -134,6 +133,38 @@ tasks:
         localhost/{{.INSTALLER_IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/bootiso/install.iso"
+
+  build-disk-image:
+    desc: >-
+      Build a ready-installed disk image (qcow2) of the local quine-linux
+      image, via bootc-image-builder: boot it in a VM and plasma-setup asks
+      for the first user. Output lands in {{.OUTPUT_DIR}}/qcow2/disk.qcow2.
+    preconditions:
+      - sh: |
+          case "$(uname -m)" in x86_64|amd64) a=amd64 ;; aarch64|arm64) a=arm64 ;; *) a="$(uname -m)" ;; esac
+          [ "$a" = "{{.TARGET_ARCH}}" ]
+        msg: >-
+          Disk image builds need a host of architecture {{.TARGET_ARCH}}. This
+          one is {{ARCH}}; see build-iso.
+    cmds:
+      # Not a dep: deps run before preconditions, and this should fail fast.
+      - task: build-image
+      - task: export-to-storage
+        vars: { IMAGES: "{{.IMAGE}}" }
+      - mkdir -p {{.OUTPUT_DIR}}
+      # --rootfs btrfs: what Aurora installs with, as in build-installer-iso.
+      - >-
+        {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
+        --security-opt label=type:unconfined_t
+        -v {{.OUTPUT_DIR}}:/output
+        -v {{.ROOT_DIR}}/disk/config.toml:/config.toml:ro
+        -v {{.STORAGE}}:/var/lib/containers/storage
+        {{.BIB_IMAGE}}
+        --type qcow2
+        --rootfs btrfs
+        localhost/{{.IMAGE}}
+    generates:
+      - "{{.OUTPUT_DIR}}/qcow2/disk.qcow2"
 
   export-to-storage:
     internal: true

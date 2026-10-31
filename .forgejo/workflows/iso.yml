@@ -1,11 +1,12 @@
-name: Image and installer ISO
+name: Image, installer ISO and disk image
 
 # Builds the quine-linux image on our Aurora build (published by
 # quine-global-labs/aurora's workflow to this forge's registry), pushes it to
 # forge.quinefoundation.com/quine-global-labs/quine-linux (`latest`,
-# `<date>`, the commit), then builds the installer ISO from it and uploads
-# that to MinIO as <bucket>/installer/<commit>/install.iso and
-# <bucket>/installer/latest/install.iso.
+# `<date>`, the commit), then builds the installer ISO and a disk image
+# (qcow2) from it and uploads them to MinIO as
+# <bucket>/installer/<commit>/install.iso, <bucket>/installer/latest/install.iso
+# and <bucket>/disk/latest/disk.qcow2.
 #
 # Runs on runner-x86-linux (host mode, root podman; petersweb-infra,
 # hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
@@ -127,6 +128,9 @@ jobs:
       - name: Build installer ISO
         run: task build-installer-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
 
+      - name: Build disk image
+        run: task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+
       - name: Upload to MinIO
         env:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
@@ -143,6 +147,9 @@ jobs:
           dest="store/${MINIO_BUCKET}/installer"
           mc cp "$iso" "${dest}/${GITHUB_SHA}/install.iso"
           mc cp "${dest}/${GITHUB_SHA}/install.iso" "${dest}/latest/install.iso"
+          # The disk image: latest only, it's as big as the ISO.
+          ls -lh output/qcow2/disk.qcow2
+          mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk.qcow2"
 
       - name: Publish the release
         if: github.ref_type == 'tag'
@@ -154,6 +161,7 @@ jobs:
           tag=$GITHUB_REF_NAME
           mkdir -p release
           ln -f "$(find output -name install.iso -print -quit)" "release/quine-linux-$tag-installer-x86_64.iso"
+          ln -f output/qcow2/disk.qcow2 "release/quine-linux-$tag-x86_64.qcow2"
           (cd release && sha256sum -- * > SHA256SUMS)
           cat release/SHA256SUMS
 
