@@ -5,8 +5,8 @@ name: Image, installer ISO, disk image and live ISO
 # forge.quinefoundation.com/quine-global-labs/quine-linux (`latest`,
 # `<date>`, the commit), then builds the installer ISO, a disk image (qcow2)
 # and a live ISO from it and uploads them to MinIO as
-# <bucket>/installer/<commit>/install.iso, <bucket>/installer/latest/install.iso,
-# <bucket>/disk/latest/disk.qcow2 and <bucket>/live/latest/live.iso.
+# <bucket>/installer/latest/install.iso, <bucket>/disk/latest/disk.qcow2 and
+# <bucket>/live/latest/live.iso, replacing the last build's.
 #
 # Runs on runner-x86-linux (host mode, root podman; petersweb-infra,
 # hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
@@ -151,10 +151,9 @@ jobs:
           ls -lh "$iso"
           mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc mb --ignore-existing "store/${MINIO_BUCKET}"
-          dest="store/${MINIO_BUCKET}/installer"
-          mc cp "$iso" "${dest}/${GITHUB_SHA}/install.iso"
-          mc cp "${dest}/${GITHUB_SHA}/install.iso" "${dest}/latest/install.iso"
-          # The disk image and live ISO: latest only, they're as big as the ISO.
+          # Latest only: each file is 5-8 GB, and the forge VM's disk is
+          # shared. Tagged releases keep their own copies (releases/<tag>/).
+          mc cp "$iso" "store/${MINIO_BUCKET}/installer/latest/install.iso"
           ls -lh output/qcow2/disk.qcow2
           mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk.qcow2"
           ls -lh output/live/Quine-Linux-Live.iso
