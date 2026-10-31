@@ -47,8 +47,9 @@ jobs:
     runs-on: runner-x86-linux
     timeout-minutes: 300
     steps:
-      # No submodules: stage 0 (Aurora) comes from the registry now.
-      - uses: actions/checkout@v4
+      # No submodules: stage 0 (Aurora) comes from the registry now. Our pull
+      # mirror of code.forgejo.org/actions/checkout.
+      - uses: https://forge.quinefoundation.com/quine-global-labs/mirror-actions-checkout@v4
 
       - name: Install task, mc, just, yq and cosign
         # Only what the runner doesn't already have: runner-x86-linux has
