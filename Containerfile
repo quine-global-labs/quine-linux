@@ -55,6 +55,18 @@ RUN set -eux; \
     mv /tmp/snd-hda-codec-cs8409.ko "/usr/lib/modules/${NVR}/extra/snd-hda-codec-cs8409.ko"; \
     depmod -a "${NVR}"
 
+# Our own apps, from the forge's `quine` RPM group: each repo's rpm.yml
+# builds and uploads them (quine-global-labs/layer-wizard, dnf-package-store,
+# swap-watchdog). The repo is only used here, not left configured: the apps
+# update with the image. kdotool, which swap-watchdog drives, is Fedora's.
+# Forgejo signs the repository metadata, not the packages, so dnf checks the
+# metadata (repo_gpgcheck), which pins each package's checksum.
+RUN dnf install -y \
+      --repofrompath=quine,https://forge.quinefoundation.com/api/packages/quine-global-labs/rpm/quine \
+      --setopt=quine.gpgcheck=0 --setopt=quine.repo_gpgcheck=1 \
+      --setopt=quine.gpgkey=https://forge.quinefoundation.com/api/packages/quine-global-labs/rpm/repository.key \
+      layer-wizard dnf-package-store swap-watchdog
+
 # System-level units are enabled explicitly. User units are picked up
 # automatically via overlay/usr/lib/systemd/user-preset/.
 RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service
