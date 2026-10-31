@@ -2,7 +2,6 @@ version: '3'
 
 vars:
   IMAGE: quine-linux
-  INSTALLER_IMAGE: quine-installer
   LIVE_IMAGE: quine-linux-live
   # What the Containerfile builds FROM: our Aurora fork
   # (quine-global-labs/aurora), built and published by that repo's workflow.
@@ -58,85 +57,6 @@ tasks:
       - overlay/**/*
       - patches/**/*
 
-  build-iso:
-    desc: >-
-      Build a bootable install ISO from the local quine-linux image, via
-      bootc-image-builder. Output lands in {{.OUTPUT_DIR}}/bootiso/install.iso.
-    preconditions:
-      - sh: |
-          case "$(uname -m)" in x86_64|amd64) a=amd64 ;; aarch64|arm64) a=arm64 ;; *) a="$(uname -m)" ;; esac
-          [ "$a" = "{{.TARGET_ARCH}}" ]
-        msg: >-
-          ISO builds need a host of architecture {{.TARGET_ARCH}}. This one is
-          {{ARCH}}, and bootc-image-builder's cross-arch mode fails partway
-          (it runs the image for inspection, which needs emulation inside
-          its own container). Build the ISO on an x86_64 machine, e.g. the
-          Aurora box.
-    cmds:
-      # Not a dep: deps run before preconditions, and this should fail fast.
-      - task: build-image
-      - task: export-to-storage
-        vars: { IMAGES: "{{.IMAGE}}" }
-      - mkdir -p {{.OUTPUT_DIR}}
-      - >-
-        {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
-        --security-opt label=type:unconfined_t
-        -v {{.OUTPUT_DIR}}:/output
-        -v {{.STORAGE}}:/var/lib/containers/storage
-        {{.BIB_IMAGE}}
-        --type iso localhost/{{.IMAGE}}
-    generates:
-      - "{{.OUTPUT_DIR}}/bootiso/install.iso"
-
-  build-installer-image:
-    desc: >-
-      Build the patched-Anaconda installer-environment container (see
-      installer/Containerfile and docs/patched-anaconda-installer.md). This
-      is separate from the quine-linux OS image itself. Defaults to the
-      anaconda-webui built from installer/anaconda-webui/vendor/.
-    cmds:
-      - '{{.SUDO}} {{.CONTAINER_RUNTIME}} build --platform {{.PLATFORM}} -t {{.INSTALLER_IMAGE}} -f installer/Containerfile installer/'
-
-  build-installer-iso:
-    desc: >-
-      Build a bootable install ISO using the patched-Anaconda installer
-      image to install the quine-linux bootc image, via
-      bootc-image-builder's `bootc-installer` type. Output lands in
-      {{.OUTPUT_DIR}}/bootiso/install.iso.
-    preconditions:
-      - sh: |
-          case "$(uname -m)" in x86_64|amd64) a=amd64 ;; aarch64|arm64) a=arm64 ;; *) a="$(uname -m)" ;; esac
-          [ "$a" = "{{.TARGET_ARCH}}" ]
-        msg: >-
-          ISO builds need a host of architecture {{.TARGET_ARCH}}. This one is
-          {{ARCH}}, and bootc-image-builder's cross-arch mode fails partway
-          (it runs the image for inspection, which needs emulation inside
-          its own container). Build the ISO on an x86_64 machine, e.g. the
-          Aurora box.
-    cmds:
-      # Not a dep: deps run before preconditions, and this should fail fast.
-      - task: build-image
-      - task: build-installer-image
-      - task: export-to-storage
-        vars: { IMAGES: "{{.IMAGE}} {{.INSTALLER_IMAGE}}" }
-      - mkdir -p {{.OUTPUT_DIR}}
-      # --rootfs: bootc-image-builder takes the default root filesystem from
-      # the installer image, and fedora-bootc:rawhide declares none ("missing
-      # required info: DefaultRootFs"). btrfs is what the payload declares
-      # (Aurora's /usr/lib/bootc/install/20-aurora.toml).
-      - >-
-        {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
-        --security-opt label=type:unconfined_t
-        -v {{.OUTPUT_DIR}}:/output
-        -v {{.STORAGE}}:/var/lib/containers/storage
-        {{.BIB_IMAGE}}
-        --type bootc-installer
-        --rootfs btrfs
-        --installer-payload-ref localhost/{{.IMAGE}}
-        localhost/{{.INSTALLER_IMAGE}}
-    generates:
-      - "{{.OUTPUT_DIR}}/bootiso/install.iso"
-
   build-disk-image:
     desc: >-
       Build a ready-installed disk image (qcow2) of the local quine-linux
@@ -148,7 +68,9 @@ tasks:
           [ "$a" = "{{.TARGET_ARCH}}" ]
         msg: >-
           Disk image builds need a host of architecture {{.TARGET_ARCH}}. This
-          one is {{ARCH}}; see build-iso.
+          one is {{ARCH}}, and bootc-image-builder's cross-arch mode fails
+          partway (it runs the image for inspection, which needs emulation
+          inside its own container).
     cmds:
       # Not a dep: deps run before preconditions, and this should fail fast.
       - task: build-image

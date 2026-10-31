@@ -1,7 +1,0 @@
-[submodule "test/reference"]
-	path = test/reference
-	url = https://github.com/rhinstaller/pixel-test-reference
-	branch = empty
-[submodule "node_modules"]
-	path = node_modules
-	url = https://github.com/rhinstaller/node-cache

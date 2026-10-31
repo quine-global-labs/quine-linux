@@ -2,9 +2,7 @@
 
 Not started -- this is a write-up of a problem observed on this machine and
 the shape a fix would take in a Chromium fork, kept here so the idea isn't
-lost before anyone has time to act on it. Unlike
-[`docs/patched-anaconda-installer.md`](patched-anaconda-installer.md), there
-is no fork yet.
+lost before anyone has time to act on it. There is no fork yet.
 
 ## Symptom
 

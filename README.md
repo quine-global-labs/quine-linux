@@ -17,11 +17,11 @@ The image is built in two repos:
   `kmod-builder` stage that compiles the CS8409 mic-fix kernel module (see
   [Hardware-specific patches](#hardware-specific-patches) below). Anything a
   `RUN` step on top of Aurora can do belongs here, not in the fork. Its
-  workflow publishes `forge.quinefoundation.com/quine-global-labs/quine-linux`
-  and the installer ISO (to MinIO).
+  workflow publishes `forge.quinefoundation.com/quine-global-labs/quine-linux`,
+  and the live ISO and disk image (to MinIO).
 
-Both images are private: `sudo podman login forge.quinefoundation.com`
-(with a token that can read packages) before building locally.
+Like Aurora, there's one installer: the live ISO's. There's no separate
+install ISO.
 
 [`Taskfile.yml`](Taskfile.yml) (requires [`task`](https://taskfile.dev)) is
 the supported way to drive all of this — run `task` with no arguments to
@@ -35,13 +35,6 @@ list what's available. Notably:
   `CONTAINER_RUNTIME=docker|podman`). Every task below works with either;
   under docker, images are copied via skopeo into a
   `quine-containers-storage` volume for `bootc-image-builder` to read.
-- `task build-iso` — builds a bootable install ISO from that image via
-  `bootc-image-builder`, landing in `output/bootiso/install.iso`.
-- `task build-installer-iso` — builds an install ISO using a custom
-  Anaconda installer environment (`installer/Containerfile`) instead of
-  stock Fedora's, landing in `output/bootiso/install.iso`. See
-  [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
-  for forking/patching Anaconda itself.
 - `task build-disk-image` — builds a ready-installed disk image (qcow2)
   via `bootc-image-builder`, landing in `output/qcow2/disk.qcow2`. It has
   no user: plasma-setup creates the first one at first boot.
@@ -133,8 +126,6 @@ anywhere else in this repo:
 Write-ups of problems found on this image that point at a fork/patch of an
 upstream project, kept here before anyone's had time to act on them:
 
-- [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
-  — active: how to get a forked/patched Anaconda into the install ISO.
 - [`docs/chromium-dbus-singleton-activation.md`](docs/chromium-dbus-singleton-activation.md)
   — not started: Chromium lacks D-Bus activation, so KDE + Flatpak can't
   dedupe a slow-starting launch, and repeated launcher clicks stack up full
