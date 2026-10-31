@@ -1,8 +1,19 @@
 # bootc-image-builder's config for the disk image (task build-disk-image).
 # No user: the image has none, so plasma-setup (Aurora's, enabled by
-# default) creates the first one at first boot. Only the disk's minimum
-# size (customizations.filesystem isn't supported for disk images); a
-# qcow2 is sparse, so the download is the size of what's written, not 64
-# GiB.
+# default) creates the first one at first boot.
+#
+# A 64 GiB disk, root on btrfs as Aurora installs it. qcow2 is sparse, so
+# the download is the size of what's written. The btrfs partition goes here
+# rather than in --rootfs: bootc-image-builder panics on --rootfs btrfs
+# with a disk size ("unknown fs type: btrfs for /"), and doesn't support
+# customizations.filesystem for disk images.
 [customizations.disk]
 minsize = "64 GiB"
+
+[[customizations.disk.partitions]]
+type = "btrfs"
+minsize = "60 GiB"
+
+[[customizations.disk.partitions.subvolumes]]
+name = "root"
+mountpoint = "/"

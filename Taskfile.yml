@@ -155,7 +155,7 @@ tasks:
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}}" }
       - mkdir -p {{.OUTPUT_DIR}}
-      # --rootfs btrfs: what Aurora installs with, as in build-installer-iso.
+      # Root on btrfs, as Aurora installs it: disk/config.toml.
       - >-
         {{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged {{.PULL_FLAG}}
         --security-opt label=type:unconfined_t
@@ -164,7 +164,6 @@ tasks:
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
         --type qcow2
-        --rootfs btrfs
         localhost/{{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/qcow2/disk.qcow2"
