@@ -11,6 +11,11 @@ name: Image and installer ISO
 # hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
 # root podman and ~30 GB of free disk.
 #
+# A tag `v*` also publishes a release: the files go to MinIO's public
+# <bucket>/releases/<tag>/, and a Forgejo release on this repo links to them
+# (Forgejo's external-URL release files: the images are too big for GitHub's
+# 2 GiB limit, and this keeps one copy). The website lists these releases.
+#
 # Upstream images (Fedora's, bootc-image-builder) are vendored into
 # forge.quinefoundation.com/quine-global-labs/mirror/ first, and pulled
 # from there (.forgejo/vendor-images.sh).
@@ -28,6 +33,7 @@ name: Image and installer ISO
 on:
   push:
     branches: [main]
+    tags: ['v*']
   schedule:
     - cron: '0 7 * * *'
   workflow_dispatch:
@@ -111,7 +117,9 @@ jobs:
 
       - name: Push image
         run: |
-          for t in latest "$(date -u +%Y%m%d)" "${GITHUB_SHA::12}"; do
+          tags=(latest "$(date -u +%Y%m%d)" "${GITHUB_SHA::12}")
+          [ "$GITHUB_REF_TYPE" != tag ] || tags+=("$GITHUB_REF_NAME")
+          for t in "${tags[@]}"; do
             podman tag localhost/quine-linux "$IMAGE:$t"
             podman push --retry 5 "$IMAGE:$t"
           done
@@ -136,8 +144,37 @@ jobs:
           mc cp "$iso" "${dest}/${GITHUB_SHA}/install.iso"
           mc cp "${dest}/${GITHUB_SHA}/install.iso" "${dest}/latest/install.iso"
 
+      - name: Publish the release
+        if: github.ref_type == 'tag'
+        env:
+          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          TOKEN: ${{ github.token }}
+        run: |
+          tag=$GITHUB_REF_NAME
+          mkdir -p release
+          ln -f "$(find output -name install.iso -print -quit)" "release/quine-linux-$tag-installer-x86_64.iso"
+          (cd release && sha256sum -- * > SHA256SUMS)
+          cat release/SHA256SUMS
+
+          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+          for f in release/*; do mc cp "$f" "store/${MINIO_BUCKET}/releases/$tag/${f#release/}"; done
+
+          api="$GITHUB_SERVER_URL/api/v1/repos/$GITHUB_REPOSITORY/releases"
+          auth=(-H "Authorization: token $TOKEN")
+          id=$(jq -n --arg tag "$tag" --arg image "$IMAGE:$tag" '{tag_name: $tag, name: $tag,
+                 body: "Container image: `\($image)`.\nFiles are checked by SHA256SUMS."}' |
+               curl -fsS "${auth[@]}" -H 'Content-Type: application/json' -d @- "$api" | jq -er .id)
+          for f in release/*; do
+            name=${f#release/}
+            curl -fsS "${auth[@]}" -F "external_url=${MINIO_ENDPOINT}/${MINIO_BUCKET}/releases/$tag/$name" \
+              "$api/$id/assets?name=$name" >/dev/null
+            echo "linked $name"
+          done
+          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"
+
       - name: Clean up
         if: always()
         run: |
-          rm -rf output
+          rm -rf output release
           podman logout "$REGISTRY" || true
