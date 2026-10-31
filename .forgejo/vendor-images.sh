@@ -18,17 +18,21 @@ mirror=${MIRROR:-forge.quinefoundation.com/quine-global-labs/mirror}
 export CONTAINERS_REGISTRIES_CONF=/dev/null
 
 for ref in "$@"; do
-  dest="docker://$mirror/${ref%@*}"
+  src="docker://$ref"
+  dest="docker://$mirror/$ref"
+  opts=(--multi-arch system)
   if [[ $ref == *@sha256:* ]]; then
     # Pinned by digest: copy the whole index unchanged, so the digest the
-    # build asks for exists on the mirror.
+    # build asks for exists on the mirror. skopeo refuses a reference with
+    # both a tag and a digest, so read by digest and write by tag.
+    name=${ref%@*}
+    src="docker://${name%:*}@${ref#*@}"
+    dest="docker://$mirror/$name"
     opts=(--multi-arch all --preserve-digests)
-  else
-    opts=(--multi-arch system)
   fi
   echo "::group::$ref"
   # Layers already on the mirror aren't downloaded again.
-  skopeo copy --retry-times 5 "${opts[@]}" "docker://$ref" "$dest" ||
+  skopeo copy --retry-times 5 "${opts[@]}" "$src" "$dest" ||
     echo "::warning::couldn't vendor $ref; builds get the mirror's last copy, or upstream's"
   echo "::endgroup::"
 done
