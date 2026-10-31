@@ -23,7 +23,8 @@ name: Image and installer ISO
 # (default quine-linux).
 
 # Also daily, two hours after quine-global-labs/aurora's daily build, so the
-# image and ISO pick up its result.
+# image and ISO pick up its result. Forgejo reads the schedule from pushes to
+# main, but not from `[skip ci]` ones: after changing it, push without.
 on:
   push:
     branches: [main]
