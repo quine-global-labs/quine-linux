@@ -10,6 +10,14 @@
 [customizations.disk]
 minsize = "64 GiB"
 
+# ext4, not the default xfs: Fedora 44's mkfs.xfs turns on features the
+# build host's kernel can't mount (runner-x86-linux runs 6.6).
+[[customizations.disk.partitions]]
+type = "plain"
+mountpoint = "/boot"
+fs_type = "ext4"
+minsize = "1 GiB"
+
 [[customizations.disk.partitions]]
 type = "btrfs"
 minsize = "60 GiB"
