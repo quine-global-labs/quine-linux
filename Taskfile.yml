@@ -3,6 +3,7 @@ version: '3'
 vars:
   IMAGE: quine-linux
   INSTALLER_IMAGE: quine-installer
+  LIVE_IMAGE: quine-linux-live
   # What the Containerfile builds FROM: our Aurora fork
   # (quine-global-labs/aurora), built and published by that repo's workflow.
   # Override with a local build of the fork (BASE_IMAGE=localhost/aurora:stable,
@@ -25,6 +26,8 @@ vars:
   PLATFORM: linux/amd64
   TARGET_ARCH: amd64
   SKOPEO_IMAGE: quay.io/skopeo/stable:latest
+  # Titanoboa's ISO step runs in this (live/titanoboa-build-iso.sh).
+  FEDORA_IMAGE: quay.io/fedora/fedora:latest
   # bootc-image-builder reads images from a containers-storage mounted at
   # /var/lib/containers/storage. Under podman that's root's real store; docker
   # has no such store, so images get copied (via skopeo) into this volume.
@@ -165,6 +168,47 @@ tasks:
         localhost/{{.IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/qcow2/disk.qcow2"
+
+  build-live-image:
+    desc: >-
+      Build the live ISO's root filesystem (live/Containerfile): quine-linux
+      plus the live session and Anaconda WebUI, with PAYLOAD_IMAGE (what the
+      installer installs) pulled into it. Podman only.
+    vars:
+      PAYLOAD_IMAGE: '{{.PAYLOAD_IMAGE | default "forge.quinefoundation.com/quine-global-labs/quine-linux:latest"}}'
+    preconditions:
+      - sh: '[ "{{.CONTAINER_RUNTIME}}" = podman ]'
+        msg: The live ISO tasks need podman (they mount the image into Titanoboa's container).
+    cmds:
+      - >-
+        {{.SUDO}} podman build --platform {{.PLATFORM}}
+        --cap-add sys_admin --security-opt label=disable
+        --build-arg BASE_IMAGE=localhost/{{.IMAGE}}
+        --build-arg PAYLOAD_IMAGE={{.PAYLOAD_IMAGE}}
+        -t {{.LIVE_IMAGE}} -f live/Containerfile live/
+
+  build-live-iso:
+    desc: >-
+      Build the live ISO: boots into a Quine Linux session, with an installer.
+      Titanoboa's script (live/titanoboa-build-iso.sh) packs the live image
+      into it. Output lands in {{.OUTPUT_DIR}}/live/Quine-Linux-Live.iso.
+      PAYLOAD_IMAGE: see build-live-image.
+    preconditions:
+      - sh: '[ "{{.CONTAINER_RUNTIME}}" = podman ]'
+        msg: The live ISO tasks need podman (they mount the image into Titanoboa's container).
+    cmds:
+      - task: build-image
+      - task: build-live-image
+      - mkdir -p {{.OUTPUT_DIR}}/live
+      - >-
+        {{.SUDO}} podman run --rm {{.PULL_FLAG}}
+        --cap-add sys_admin --security-opt label=disable
+        -v {{.ROOT_DIR}}/live/titanoboa-build-iso.sh:/src/build_iso.sh:ro
+        --mount type=image,source=localhost/{{.LIVE_IMAGE}},dst=/rootfs
+        -v {{.OUTPUT_DIR}}/live:/output
+        {{.FEDORA_IMAGE}} /src/build_iso.sh
+    generates:
+      - "{{.OUTPUT_DIR}}/live/Quine-Linux-Live.iso"
 
   export-to-storage:
     internal: true

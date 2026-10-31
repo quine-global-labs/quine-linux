@@ -42,6 +42,12 @@ list what's available. Notably:
   stock Fedora's, landing in `output/bootiso/install.iso`. See
   [`docs/patched-anaconda-installer.md`](docs/patched-anaconda-installer.md)
   for forking/patching Anaconda itself.
+- `task build-disk-image` — builds a ready-installed disk image (qcow2)
+  via `bootc-image-builder`, landing in `output/qcow2/disk.qcow2`. It has
+  no user: plasma-setup creates the first one at first boot.
+- `task build-live-iso` — builds a live ISO (`live/`, after Aurora's):
+  boots into a Quine Linux session with Anaconda WebUI to install it,
+  landing in `output/live/Quine-Linux-Live.iso`. Podman only.
 - `task test:stage` / `task test:boot` — stage the locally-built image as
   this machine's next boot target (`bootc switch`), optionally rebooting
   into it immediately. The fast way to test a change — especially the

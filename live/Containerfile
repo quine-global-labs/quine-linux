@@ -1,0 +1,17 @@
+# The live ISO's root filesystem: quine-linux plus what booting from an ISO
+# and installing from it need (build.sh). Titanoboa's script then packs it
+# into the ISO (titanoboa-build-iso.sh, task build-live-iso).
+#
+# Build with --cap-add sys_admin --security-opt label=disable: build.sh
+# remounts /proc/sys and pulls the image the installer installs.
+ARG BASE_IMAGE=localhost/quine-linux
+# What the installer puts on disk, from the registry, and what installed
+# systems then update from.
+ARG PAYLOAD_IMAGE=forge.quinefoundation.com/quine-global-labs/quine-linux:latest
+FROM ${BASE_IMAGE}
+ARG PAYLOAD_IMAGE
+ENV PAYLOAD_IMAGE=${PAYLOAD_IMAGE}
+
+COPY . /src/live/
+RUN --mount=type=cache,dst=/var/cache/libdnf5 \
+    bash /src/live/build.sh && rm -rf /src/live

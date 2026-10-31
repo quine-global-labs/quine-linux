@@ -1,12 +1,12 @@
-name: Image, installer ISO and disk image
+name: Image, installer ISO, disk image and live ISO
 
 # Builds the quine-linux image on our Aurora build (published by
 # quine-global-labs/aurora's workflow to this forge's registry), pushes it to
 # forge.quinefoundation.com/quine-global-labs/quine-linux (`latest`,
-# `<date>`, the commit), then builds the installer ISO and a disk image
-# (qcow2) from it and uploads them to MinIO as
-# <bucket>/installer/<commit>/install.iso, <bucket>/installer/latest/install.iso
-# and <bucket>/disk/latest/disk.qcow2.
+# `<date>`, the commit), then builds the installer ISO, a disk image (qcow2)
+# and a live ISO from it and uploads them to MinIO as
+# <bucket>/installer/<commit>/install.iso, <bucket>/installer/latest/install.iso,
+# <bucket>/disk/latest/disk.qcow2 and <bucket>/live/latest/live.iso.
 #
 # Runs on runner-x86-linux (host mode, root podman; petersweb-infra,
 # hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
@@ -86,9 +86,11 @@ jobs:
       - name: Vendor upstream images
         # Into the forge's mirror/ (.forgejo/vendor-images.sh), which the
         # pulls below then read: the installer's two bases
-        # (installer/Containerfile) and bootc-image-builder (Taskfile.yml).
+        # (installer/Containerfile), bootc-image-builder (Taskfile.yml) and
+        # what Titanoboa's ISO step runs in (Taskfile.yml, FEDORA_IMAGE).
         run: |
           .forgejo/vendor-images.sh \
+            quay.io/fedora/fedora:latest \
             quay.io/fedora/fedora-bootc:rawhide \
             registry.fedoraproject.org/fedora:rawhide \
             ghcr.io/osbuild/bootc-image-builder:latest
@@ -103,6 +105,7 @@ jobs:
         run: |
           for img in \
             "$BASE_IMAGE" \
+            quay.io/fedora/fedora:latest \
             quay.io/fedora/fedora-bootc:rawhide \
             registry.fedoraproject.org/fedora:rawhide \
             ghcr.io/osbuild/bootc-image-builder:latest; do
@@ -131,6 +134,10 @@ jobs:
       - name: Build disk image
         run: task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
 
+      - name: Build live ISO
+        # Installs quine-linux:latest, which "Push image" just updated.
+        run: task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+
       - name: Upload to MinIO
         env:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
@@ -147,9 +154,11 @@ jobs:
           dest="store/${MINIO_BUCKET}/installer"
           mc cp "$iso" "${dest}/${GITHUB_SHA}/install.iso"
           mc cp "${dest}/${GITHUB_SHA}/install.iso" "${dest}/latest/install.iso"
-          # The disk image: latest only, it's as big as the ISO.
+          # The disk image and live ISO: latest only, they're as big as the ISO.
           ls -lh output/qcow2/disk.qcow2
           mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk.qcow2"
+          ls -lh output/live/Quine-Linux-Live.iso
+          mc cp output/live/Quine-Linux-Live.iso "store/${MINIO_BUCKET}/live/latest/live.iso"
 
       - name: Publish the release
         if: github.ref_type == 'tag'
@@ -162,6 +171,7 @@ jobs:
           mkdir -p release
           ln -f "$(find output -name install.iso -print -quit)" "release/quine-linux-$tag-installer-x86_64.iso"
           ln -f output/qcow2/disk.qcow2 "release/quine-linux-$tag-x86_64.qcow2"
+          ln -f output/live/Quine-Linux-Live.iso "release/quine-linux-$tag-live-x86_64.iso"
           (cd release && sha256sum -- * > SHA256SUMS)
           cat release/SHA256SUMS
 

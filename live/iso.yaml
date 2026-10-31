@@ -1,0 +1,11 @@
+# Titanoboa's ISO config: the volume label and the boot menu.
+label: "Quine-Linux-Live"
+grub2:
+  timeout: 10
+  entries:
+    - name: "Quine Linux Live"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=Quine-Linux-Live enforcing=0 rd.live.image"
+      initrd: "/images/pxeboot/initrd.img"
+    - name: "Quine Linux Live (Safe Graphics Mode)"
+      linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=Quine-Linux-Live enforcing=0 rd.live.image nomodeset"
+      initrd: "/images/pxeboot/initrd.img"
