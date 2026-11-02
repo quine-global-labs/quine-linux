@@ -81,6 +81,15 @@ tasks:
       - task: build-image
       - task: export-to-storage
         vars: { IMAGES: "{{.IMAGE}}" }
+      # An install follows the image name its disk was built from for
+      # updates, so build it from UPDATE_IMAGE's name, not localhost/:
+      # same image, under the name installs should pull from.
+      # (bootc-image-builder's --target-imgref did this; image-builder
+      # dropped it.)
+      - >-
+        {{if eq .CONTAINER_RUNTIME "podman"}}{{.SUDO}} podman tag localhost/{{.IMAGE}} {{.UPDATE_IMAGE}}{{else}}{{.SUDO}} {{.CONTAINER_RUNTIME}} run --rm --privileged
+        -v {{.STORAGE}}:/var/lib/containers/storage {{.SKOPEO_IMAGE}}
+        copy containers-storage:localhost/{{.IMAGE}}:latest containers-storage:{{.UPDATE_IMAGE}}{{end}}
       - mkdir -p {{.OUTPUT_DIR}}
       # Root on btrfs, as Aurora installs it: disk/config.toml.
       - >-
@@ -91,7 +100,7 @@ tasks:
         -v {{.STORAGE}}:/var/lib/containers/storage
         {{.BIB_IMAGE}}
         --type qcow2
-        localhost/{{.IMAGE}}
+        {{.UPDATE_IMAGE}}
     generates:
       - "{{.OUTPUT_DIR}}/qcow2/disk.qcow2"
 
