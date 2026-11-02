@@ -35,6 +35,43 @@ RUN set -eux; \
     mkdir -p /output; \
     cp snd-hda-codec-cs8409.ko /output/
 
+# --- Builds Kickoff (the start menu) with our update bar. ---
+# Kickoff is QML packed into one plugin of plasma-desktop. This rebuilds
+# just that plugin from the same plasma-desktop version the image ships
+# (KDE's source, via the forge's mirror), with patches/kickoff/ on top, and
+# the final stage puts it in place of the stock one. Like kmod-builder, it's
+# built FROM BASE_IMAGE so it can't drift from the Plasma it runs on; the
+# -devel packages are pinned to the installed versions (older ones come
+# from Fedora's updates-archive).
+FROM ${BASE_IMAGE} AS kickoff-builder
+
+COPY patches/kickoff/ /tmp/kickoff/
+
+RUN set -eux; \
+    v() { rpm -q --qf '%{VERSION}-%{RELEASE}' "$1"; }; \
+    devel=(cmake gcc-c++ extra-cmake-modules patch \
+      "libplasma-devel-$(v libplasma)" \
+      "qt6-qtbase-devel-$(v qt6-qtbase)" \
+      "qt6-qtdeclarative-devel-$(v qt6-qtdeclarative)"); \
+    for f in kcoreaddons kconfig kpackage kwindowsystem kservice ki18n kguiaddons knotifications; do \
+      devel+=("kf6-$f-devel-$(v "kf6-$f")"); \
+    done; \
+    dnf install -y --setopt=install_weak_deps=False "${devel[@]}"; \
+    V="$(rpm -q --qf '%{VERSION}' plasma-desktop)"; \
+    echo "Building Kickoff from plasma-desktop ${V}"; \
+    curl -fsSL --retry 3 -o /tmp/plasma-desktop.tar.gz \
+      "https://forge.quinefoundation.com/quine-global-labs/mirror-kde-plasma-desktop/archive/v${V}.tar.gz"; \
+    mkdir -p /build-src; \
+    tar -xzf /tmp/plasma-desktop.tar.gz -C /build-src --strip-components=2 \
+      mirror-kde-plasma-desktop/applets/kickoff; \
+    cp /tmp/kickoff/CMakeLists.txt /build-src/; \
+    cd /build-src; \
+    for p in /tmp/kickoff/*.patch; do patch -p1 --fuzz=0 < "$p"; done; \
+    cmake -S /build-src -B /build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr; \
+    cmake --build /build -j"$(nproc)"; \
+    DESTDIR=/out cmake --install /build --strip; \
+    ls -l /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so
+
 # --- Final image. ---
 FROM ${BASE_IMAGE} AS final
 
@@ -67,6 +104,12 @@ RUN dnf install -y \
       --setopt=quine.gpgkey=https://forge.quinefoundation.com/api/packages/quine-global-labs/rpm/repository.key \
       layer-wizard dnf-package-store swap-watchdog
 
+# Kickoff with our update bar (kickoff-builder, above), over plasma-desktop's.
+COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so \
+     /usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so
+
 # System-level units are enabled explicitly. User units are picked up
 # automatically via overlay/usr/lib/systemd/user-preset/.
-RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service
+# quine-update-check.timer: the status Kickoff's update bar shows.
+RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service \
+      quine-update-check.timer

@@ -1,0 +1,47 @@
+#!/usr/bin/bash
+# Is a newer Quine Linux available, or downloaded and waiting for a restart?
+# Writes the answer to /run/quine-linux/update-status.json, which Kickoff's
+# update bar reads (patches/kickoff). Run as root by
+# quine-update-check.service: bootc needs root.
+#
+#   state: "staged"    an update is downloaded; it applies at the next boot
+#          "available" the registry has a newer image than the running one
+#          "current"   neither
+#   new:   the staged or available image's version and build time
+#   error: why the registry check failed, if it did (state then falls back
+#          to what bootc already knew)
+set -euo pipefail
+
+out_dir=/run/quine-linux
+out="$out_dir/update-status.json"
+mkdir -p "$out_dir"
+
+# Fetches the image's manifest and config only, not its layers, and records
+# what it found as the booted entry's cachedUpdate.
+error=""
+if ! check_output=$(bootc upgrade --check 2>&1); then
+  error=$(tail -n 1 <<<"$check_output")
+fi
+
+bootc status --json | jq --arg error "$error" --arg checked "$(date -Is)" '
+  .status as $s
+  | ($s.booted.image.imageDigest // null) as $booted
+  | ($s.staged.image // null) as $staged
+  | ($s.booted.cachedUpdate // null) as $cached
+  | {
+      checked: $checked,
+      error: (if $error == "" then null else $error end),
+      current: {version: $s.booted.image.version, timestamp: $s.booted.image.timestamp},
+      state: (
+        if $staged != null and $staged.imageDigest != $booted then "staged"
+        elif $cached != null and $cached.imageDigest != $booted then "available"
+        else "current" end),
+      new: (
+        if $staged != null and $staged.imageDigest != $booted then $staged
+        elif $cached != null and $cached.imageDigest != $booted then $cached
+        else null end
+        | if . == null then null else {version, timestamp} end)
+    }' >"$out.tmp"
+chmod 0644 "$out.tmp"
+mv "$out.tmp" "$out"
+jq -c '{state, new, error}' "$out"

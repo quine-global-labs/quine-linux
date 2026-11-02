@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for a newer Quine Linux a few minutes after boot, then every 4 hours
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=4h
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Check whether a newer Quine Linux is available
+# Only on an installed (bootc) system, not the live ISO's session.
+ConditionPathExists=/run/ostree-booted
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/quine-linux/update-check
