@@ -165,8 +165,10 @@ jobs:
 
           api="$GITHUB_SERVER_URL/api/v1/repos/$GITHUB_REPOSITORY/releases"
           auth=(-H "Authorization: token $TOKEN")
-          id=$(jq -n --arg tag "$tag" --arg image "$IMAGE:$tag" '{tag_name: $tag, name: $tag,
-                 body: "Container image: `\($image)`.\nFiles are checked by SHA256SUMS."}' |
+          # v1.2.3-alpha.1 and the like: a pre-release.
+          pre=false; [[ $tag != *-* ]] || pre=true
+          id=$(jq -n --arg tag "$tag" --arg image "$IMAGE:$tag" --argjson pre "$pre" '{tag_name: $tag, name: $tag,
+                 prerelease: $pre, body: "Container image: `\($image)`.\nFiles are checked by SHA256SUMS."}' |
                curl -fsS "${auth[@]}" -H 'Content-Type: application/json' -d @- "$api" | jq -er .id)
           for f in release/*; do
             name=${f#release/}
