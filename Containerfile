@@ -37,19 +37,20 @@ RUN set -eux; \
 
 # --- Builds Kickoff (the start menu) with our update bar. ---
 # Kickoff is QML packed into one plugin of plasma-desktop. This rebuilds
-# just that plugin from the same plasma-desktop version the image ships
-# (KDE's source, via the forge's mirror), with patches/kickoff/ on top, and
-# the final stage puts it in place of the stock one. Like kmod-builder, it's
-# built FROM BASE_IMAGE so it can't drift from the Plasma it runs on; the
-# -devel packages are pinned to the installed versions (older ones come
-# from Fedora's updates-archive).
+# just that plugin from our fork, quine-global-labs/plasma-desktop, branch
+# quine-v<version>: KDE's release of the plasma-desktop version the image
+# ships, plus our commits. The final stage puts it in place of the stock
+# one. Like kmod-builder, it's built FROM BASE_IMAGE so it can't drift from
+# the Plasma it runs on; the -devel packages are pinned to the installed
+# versions (older ones come from Fedora's updates-archive). kickoff/ holds
+# the CMakeLists.txt that builds the applet outside plasma-desktop's tree.
 FROM ${BASE_IMAGE} AS kickoff-builder
 
-COPY patches/kickoff/ /tmp/kickoff/
+COPY kickoff/CMakeLists.txt /tmp/kickoff/
 
 RUN set -eux; \
     v() { rpm -q --qf '%{VERSION}-%{RELEASE}' "$1"; }; \
-    devel=(cmake gcc-c++ extra-cmake-modules patch \
+    devel=(cmake gcc-c++ extra-cmake-modules \
       "libplasma-devel-$(v libplasma)" \
       "qt6-qtbase-devel-$(v qt6-qtbase)" \
       "qt6-qtdeclarative-devel-$(v qt6-qtdeclarative)"); \
@@ -58,15 +59,14 @@ RUN set -eux; \
     done; \
     dnf install -y --setopt=install_weak_deps=False "${devel[@]}"; \
     V="$(rpm -q --qf '%{VERSION}' plasma-desktop)"; \
-    echo "Building Kickoff from plasma-desktop ${V}"; \
+    echo "Building Kickoff from quine-global-labs/plasma-desktop, branch quine-v${V}"; \
     curl -fsSL --retry 3 -o /tmp/plasma-desktop.tar.gz \
-      "https://forge.quinefoundation.com/quine-global-labs/mirror-kde-plasma-desktop/archive/v${V}.tar.gz"; \
+      "https://forge.quinefoundation.com/quine-global-labs/plasma-desktop/archive/quine-v${V}.tar.gz" \
+      || { echo "No branch quine-v${V} in quine-global-labs/plasma-desktop: the image moved to Plasma ${V}; its rebase workflow makes the branch, or failed to (check its Actions)" >&2; exit 1; }; \
     mkdir -p /build-src; \
     tar -xzf /tmp/plasma-desktop.tar.gz -C /build-src --strip-components=2 \
-      mirror-kde-plasma-desktop/applets/kickoff; \
+      plasma-desktop/applets/kickoff; \
     cp /tmp/kickoff/CMakeLists.txt /build-src/; \
-    cd /build-src; \
-    for p in /tmp/kickoff/*.patch; do patch -p1 --fuzz=0 < "$p"; done; \
     cmake -S /build-src -B /build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr; \
     cmake --build /build -j"$(nproc)"; \
     DESTDIR=/out cmake --install /build --strip; \

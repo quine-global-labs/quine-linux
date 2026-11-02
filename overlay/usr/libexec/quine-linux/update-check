@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 # Is a newer Quine Linux available, or downloaded and waiting for a restart?
 # Writes the answer to /run/quine-linux/update-status.json, which Kickoff's
-# update bar reads (patches/kickoff). Run as root by
+# update bar reads (quine-global-labs/plasma-desktop). Run as root by
 # quine-update-check.service: bootc needs root.
 #
 #   state: "staged"    an update is downloaded; it applies at the next boot
