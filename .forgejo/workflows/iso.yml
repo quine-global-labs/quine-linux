@@ -3,7 +3,9 @@ name: Image, disk image and live ISO
 # Builds the quine-linux image on our Aurora build (published by
 # quine-global-labs/aurora's workflow to this forge's registry), pushes it to
 # forge.quinefoundation.com/quine-global-labs/quine-linux (`latest`,
-# `<date>`, the commit), then builds a disk image (qcow2) and the live ISO
+# `<date>`, the commit; installed systems pull it as
+# registry.quineglobal.com/quine-linux, a pull-only name for it), then
+# builds a disk image (qcow2) and the live ISO
 # (which is also the installer, as Aurora's) from it and uploads them to MinIO
 # as <bucket>/disk/latest/disk.qcow2 and <bucket>/live/latest/live.iso,
 # replacing the last build's.

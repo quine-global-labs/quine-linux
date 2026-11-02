@@ -18,7 +18,9 @@ The image is built in two repos:
   [Hardware-specific patches](#hardware-specific-patches) below). Anything a
   `RUN` step on top of Aurora can do belongs here, not in the fork. Its
   workflow publishes `forge.quinefoundation.com/quine-global-labs/quine-linux`,
-  and the live ISO and disk image (to MinIO).
+  and the live ISO and disk image (to MinIO). Installed systems pull and
+  update from the same image as `registry.quineglobal.com/quine-linux`, a
+  pull-only name for it (Taskfile.yml's `UPDATE_IMAGE`).
 
 Like Aurora, there's one installer: the live ISO's. There's no separate
 install ISO.

@@ -6,8 +6,8 @@
 # remounts /proc/sys and pulls the image the installer installs.
 ARG BASE_IMAGE=localhost/quine-linux
 # What the installer puts on disk, from the registry, and what installed
-# systems then update from.
-ARG PAYLOAD_IMAGE=forge.quinefoundation.com/quine-global-labs/quine-linux:latest
+# systems then update from (Taskfile.yml's UPDATE_IMAGE).
+ARG PAYLOAD_IMAGE=registry.quineglobal.com/quine-linux:latest
 FROM ${BASE_IMAGE}
 ARG PAYLOAD_IMAGE
 ENV PAYLOAD_IMAGE=${PAYLOAD_IMAGE}
