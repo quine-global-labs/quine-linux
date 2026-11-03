@@ -183,3 +183,7 @@ jobs:
         run: |
           rm -rf output release
           podman logout "$REGISTRY" || true
+          # Each build leaves ~100 GB of images and stages; the runner's daily
+          # prune keeps a day's worth, and a second build that day filled the
+          # disk. The next build pulls its bases from the forge again.
+          podman image prune -af >/dev/null || true
