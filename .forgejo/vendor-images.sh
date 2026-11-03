@@ -15,8 +15,11 @@ set -uo pipefail
 
 mirror=${MIRROR:-forge.quinefoundation.com/quine-global-labs/mirror}
 # Read from upstream itself, not from the mirror registries.conf points at.
-# The flag, not CONTAINERS_REGISTRIES_CONF: skopeo 1.22 ignores that, and
-# the mirror was being copied onto itself (stuck on old upstream images).
+# The flag, not CONTAINERS_REGISTRIES_CONF: podman and buildah read that
+# variable, but skopeo never has. Until 2026-11-03 this exported it, skopeo
+# read the mirror, and every run copied the mirror onto itself, so tags
+# stayed at their first copy. (runner-x86-linux's skopeo now honors the
+# variable too; petersweb-infra, hosts/runner-x86-linux.)
 skopeo() { command skopeo --registries-conf /dev/null "$@"; }
 
 for ref in "$@"; do
