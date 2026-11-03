@@ -15,7 +15,9 @@ set -uo pipefail
 
 mirror=${MIRROR:-forge.quinefoundation.com/quine-global-labs/mirror}
 # Read from upstream itself, not from the mirror registries.conf points at.
-export CONTAINERS_REGISTRIES_CONF=/dev/null
+# The flag, not CONTAINERS_REGISTRIES_CONF: skopeo 1.22 ignores that, and
+# the mirror was being copied onto itself (stuck on old upstream images).
+skopeo() { command skopeo --registries-conf /dev/null "$@"; }
 
 for ref in "$@"; do
   src="docker://$ref"
