@@ -2,7 +2,7 @@ name: Image, disk image and live ISO
 
 # Builds the quine-linux image on our Aurora build (published by
 # quine-global-labs/aurora's workflow to this forge's registry), pushes it to
-# forge.quinefoundation.com/quine-global-labs/quine-linux (`latest`,
+# forge.in.quineglobal.com/quine-global-labs/quine-linux (`latest`,
 # `<date>`, the commit; installed systems pull it as
 # registry.quineglobal.com/quine-linux, a pull-only name for it), then
 # builds a disk image (qcow2) and the live ISO
@@ -26,7 +26,7 @@ name: Image, disk image and live ISO
 # 2 GiB limit, and this keeps one copy). The website lists these releases.
 #
 # Upstream images (Fedora's, bootc-image-builder) are vendored into
-# forge.quinefoundation.com/quine-global-labs/mirror/ first, and pulled
+# forge.in.quineglobal.com/quine-global-labs/mirror/ first, and pulled
 # from there (.forgejo/vendor-images.sh).
 #
 # Secrets: REGISTRY_TOKEN (a Forgejo token with package write access),
@@ -52,8 +52,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REGISTRY: forge.quinefoundation.com
-  IMAGE: forge.quinefoundation.com/quine-global-labs/quine-linux
+  REGISTRY: forge.in.quineglobal.com
+  IMAGE: forge.in.quineglobal.com/quine-global-labs/quine-linux
   MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
   MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
 
@@ -80,7 +80,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 300
     env:
-      BASE_IMAGE: forge.quinefoundation.com/quine-global-labs/aurora:stable${{ matrix.tag-suffix }}
+      BASE_IMAGE: forge.in.quineglobal.com/quine-global-labs/aurora:stable${{ matrix.tag-suffix }}
       # What installs of this architecture follow for updates (Taskfile.yml).
       UPDATE_IMAGE: registry.quineglobal.com/quine-linux:latest${{ matrix.tag-suffix }}
       # The tasks' architecture settings (Taskfile.yml).
@@ -88,7 +88,7 @@ jobs:
     steps:
       # No submodules: stage 0 (Aurora) comes from the registry now. Our pull
       # mirror of code.forgejo.org/actions/checkout.
-      - uses: https://forge.quinefoundation.com/quine-global-labs/mirror-actions-checkout@v4
+      - uses: https://forge.in.quineglobal.com/quine-global-labs/mirror-actions-checkout@v4
 
       - name: Install task, mc, just, yq and cosign
         # Only what the runner doesn't already have: runner-x86-linux has

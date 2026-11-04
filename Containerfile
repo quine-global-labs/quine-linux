@@ -4,7 +4,7 @@
 # --build-arg BASE_IMAGE=ghcr.io/ublue-os/aurora:stable to build on stock
 # upstream Aurora instead, or localhost/aurora:stable for a local build of
 # the fork.
-ARG BASE_IMAGE=forge.quinefoundation.com/quine-global-labs/aurora:stable
+ARG BASE_IMAGE=forge.in.quineglobal.com/quine-global-labs/aurora:stable
 
 # --- Builds the out-of-tree snd-hda-codec-cs8409 module (iMac19,2 mic fix). ---
 # See docs/imac19-2-mic-fix.md and patches/snd-hda-codec-cs8409/ for the full
@@ -63,7 +63,7 @@ RUN set -eux; \
     V="$(rpm -q --qf '%{VERSION}' plasma-desktop)"; \
     echo "Building Kickoff from quine-global-labs/plasma-desktop, branch quine-v${V}"; \
     curl -fsSL --retry 3 -o /tmp/plasma-desktop.tar.gz \
-      "https://forge.quinefoundation.com/quine-global-labs/plasma-desktop/archive/quine-v${V}.tar.gz" \
+      "https://forge.in.quineglobal.com/quine-global-labs/plasma-desktop/archive/quine-v${V}.tar.gz" \
       || { echo "No branch quine-v${V} in quine-global-labs/plasma-desktop: the image moved to Plasma ${V}; its rebase workflow makes the branch, or failed to (check its Actions)" >&2; exit 1; }; \
     mkdir -p /build-src; \
     tar -xzf /tmp/plasma-desktop.tar.gz -C /build-src --strip-components=2 \
@@ -101,9 +101,9 @@ RUN set -eux; \
 # Forgejo signs the repository metadata, not the packages, so dnf checks the
 # metadata (repo_gpgcheck), which pins each package's checksum.
 RUN dnf install -y \
-      --repofrompath=quine,https://forge.quinefoundation.com/api/packages/quine-global-labs/rpm/quine \
+      --repofrompath=quine,https://forge.in.quineglobal.com/api/packages/quine-global-labs/rpm/quine \
       --setopt=quine.gpgcheck=0 --setopt=quine.repo_gpgcheck=1 \
-      --setopt=quine.gpgkey=https://forge.quinefoundation.com/api/packages/quine-global-labs/rpm/repository.key \
+      --setopt=quine.gpgkey=https://forge.in.quineglobal.com/api/packages/quine-global-labs/rpm/repository.key \
       layer-wizard dnf-package-store swap-watchdog
 
 # Kickoff with our update bar (kickoff-builder, above), over plasma-desktop's.
