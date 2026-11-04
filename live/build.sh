@@ -26,6 +26,12 @@ xargs -r flatpak install -y --noninteractive </tmp/flatpaks.list || true
 flatpak list --columns=runtime,app
 
 # ── Booting from the ISO ───────────────────────────────────────────────────
+# EFI's name for this architecture, in Fedora's package and file names.
+case $(uname -m) in
+  x86_64) efi=x64 ;;
+  aarch64) efi=aa64 ;;
+  *) echo "no EFI name for $(uname -m)" >&2; exit 1 ;;
+esac
 dnf install -y \
   dracut-live \
   livesys-scripts \
@@ -38,7 +44,7 @@ dnf install -y \
   libblockdev-btrfs \
   libblockdev-lvm \
   libblockdev-dm \
-  grub2-efi-x64-cdboot
+  "grub2-efi-$efi-cdboot"
 
 kernel=$(find /usr/lib/modules -maxdepth 1 -type d -printf '%P\n' | grep . | head -1)
 DRACUT_NO_XATTR=1 dracut -v --force --zstd --reproducible --no-hostonly \
@@ -52,7 +58,7 @@ systemctl enable livesys.service livesys-late.service
 # Titanoboa reads EFI from /boot/efi. The fallback entry is grub itself.
 mkdir -p /boot/efi
 cp -av /usr/lib/efi/*/*/EFI /boot/efi/
-cp -v /boot/efi/EFI/fedora/grubx64.efi /boot/efi/EFI/BOOT/fbx64.efi
+cp -v "/boot/efi/EFI/fedora/grub$efi.efi" "/boot/efi/EFI/BOOT/fb$efi.efi"
 
 # A larger /var/tmp than the live overlay's
 cat >/etc/systemd/system/var-tmp.mount <<'EOF'

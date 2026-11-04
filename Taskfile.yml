@@ -25,8 +25,11 @@ vars:
   # bootc-image-builder now lives in github.com/osbuild/image-builder and is
   # published here; quay.io/centos-bootc/bootc-image-builder is frozen.
   BIB_IMAGE: ghcr.io/osbuild/bootc-image-builder:latest
-  # Aurora is amd64-only (and the kmod stage hardcodes x86_64), so pin it
-  # explicitly; otherwise an arm64 host (e.g. Apple Silicon) builds for arm64.
+  # What to build for: amd64 by default, so an arm64 host (e.g. Apple
+  # Silicon) doesn't build for arm64 by accident. For arm64, pass
+  # PLATFORM=linux/arm64 TARGET_ARCH=arm64 and the arm64 base
+  # (BASE_IMAGE=forge.quinefoundation.com/quine-global-labs/aurora:stable-arm64),
+  # as iso.yml's arm64 job does. Disk images need a host of that architecture.
   PLATFORM: linux/amd64
   TARGET_ARCH: amd64
   SKOPEO_IMAGE: quay.io/skopeo/stable:latest

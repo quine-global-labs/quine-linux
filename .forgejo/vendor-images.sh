@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Copies upstream images into this forge's registry, as
 # forge.quinefoundation.com/quine-global-labs/mirror/<registry>/<path>,
-# which runner-x86-linux's registries.conf tries before the upstream
-# registry (petersweb-infra, hosts/runner-x86-linux). So builds pull from
+# which the runners' registries.conf tries before the upstream registry
+# (petersweb-infra, nixos/forgejo-runner.nix). So builds pull from
 # the forge, and still build from yesterday's copy when upstream is down.
 #
 # Usage: vendor-images.sh REF...   (registry-qualified, e.g.
@@ -25,7 +25,9 @@ skopeo() { command skopeo --registries-conf /dev/null "$@"; }
 for ref in "$@"; do
   src="docker://$ref"
   dest="docker://$mirror/$ref"
-  opts=(--multi-arch system)
+  # Every architecture: the x86_64 and the aarch64 runner vendor the same
+  # tags, and one architecture's copy would replace the other's.
+  opts=(--multi-arch all)
   if [[ $ref == *@sha256:* ]]; then
     # Pinned by digest: copy the whole index unchanged, so the digest the
     # build asks for exists on the mirror. skopeo refuses a reference with

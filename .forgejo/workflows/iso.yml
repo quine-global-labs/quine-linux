@@ -7,15 +7,21 @@ name: Image, disk image and live ISO
 # registry.quineglobal.com/quine-linux, a pull-only name for it), then
 # builds a disk image (qcow2) and the live ISO
 # (which is also the installer, as Aurora's) from it and uploads them to MinIO
-# as <bucket>/disk/latest/disk.qcow2 and <bucket>/live/latest/live.iso,
-# replacing the last build's.
+# as <bucket>/disk/latest/disk.qcow2 and <bucket>/live/latest/live.iso
+# (aarch64: disk-aarch64.qcow2, live-aarch64.iso), replacing the last build's.
 #
-# Runs on runner-x86-linux (host mode, root podman; petersweb-infra,
-# hosts/runner-x86-linux): bootc-image-builder needs an x86_64 host with
-# root podman and ~30 GB of free disk.
+# Once per architecture, each natively on its own runner (host mode, root
+# podman; petersweb-infra, nixos/forgejo-runner.nix): x86_64 on
+# runner-x86-linux, from aurora:stable, and aarch64 on runner-arm64-linux (a
+# Tart VM on the Mac mini), from aurora:stable-arm64. bootc-image-builder
+# needs a host of the image's architecture with root podman and ~30 GB of
+# free disk. aarch64's image is quine-linux:latest-arm64 (its other tags end
+# in -arm64 too), and installs follow that; its files end in -aarch64.
 #
-# A tag `v*` also publishes a release: the files go to MinIO's public
-# <bucket>/releases/<tag>/, and a Forgejo release on this repo links to them
+# A tag `v*` also publishes a release: each architecture's files go to
+# MinIO's public <bucket>/releases/<tag>/, and then the release job writes
+# one SHA256SUMS for all of them and makes a Forgejo release on this repo
+# that links to them
 # (Forgejo's external-URL release files: the images are too big for GitHub's
 # 2 GiB limit, and this keeps one copy). The website lists these releases.
 #
@@ -47,15 +53,38 @@ concurrency:
 
 env:
   REGISTRY: forge.quinefoundation.com
-  BASE_IMAGE: forge.quinefoundation.com/quine-global-labs/aurora:stable
   IMAGE: forge.quinefoundation.com/quine-global-labs/quine-linux
   MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
   MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
 
 jobs:
   iso:
-    runs-on: runner-x86-linux
+    strategy:
+      # One architecture failing doesn't stop the other.
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: runner-x86-linux
+            platform: linux/amd64
+            file-arch: x86_64
+            # Appended to the image's tags, and to the latest/ files' names.
+            tag-suffix: ''
+            latest-suffix: ''
+          - arch: arm64
+            runner: runner-arm64-linux
+            platform: linux/arm64
+            file-arch: aarch64
+            tag-suffix: -arm64
+            latest-suffix: -aarch64
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 300
+    env:
+      BASE_IMAGE: forge.quinefoundation.com/quine-global-labs/aurora:stable${{ matrix.tag-suffix }}
+      # What installs of this architecture follow for updates (Taskfile.yml).
+      UPDATE_IMAGE: registry.quineglobal.com/quine-linux:latest${{ matrix.tag-suffix }}
+      # The tasks' architecture settings (Taskfile.yml).
+      ARCH_VARS: PLATFORM=${{ matrix.platform }} TARGET_ARCH=${{ matrix.arch }}
     steps:
       # No submodules: stage 0 (Aurora) comes from the registry now. Our pull
       # mirror of code.forgejo.org/actions/checkout.
@@ -114,69 +143,60 @@ jobs:
           done
 
       - name: Build image
-        run: task build-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+        run: task build-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" $ARCH_VARS
 
       - name: Push image
+        env:
+          SUFFIX: ${{ matrix.tag-suffix }}
         run: |
           tags=(latest "$(date -u +%Y%m%d)" "${GITHUB_SHA::12}")
           [ "$GITHUB_REF_TYPE" != tag ] || tags+=("$GITHUB_REF_NAME")
           for t in "${tags[@]}"; do
-            podman tag localhost/quine-linux "$IMAGE:$t"
-            podman push --retry 5 "$IMAGE:$t"
+            podman tag localhost/quine-linux "$IMAGE:$t$SUFFIX"
+            podman push --retry 5 "$IMAGE:$t$SUFFIX"
           done
 
       - name: Build disk image
-        run: task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+        run: task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" UPDATE_IMAGE="$UPDATE_IMAGE" $ARCH_VARS
 
       - name: Build live ISO
-        # Installs quine-linux:latest, which "Push image" just updated.
-        run: task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+        # Installs UPDATE_IMAGE (quine-linux:latest, or latest-arm64), which
+        # "Push image" just updated.
+        run: task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" UPDATE_IMAGE="$UPDATE_IMAGE" $ARCH_VARS
 
       - name: Upload to MinIO
         env:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          SUFFIX: ${{ matrix.latest-suffix }}
         run: |
           mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           mc mb --ignore-existing "store/${MINIO_BUCKET}"
           # Latest only: each file is 5-8 GB, and the forge VM's disk is
           # shared. Tagged releases keep their own copies (releases/<tag>/).
           ls -lh output/qcow2/disk.qcow2
-          mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk.qcow2"
+          mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk$SUFFIX.qcow2"
           ls -lh output/live/Quine-Linux-Live.iso
-          mc cp output/live/Quine-Linux-Live.iso "store/${MINIO_BUCKET}/live/latest/live.iso"
+          mc cp output/live/Quine-Linux-Live.iso "store/${MINIO_BUCKET}/live/latest/live$SUFFIX.iso"
 
-      - name: Publish the release
+      - name: Upload the release's files
+        # The release job below lists them in the release, with one
+        # SHA256SUMS for both architectures from the SHA256SUMS.<arch> parts.
         if: github.ref_type == 'tag'
         env:
           MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
           MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-          TOKEN: ${{ github.token }}
+          ARCH: ${{ matrix.file-arch }}
         run: |
           tag=$GITHUB_REF_NAME
           mkdir -p release
-          ln -f output/qcow2/disk.qcow2 "release/quine-linux-$tag-x86_64.qcow2"
-          ln -f output/live/Quine-Linux-Live.iso "release/quine-linux-$tag-live-x86_64.iso"
-          (cd release && sha256sum -- * > SHA256SUMS)
-          cat release/SHA256SUMS
+          ln -f output/qcow2/disk.qcow2 "release/quine-linux-$tag-$ARCH.qcow2"
+          ln -f output/live/Quine-Linux-Live.iso "release/quine-linux-$tag-live-$ARCH.iso"
+          (cd release && sha256sum -- * > "SHA256SUMS.$ARCH")
+          cat "release/SHA256SUMS.$ARCH"
 
           mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
           for f in release/*; do mc cp "$f" "store/${MINIO_BUCKET}/releases/$tag/${f#release/}"; done
-
-          api="$GITHUB_SERVER_URL/api/v1/repos/$GITHUB_REPOSITORY/releases"
-          auth=(-H "Authorization: token $TOKEN")
-          # v1.2.3-alpha.1 and the like: a pre-release.
-          pre=false; [[ $tag != *-* ]] || pre=true
-          id=$(jq -n --arg tag "$tag" --arg image "$IMAGE:$tag" --argjson pre "$pre" '{tag_name: $tag, name: $tag,
-                 prerelease: $pre, body: "Container image: `\($image)`.\nFiles are checked by SHA256SUMS."}' |
-               curl -fsS "${auth[@]}" -H 'Content-Type: application/json' -d @- "$api" | jq -er .id)
-          for f in release/*; do
-            name=${f#release/}
-            curl -fsS "${auth[@]}" -F "external_url=${MINIO_ENDPOINT}/${MINIO_BUCKET}/releases/$tag/$name" \
-              "$api/$id/assets?name=$name" >/dev/null
-            echo "linked $name"
-          done
-          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"
 
       - name: Clean up
         if: always()
@@ -187,3 +207,43 @@ jobs:
           # prune keeps a day's worth, and a second build that day filled the
           # disk. The next build pulls its bases from the forge again.
           podman image prune -af >/dev/null || true
+
+  release:
+    # After both architectures, even if one failed: the release gets
+    # whatever was built (SHA256SUMS says which).
+    needs: iso
+    if: always() && github.ref_type == 'tag'
+    runs-on: runner-x86-linux
+    steps:
+      - name: Publish the release
+        env:
+          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          TOKEN: ${{ github.token }}
+        run: |
+          tag=$GITHUB_REF_NAME
+          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
+          dir="store/${MINIO_BUCKET}/releases/$tag"
+          sums=$(mktemp)
+          for part in $(mc ls --json "$dir/" | jq -r 'select(.key | startswith("SHA256SUMS.")) | .key' | sort); do
+            mc cat "$dir/$part" >>"$sums"
+          done
+          [ -s "$sums" ] || { echo "::error::no architecture uploaded its files"; exit 1; }
+          cat "$sums"
+          mc cp "$sums" "$dir/SHA256SUMS"
+          files=(SHA256SUMS)
+          mapfile -t -O 1 files < <(awk '{print $2}' "$sums")
+
+          api="$GITHUB_SERVER_URL/api/v1/repos/$GITHUB_REPOSITORY/releases"
+          auth=(-H "Authorization: token $TOKEN")
+          # v1.2.3-alpha.1 and the like: a pre-release.
+          pre=false; [[ $tag != *-* ]] || pre=true
+          id=$(jq -n --arg tag "$tag" --arg image "$IMAGE:$tag" --argjson pre "$pre" '{tag_name: $tag, name: $tag,
+                 prerelease: $pre, body: "Container images: `\($image)` (x86_64), `\($image)-arm64` (aarch64).\nFiles are checked by SHA256SUMS."}' |
+               curl -fsS "${auth[@]}" -H 'Content-Type: application/json' -d @- "$api" | jq -er .id)
+          for name in "${files[@]}"; do
+            curl -fsS "${auth[@]}" -F "external_url=${MINIO_ENDPOINT}/${MINIO_BUCKET}/releases/$tag/$name" \
+              "$api/$id/assets?name=$name" >/dev/null
+            echo "linked $name"
+          done
+          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag"

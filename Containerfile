@@ -1,5 +1,6 @@
 # Built on our Aurora fork (quine-global-labs/aurora), which its own workflow
-# builds and publishes to this forge's registry. Pass e.g.
+# builds and publishes to this forge's registry (`stable` for x86_64,
+# `stable-arm64` for aarch64; iso.yml picks). Pass e.g.
 # --build-arg BASE_IMAGE=ghcr.io/ublue-os/aurora:stable to build on stock
 # upstream Aurora instead, or localhost/aurora:stable for a local build of
 # the fork.
@@ -17,10 +18,11 @@ RUN set -eux; \
     NVR="$(rpm -q kernel-core --qf '%{VERSION}-%{RELEASE}.%{ARCH}')"; \
     VERSION="$(rpm -q kernel-core --qf '%{VERSION}')"; \
     RELEASE="$(rpm -q kernel-core --qf '%{RELEASE}')"; \
+    ARCH="$(rpm -q kernel-core --qf '%{ARCH}')"; \
     echo "Building snd-hda-codec-cs8409 against kernel ${NVR}"; \
     dnf install -y gcc make elfutils-libelf-devel bc perl patch; \
     dnf install -y "kernel-devel-${NVR}" \
-      || dnf install -y "https://kojipkgs.fedoraproject.org/packages/kernel/${VERSION}/${RELEASE}/x86_64/kernel-devel-${NVR}.rpm"; \
+      || dnf install -y "https://kojipkgs.fedoraproject.org/packages/kernel/${VERSION}/${RELEASE}/${ARCH}/kernel-devel-${NVR}.rpm"; \
     echo "${NVR}" > /kernel-nvr.txt
 
 COPY patches/snd-hda-codec-cs8409/vendor/ /usr/src/snd-hda-codec-cs8409/
