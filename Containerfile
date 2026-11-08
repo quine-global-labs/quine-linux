@@ -82,6 +82,12 @@ COPY overlay/ /
 # alsa-tools provides hda-verb, used by cs8409-intmike-power-fixup.service.
 RUN dnf install -y alsa-tools
 
+# calligra-words: default word processor on every system. tailscale: mesh
+# VPN for remote access across the fleet -- Fedora carries it in its own
+# repos as of F44, no vendor repo needed (unlike teamviewer, which is
+# install-on-demand via layer-wizard instead; see overlay/etc/yum.repos.d).
+RUN dnf install -y calligra-words tailscale
+
 COPY --from=kmod-builder /output/snd-hda-codec-cs8409.ko /tmp/snd-hda-codec-cs8409.ko
 
 # Installs into .../extra/, which kmod's default search order gives
@@ -114,4 +120,4 @@ COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.pl
 # automatically via overlay/usr/lib/systemd/user-preset/.
 # quine-update-check.timer: the status Kickoff's update bar shows.
 RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service \
-      quine-update-check.timer
+      quine-update-check.timer tailscaled.service
