@@ -1,0 +1,14 @@
+# Not installed by default (see Containerfile) -- this just makes
+# `teamviewer` resolvable via `dnf repoquery`/`rpm-ostree install` out of the
+# box, so layer-wizard's plain "type a package name, Check, Install" flow
+# works for it on whichever machines want it, without having to hand-add
+# this repo first. Content matches what the teamviewer RPM itself ships at
+# /usr/etc/yum.repos.d/teamviewer.repo once installed.
+[teamviewer]
+name=TeamViewer - $basearch
+baseurl=https://linux.teamviewer.com/yum/stable/main/binary-$basearch/
+gpgkey=https://linux.teamviewer.com/pubkey/currentkey.asc
+gpgcheck=1
+repo_gpgcheck=1
+enabled=1
+type=rpm-md
