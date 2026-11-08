@@ -1,0 +1,27 @@
+# Our changes to Aurora's default flatpak set. /etc (here) overrides /usr,
+# which is where Aurora's own list lives -- see `man flatpak-preinstall` for
+# the format. flatpak-preinstall.service re-syncs this on every boot; a
+# user who later uninstalls one of the Install=true apps below just keeps
+# it uninstalled (preinstall never reinstalls something explicitly removed).
+
+[Flatpak Preinstall org.kde.falkon]
+Branch=stable
+IsRuntime=false
+
+[Flatpak Preinstall org.mozilla.firefox]
+Branch=stable
+IsRuntime=false
+
+[Flatpak Preinstall com.fastmail.Fastmail]
+Branch=stable
+IsRuntime=false
+
+[Flatpak Preinstall io.github.tobagin.karere]
+Branch=stable
+IsRuntime=false
+
+[Flatpak Preinstall org.kde.kclock]
+Install=false
+
+[Flatpak Preinstall org.kde.qrca]
+Install=false

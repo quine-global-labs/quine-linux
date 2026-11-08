@@ -82,11 +82,22 @@ COPY overlay/ /
 # alsa-tools provides hda-verb, used by cs8409-intmike-power-fixup.service.
 RUN dnf install -y alsa-tools
 
-# calligra-words: default word processor on every system. tailscale: mesh
-# VPN for remote access across the fleet -- Fedora carries it in its own
-# repos as of F44, no vendor repo needed (unlike teamviewer, which is
-# install-on-demand via layer-wizard instead; see overlay/etc/yum.repos.d).
-RUN dnf install -y calligra-words tailscale
+# calligra-words, tailscale, teamviewer: NOT baked in here -- layer-wizard
+# (already installed below) ships them as built-in recipes instead, so
+# they're install-on-demand per machine rather than forced onto every
+# system, and the recipes work on any rpm-ostree bootc system running
+# layer-wizard, not just this image.
+
+# Removes apps from the base image's default set that don't belong in ours.
+# Native RPMs: plasma-welcome (Welcome Center), Sunshine (game-stream host).
+RUN dnf remove -y plasma-welcome Sunshine
+
+# Un-owned files baked directly into Aurora's own build, not from an RPM --
+# dnf/rpm can't remove these, so plain rm: Aurora Offline Docs (a webapp
+# shortcut to a local PDF) and Community (a webapp shortcut to the GitHub
+# discussions page).
+RUN rm -f /usr/share/applications/dev.getaurora.offline-docs.desktop \
+          /usr/share/applications/dev.getaurora.discussions.desktop
 
 COPY --from=kmod-builder /output/snd-hda-codec-cs8409.ko /tmp/snd-hda-codec-cs8409.ko
 
@@ -120,4 +131,4 @@ COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.pl
 # automatically via overlay/usr/lib/systemd/user-preset/.
 # quine-update-check.timer: the status Kickoff's update bar shows.
 RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service \
-      quine-update-check.timer tailscaled.service
+      quine-update-check.timer
