@@ -135,11 +135,16 @@ jobs:
             "$BASE_IMAGE" \
             quay.io/fedora/fedora:latest \
             ghcr.io/osbuild/bootc-image-builder:latest; do
+            start=$SECONDS
             for try in 1 2 3 4 5; do
-              podman pull --retry 5 --retry-delay 20s -q "$img" && break
-              [ "$try" != 5 ] || exit 1
-              echo "retrying $img in 30s"; sleep 30
+              echo "== pulling $img (attempt $try/5)"
+              podman pull --retry 5 --retry-delay 20s "$img" && break
+              [ "$try" != 5 ] || { echo "== giving up on $img after 5 attempts"; exit 1; }
+              echo "== pull of $img failed, retrying in 30s"; sleep 30
             done
+            podman image inspect --format \
+              "== $img: {{.Digest}} {{.Os}}/{{.Architecture}}, {{.Size}} bytes, $((SECONDS - start))s" \
+              "$img"
           done
 
       - name: Build image
