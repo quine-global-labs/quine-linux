@@ -111,9 +111,12 @@ tasks:
     desc: >-
       Build the live ISO's root filesystem (live/Containerfile): quine-linux
       plus the live session and Anaconda WebUI, with PAYLOAD_IMAGE (what the
-      installer installs) pulled into it. Podman only.
+      installer installs) pulled into it, from PAYLOAD_PULL if given (the
+      same image under another name, e.g. straight from the forge). Podman
+      only.
     vars:
       PAYLOAD_IMAGE: '{{.PAYLOAD_IMAGE | default .UPDATE_IMAGE}}'
+      PAYLOAD_PULL: '{{.PAYLOAD_PULL | default ""}}'
     preconditions:
       - sh: '[ "{{.CONTAINER_RUNTIME}}" = podman ]'
         msg: The live ISO tasks need podman (they mount the image into Titanoboa's container).
@@ -123,6 +126,7 @@ tasks:
         --cap-add sys_admin --security-opt label=disable
         --build-arg BASE_IMAGE=localhost/{{.IMAGE}}
         --build-arg PAYLOAD_IMAGE={{.PAYLOAD_IMAGE}}
+        --build-arg PAYLOAD_PULL={{.PAYLOAD_PULL}}
         -t {{.LIVE_IMAGE}} -f live/Containerfile live/
 
   build-live-iso:

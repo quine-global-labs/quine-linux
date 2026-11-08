@@ -166,8 +166,15 @@ jobs:
 
       - name: Build live ISO
         # Installs UPDATE_IMAGE (quine-linux:latest, or latest-arm64), which
-        # "Push image" just updated.
-        run: task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" UPDATE_IMAGE="$UPDATE_IMAGE" $ARCH_VARS
+        # "Push image" just updated. Pulled into the ISO straight from the
+        # forge, under this commit's tag (PAYLOAD_PULL): through the
+        # registry.quineglobal.com proxy (Hetzner and back) it ran at ~1 MB/s
+        # against ~100 MB/s direct, and took most of this step.
+        env:
+          SUFFIX: ${{ matrix.tag-suffix }}
+        run: >-
+          task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+          UPDATE_IMAGE="$UPDATE_IMAGE" PAYLOAD_PULL="$IMAGE:${GITHUB_SHA::12}$SUFFIX" $ARCH_VARS
 
       - name: Upload to MinIO
         env:

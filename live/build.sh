@@ -17,7 +17,16 @@ mount -o remount,rw /proc/sys
 
 # ── The image to install, and the system Flatpaks to copy over ─────────────
 # Both land in this filesystem, so installing needs no network.
-podman pull "$PAYLOAD_IMAGE"
+# PAYLOAD_PULL: where to pull it from, if not its own name (iso.yml: the
+# forge directly, ~100x faster from the runners than the
+# registry.quineglobal.com proxy). Same manifest, so same digest; it's
+# then known only by PAYLOAD_IMAGE, the name installs follow.
+pull="${PAYLOAD_PULL:-$PAYLOAD_IMAGE}"
+podman pull "$pull"
+if [ "$pull" != "$PAYLOAD_IMAGE" ]; then
+  podman tag "$pull" "$PAYLOAD_IMAGE"
+  podman untag "$pull" "$pull"
+fi
 
 grep -v '#' /usr/share/ublue-os/homebrew/system-flatpaks.Brewfile | grep '^flatpak' |
   sed 's/flatpak //' | tr -d '"' >/tmp/flatpaks.list
