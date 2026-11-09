@@ -116,11 +116,14 @@ jobs:
         # A build that fails or is cancelled can leave its build containers
         # (`podman ps --external`), and they keep their images, ~11 GB each,
         # from every prune (run 48 ran out of disk). One job per runner
-        # (petersweb-infra, nixos/forgejo-runner.nix), so none is ours.
+        # (petersweb-infra, nixos/forgejo-runner.nix), so none is ours. And a
+        # cancelled run skips the cleanup at the end: its images, 25 GB on
+        # arm64, left too little of the 50 GB disk for bootc-image-builder
+        # (run 50, attempt 2). Every job ends with prune -af anyway.
         run: |
           ids=$(podman ps -aq --external)
           [ -z "$ids" ] || { echo "removing leftover build containers: $ids"; podman rm -f $ids || true; }
-          podman image prune -f >/dev/null || true
+          podman image prune -af >/dev/null || true
           df -h /var/lib/containers/storage | tail -1
 
       - name: Log in to the registry
