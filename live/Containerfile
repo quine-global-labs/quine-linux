@@ -62,4 +62,6 @@ RUN set -eux; \
     rm -rf /usr/share/cockpit/anaconda-webui; \
     cp -a /tmp/anaconda-webui/. /; \
     rm -rf /tmp/anaconda-webui /tmp/anaconda-webui.version; \
-    test -f /usr/share/cockpit/anaconda-webui/index.js
+    # Production builds are gzipped (index.js.gz); Cockpit serves either.
+    ls /usr/share/cockpit/anaconda-webui/index.js*; \
+    test -f /usr/share/cockpit/anaconda-webui/manifest.json
