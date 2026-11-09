@@ -112,6 +112,17 @@ jobs:
           echo "$bin" >> "$GITHUB_PATH"
           for t in task just yq cosign rclone; do printf '%s: ' "$t"; command -v "$t"; done
 
+      - name: Remove what failed builds left behind
+        # A build that fails or is cancelled can leave its build containers
+        # (`podman ps --external`), and they keep their images, ~11 GB each,
+        # from every prune (run 48 ran out of disk). One job per runner
+        # (petersweb-infra, nixos/forgejo-runner.nix), so none is ours.
+        run: |
+          ids=$(podman ps -aq --external)
+          [ -z "$ids" ] || { echo "removing leftover build containers: $ids"; podman rm -f $ids || true; }
+          podman image prune -f >/dev/null || true
+          df -h /var/lib/containers/storage | tail -1
+
       - name: Log in to the registry
         env:
           REGISTRY_USER: ${{ vars.REGISTRY_USER || github.actor }}
@@ -220,6 +231,8 @@ jobs:
           # Each build leaves ~100 GB of images and stages; the runner's daily
           # prune keeps a day's worth, and a second build that day filled the
           # disk. The next build pulls its bases from the forge again.
+          ids=$(podman ps -aq --external)
+          [ -z "$ids" ] || podman rm -f $ids || true
           podman image prune -af >/dev/null || true
 
   release:
