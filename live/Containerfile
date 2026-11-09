@@ -23,6 +23,9 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     dnf install -y git make nodejs npm gettext diffutils
 COPY anaconda-webui/ /quine/
 RUN set -eux; \
+    # /root is a symlink to /var/roothome, missing in a build; upstream's
+    # tools cache under ~/.cache.
+    mkdir -p "$(realpath /root)"; \
     v="$(dnf repoquery -q --latest-limit 1 --qf '%{version}' anaconda-webui)"; \
     echo "Building anaconda-webui ${v} with the Data disk step"; \
     git clone -q --depth 1 --branch "${v}" https://github.com/rhinstaller/anaconda-webui /src; \
