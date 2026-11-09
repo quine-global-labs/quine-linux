@@ -70,6 +70,25 @@ An ISO can then be generated from the built image with `bootc-image-builder`
 [osbuild/image-builder](https://github.com/osbuild/image-builder), and the old
 `quay.io/centos-bootc/bootc-image-builder` image is no longer updated).
 
+## Releasing
+
+On the forge: **Actions → Release → Run workflow**. It works out the next
+version from the newest `v*` tag, tags `main` with it and pushes the tag.
+The tag push makes `iso.yml` build both architectures, upload the files to
+`releases/<tag>/` and publish the Forgejo release. Choose `bump`:
+
+| `bump` | From `v0.1.0-alpha.2` | From `v0.1.0` |
+|---|---|---|
+| `prerelease` (with `pre`) | `v0.1.0-alpha.3`, or `v0.1.0-beta.1` with `pre: beta` | `v0.1.1-alpha.1` |
+| `release` | `v0.1.0` | an error (already released) |
+| `patch` / `minor` / `major` | `v0.1.1` / `v0.2.0` / `v1.0.0` | the same, plus `-<pre>.1` unless `pre: none` |
+
+`version` (e.g. `1.0.0`) sets the version exactly instead. `dry_run` only
+reports the tag it would make. It refuses to reuse a tag or go backwards.
+Pushing the tag needs the repo secret `RELEASE_TOKEN`, a Forgejo token with
+`write:repository`. The automatic token can push, but a tag pushed with it
+doesn't start `iso.yml`.
+
 ## overlay/
 
 Files here mirror their path on the root filesystem and are baked into the

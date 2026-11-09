@@ -1,0 +1,141 @@
+name: Release
+
+# Starts a release: works out the next version from the newest v* tag, tags
+# main's commit with it, and pushes the tag. That tag push starts iso.yml,
+# which builds both architectures, uploads their files to
+# <bucket>/releases/<tag>/ and makes the Forgejo release.
+#
+# Run it from Actions → Release → Run workflow. `bump`:
+# - prerelease: the next prerelease. v0.1.0-alpha.2 → v0.1.0-alpha.3. With
+#   another `pre`: v0.1.0-alpha.2 → v0.1.0-beta.1. After a full release:
+#   v0.1.0 → v0.1.1-alpha.1.
+# - release: the full release of the current prerelease, v0.1.0-rc.2 → v0.1.0.
+# - patch, minor, major: v0.1.0 → v0.1.1, v0.2.0, v1.0.0, or, with `pre`
+#   other than none, v0.1.1-alpha.1 and so on. From a prerelease, patch
+#   moves past it too: v0.1.0-alpha.2 → v0.1.1.
+# `version` (e.g. 1.0.0, without the v) skips all that.
+# `dry_run` says what it would tag, and tags nothing.
+#
+# Secret: RELEASE_TOKEN, a Forgejo token with write:repository on this repo,
+# for the push. Not the automatic token: a tag pushed with that doesn't
+# start iso.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: What to release
+        type: choice
+        options: [prerelease, release, patch, minor, major]
+        default: prerelease
+      pre:
+        description: Prerelease label (prerelease, patch, minor and major)
+        type: choice
+        options: [alpha, beta, rc, none]
+        default: alpha
+      version:
+        description: Exact version instead (e.g. 1.0.0 or 1.0.0-rc.1; no v)
+        type: string
+        default: ''
+      dry_run:
+        description: Only say which tag it would make
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: runner-x86-linux
+    steps:
+      - uses: https://forge.in.quineglobal.com/quine-global-labs/mirror-actions-checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - name: Work out the version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          PRE: ${{ inputs.pre }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          git fetch --force --tags origin
+          # Newest v* tag in semver order: versionsort.suffix=- puts
+          # v0.1.0-alpha.2 before v0.1.0.
+          last=$(git -c versionsort.suffix=- tag -l 'v*' --sort=-v:refname | head -1)
+          last=${last:-v0.0.0}
+          echo "last release: $last"
+
+          semver='^([0-9]+)\.([0-9]+)\.([0-9]+)(-([0-9A-Za-z-]+)\.([0-9]+))?$'
+          [[ ${last#v} =~ $semver ]] || { echo "::error::$last isn't vX.Y.Z or vX.Y.Z-label.N"; exit 1; }
+          major=${BASH_REMATCH[1]} minor=${BASH_REMATCH[2]} patch=${BASH_REMATCH[3]}
+          label=${BASH_REMATCH[5]} n=${BASH_REMATCH[6]}
+          [ "$PRE" = none ] && PRE=
+
+          if [ -n "$VERSION" ]; then
+            next=${VERSION#v}
+            [[ $next =~ $semver ]] || { echo "::error::version $VERSION isn't X.Y.Z or X.Y.Z-label.N"; exit 1; }
+          else
+            case $BUMP in
+              prerelease)
+                [ -n "$PRE" ] || { echo "::error::prerelease needs a pre label"; exit 1; }
+                if [ -z "$label" ]; then
+                  next="$major.$minor.$((patch + 1))-$PRE.1"
+                elif [ "$label" = "$PRE" ]; then
+                  next="$major.$minor.$patch-$PRE.$((n + 1))"
+                else
+                  next="$major.$minor.$patch-$PRE.1"
+                fi ;;
+              release)
+                [ -n "$label" ] || { echo "::error::$last is already a full release"; exit 1; }
+                next="$major.$minor.$patch" ;;
+              patch) next="$major.$minor.$((patch + 1))" ;;
+              minor) next="$major.$((minor + 1)).0" ;;
+              major) next="$((major + 1)).0.0" ;;
+            esac
+            if [ -n "$PRE" ] && [[ $BUMP =~ ^(patch|minor|major)$ ]]; then
+              next="$next-$PRE.1"
+            fi
+          fi
+          tag="v$next"
+
+          # Never move or reuse a tag, and only go forwards.
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "::error::$tag already exists"; exit 1
+          fi
+          # Semver order: X.Y.Z numerically, then a full release after its
+          # prereleases, then the label (alpha < beta < rc), then N.
+          key() {
+            [[ ${1#v} =~ $semver ]]
+            printf '%09d.%09d.%09d.%d.%s.%09d' "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}" \
+              "${BASH_REMATCH[3]}" "$([ -z "${BASH_REMATCH[5]}" ] && echo 1 || echo 0)" \
+              "${BASH_REMATCH[5]:-~}" "${BASH_REMATCH[6]:-0}"
+          }
+          if [[ ! $(key "$tag") > $(key "$last") ]]; then
+            echo "::error::$tag isn't newer than $last"; exit 1
+          fi
+          echo "next release: $tag (main at $(git rev-parse --short HEAD))"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Tag main and push the tag
+        if: ${{ !inputs.dry_run }}
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          HAS_TOKEN: ${{ secrets.RELEASE_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          [ "$HAS_TOKEN" = true ] || {
+            echo "::error::RELEASE_TOKEN isn't set: a tag pushed with the automatic token wouldn't start iso.yml"
+            exit 1
+          }
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@noreply.forge.in.quineglobal.com"
+          git tag -a "$TAG" -m "quine-linux $TAG"
+          git push origin "refs/tags/$TAG"
+          echo "pushed $TAG; iso.yml builds and publishes it:"
+          echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions"
