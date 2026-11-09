@@ -187,6 +187,7 @@ tee -a /usr/share/anaconda/interactive-defaults.ks <<EOF
 ostreecontainer --url=$PAYLOAD_IMAGE --transport=containers-storage --no-signature-verification
 %include /usr/share/anaconda/post-scripts/install-configure-upgrade.ks
 %include /usr/share/anaconda/post-scripts/install-flatpaks.ks
+%include /usr/share/anaconda/post-scripts/data-disk.ks
 %include /usr/share/anaconda/post-scripts/secureboot-enroll-key.ks
 EOF
 
@@ -203,6 +204,89 @@ target="/mnt/sysimage/ostree/deploy/default/deploy/$deployment.0/var/lib/"
 mkdir -p "$target"
 systemctl stop var-lib-flatpak.mount
 rsync -aAXUHKP /var/lib/flatpak "$target"
+sync
+%end
+EOF
+
+# The installer's Data disk step (anaconda-webui/) writes the partition chosen
+# to /run/quine-data-disk.json. Mount it at /var/hdd and bind what's on it
+# into place, as the iMac was set up by hand (docs/relocate-home-to-hdd.md):
+#   home-<user>/          -> /var/home/<user>   (each; no nofail: a missing
+#                            disk stops the boot rather than show an empty home)
+#   home/                 -> /var/home          (a new disk: everyone's homes)
+#   flatpak/              -> /var/lib/flatpak   (made from the ISO's if absent)
+#   podman-storage/storage, tmp -> /var/lib/containers/storage, /var/tmp
+#   swapfile              -> swap, below zram's priority
+# Nothing on the disk is deleted or formatted. Runs after install-flatpaks.ks.
+tee /usr/share/anaconda/post-scripts/data-disk.ks <<'EOF'
+%post --erroronfail --nochroot
+set -euo pipefail
+choice=/run/quine-data-disk.json
+[ -s "$choice" ] || exit 0
+dev="$(jq -r '.device // empty' "$choice")"
+[ -b "$dev" ] || { echo "data disk: $dev isn't a block device" >&2; exit 1; }
+uuid="$(blkid -s UUID -o value "$dev")"
+fstype="$(blkid -s TYPE -o value "$dev")"
+echo "data disk: $dev (UUID=$uuid, $fstype)"
+
+deployment="$(ostree rev-parse --repo=/mnt/sysimage/ostree/repo ostree/0/1/0)"
+deploy="/mnt/sysimage/ostree/deploy/default/deploy/$deployment.0"
+var="/mnt/sysimage/ostree/deploy/default/var"
+fstab="$deploy/etc/fstab"
+
+data="$(mktemp -d)"
+mount "$dev" "$data"
+trap 'umount "$data"' EXIT
+
+lines=("UUID=$uuid /var/hdd $fstype defaults,nofail 0 2")
+bind() { lines+=("$1 $2 none bind,x-systemd.requires-mounts-for=/var/hdd${3:+,$3} 0 0"); }
+created=false
+
+homes=()
+for d in "$data"/home-*/; do
+  [ -d "$d" ] && homes+=("$(basename "$d")")
+done
+if [ ${#homes[@]} -gt 0 ]; then
+  for h in "${homes[@]}"; do
+    mkdir -p "$var/home/${h#home-}"
+    bind "/var/hdd/$h" "/var/home/${h#home-}"
+  done
+else
+  [ -d "$data/home" ] || { mkdir -p "$data/home"; created=true; }
+  bind /var/hdd/home /var/home
+fi
+
+if [ ! -d "$data/flatpak" ]; then
+  mkdir -p "$data/flatpak"
+  rsync -aAXUHK "$deploy/var/lib/flatpak/" "$data/flatpak/"
+  created=true
+fi
+bind /var/hdd/flatpak /var/lib/flatpak nofail
+
+if [ ! -d "$data/podman-storage" ]; then
+  mkdir -p "$data/podman-storage/storage" "$data/podman-storage/tmp"
+  created=true
+fi
+# It becomes /var/tmp: everyone writes there.
+chmod 1777 "$data/podman-storage/tmp"
+bind /var/hdd/podman-storage/storage /var/lib/containers/storage nofail
+bind /var/hdd/podman-storage/tmp /var/tmp nofail
+
+[ ! -f "$data/swapfile" ] || lines+=("/var/hdd/swapfile none swap sw,pri=10,nofail 0 0")
+
+mkdir -p "$var/hdd" "$var/lib/flatpak" "$var/lib/containers/storage" "$var/tmp"
+{
+  echo "# Data disk (quine-linux installer): $dev"
+  printf '%s\n' "${lines[@]}"
+} >>"$fstab"
+cat "$fstab"
+
+# What this created has no SELinux labels yet: quine-data-disk-relabel.service
+# labels it at first boot.
+if $created; then
+  mkdir -p "$var/lib/quine-linux"
+  touch "$var/lib/quine-linux/relabel-data-disk"
+fi
 sync
 %end
 EOF

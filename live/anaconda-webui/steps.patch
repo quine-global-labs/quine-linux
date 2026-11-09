@@ -1,0 +1,20 @@
+diff --git a/src/components/steps.js b/src/components/steps.js
+index 13303d2..179463f 100644
+--- a/src/components/steps.js
++++ b/src/components/steps.js
+@@ -15,6 +15,7 @@ import { Page as PageInstallationMethod } from "./storage/installation-method/in
+ import { Page as PageMountPointMapping } from "./storage/mount-point-mapping/index.js";
+ import { Page as PageStorageConfiguration } from "./storage/storage-configuration/index.js";
+ import { Page as PageAccounts } from "./users/index.js";
++import { Page as PageDataDisk } from "./datadisk/index.js";
+ 
+ const _ = cockpit.gettext;
+ 
+@@ -33,6 +34,7 @@ export const getSteps = (userInterfaceConfig, args) => {
+             label: _("Storage configuration"),
+             steps: [mountPointMappingStep],
+         },
++        new PageDataDisk(args),
+         new PageAccounts(args),
+         new PageReviewConfiguration(args),
+         new PageProgress(args),

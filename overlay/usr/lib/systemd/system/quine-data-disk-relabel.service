@@ -1,0 +1,19 @@
+# Labels (SELinux) what the installer's Data disk step created on the data
+# disk: an empty home/, flatpak/ copied from the ISO, podman-storage/.
+# live/build.sh's data-disk.ks leaves /var/lib/quine-linux/relabel-data-disk
+# when it created any of them; this runs once, at the first boot, before
+# anyone logs in, then removes it.
+[Unit]
+Description=Label the data disk's new folders for SELinux
+ConditionPathExists=/var/lib/quine-linux/relabel-data-disk
+RequiresMountsFor=/var/hdd /var/home /var/lib/flatpak /var/lib/containers/storage /var/tmp
+After=local-fs.target
+Before=systemd-user-sessions.service display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/restorecon -R /var/hdd /var/home /var/lib/flatpak /var/lib/containers/storage /var/tmp
+ExecStartPost=/usr/bin/rm -f /var/lib/quine-linux/relabel-data-disk
+
+[Install]
+WantedBy=multi-user.target

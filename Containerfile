@@ -135,5 +135,6 @@ COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.pl
 # System-level units are enabled explicitly. User units are picked up
 # automatically via overlay/usr/lib/systemd/user-preset/.
 # quine-update-check.timer: the status Kickoff's update bar shows.
+# quine-data-disk-relabel.service: once, after an install with a data disk.
 RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service \
-      quine-update-check.timer
+      quine-update-check.timer quine-data-disk-relabel.service

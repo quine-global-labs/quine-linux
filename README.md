@@ -89,6 +89,35 @@ Pushing the tag needs the repo secret `RELEASE_TOKEN`, a Forgejo token with
 `write:repository`. The automatic token can push, but a tag pushed with it
 doesn't start `iso.yml`.
 
+## Installing with a data disk
+
+The installer (the live ISO's Anaconda) has a **Data disk** step after the
+storage steps. It can keep home folders, Flatpak apps, containers and swap on
+a second disk, so a small system disk doesn't fill up. The iMac (a 32 GB SSD
+next to a 1 TB hard disk) is the case it was made for.
+
+- **Choosing:** pick an existing ext4, XFS or Btrfs partition that isn't on a
+  disk being installed to. A partition labelled `hdd`, `data` or `quine-data`
+  is preselected. Nothing on it is erased.
+- **Reusing an earlier layout:** whatever is already on the partition is used
+  again (`home-<user>/`, `flatpak/`, `podman-storage/`, `swapfile`). Create
+  your account at first boot with the same user name as before to get your
+  files back.
+- **A fresh disk:** it gets `home/` (every user's home), `flatpak/` (the
+  ISO's apps) and `podman-storage/`. `quine-data-disk-relabel.service` gives
+  them SELinux labels at first boot.
+- **How it works:**
+  - The partition is mounted at `/var/hdd` (`nofail`), and its folders are
+    bind-mounted into place in `/etc/fstab`.
+  - The home binds have no `nofail`: if the disk is missing, boot stops
+    instead of showing an empty home.
+- **Code:**
+  - the page is `live/anaconda-webui/` (upstream's source plus
+    `steps.patch`, built in `live/Containerfile`'s `anaconda-webui` stage at
+    the version Fedora ships);
+  - the install step is `data-disk.ks` in `live/build.sh`;
+  - the hand-made original is described in `docs/relocate-home-to-hdd.md`.
+
 ## overlay/
 
 Files here mirror their path on the root filesystem and are baked into the

@@ -11,6 +11,33 @@ ARG PAYLOAD_IMAGE=registry.quineglobal.com/quine-linux:latest
 # Where to pull it from instead, under another name for the same image
 # (build.sh); empty: PAYLOAD_IMAGE itself.
 ARG PAYLOAD_PULL=
+
+# Anaconda's web UI with quine-linux's "Data disk" step (anaconda-webui/):
+# upstream's source at the version Fedora ships, plus our page, built with
+# upstream's own `make install` (what Fedora's RPM runs). The final stage
+# lays it over Fedora's package. Needs GitHub (upstream, its npm cache, and
+# cockpit's shared lib). If steps.patch no longer applies to a new upstream
+# version, this fails here: re-make the patch against that tag.
+FROM ${BASE_IMAGE} AS anaconda-webui
+RUN --mount=type=cache,dst=/var/cache/libdnf5 \
+    dnf install -y git make nodejs npm gettext diffutils
+COPY anaconda-webui/ /quine/
+RUN set -eux; \
+    v="$(dnf repoquery -q --latest-limit 1 --qf '%{version}' anaconda-webui)"; \
+    echo "Building anaconda-webui ${v} with the Data disk step"; \
+    git clone -q --depth 1 --branch "${v}" https://github.com/rhinstaller/anaconda-webui /src; \
+    cd /src; \
+    cp -R /quine/src/. src/; \
+    git apply /quine/steps.patch; \
+    make package-lock.json; \
+    # node_modules ships only x86_64's esbuild binary; add the host's if needed.
+    e="$(node -p 'require("./node_modules/esbuild/package.json").version')"; \
+    case "$(uname -m)" in \
+      aarch64) npm install --no-save --ignore-scripts "@esbuild/linux-arm64@${e}" ;; \
+    esac; \
+    make install DESTDIR=/out VERSION="${v}"; \
+    echo "${v}" >/out-version
+
 FROM ${BASE_IMAGE}
 ARG PAYLOAD_IMAGE
 ARG PAYLOAD_PULL
@@ -19,3 +46,17 @@ ENV PAYLOAD_IMAGE=${PAYLOAD_IMAGE}
 COPY . /src/live/
 RUN --mount=type=cache,dst=/var/cache/libdnf5 \
     bash /src/live/build.sh && rm -rf /src/live
+
+# The Data disk step (anaconda-webui stage above), over Fedora's web UI, which
+# build.sh installed. Same version or nothing: our build is that version's
+# source plus one page.
+COPY --from=anaconda-webui /out/ /tmp/anaconda-webui/
+COPY --from=anaconda-webui /out-version /tmp/anaconda-webui.version
+RUN set -eux; \
+    want="$(rpm -q --qf '%{VERSION}' anaconda-webui)"; \
+    have="$(cat /tmp/anaconda-webui.version)"; \
+    [ "$want" = "$have" ] || { echo "anaconda-webui: Fedora's is $want, ours was built from $have" >&2; exit 1; }; \
+    rm -rf /usr/share/cockpit/anaconda-webui; \
+    cp -a /tmp/anaconda-webui/. /; \
+    rm -rf /tmp/anaconda-webui /tmp/anaconda-webui.version; \
+    test -f /usr/share/cockpit/anaconda-webui/index.js
