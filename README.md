@@ -129,6 +129,45 @@ KWin defaults for every user. The top-left hot corner that opens Overview
 is off (`[Effect-overview] BorderActivate=9`). A user's own
 `~/.config/kwinrc`, which System Settings writes, still overrides it.
 
+### Graceful updates: `update-confirm`, `update-rollback`, `update-skip-rejected`, `update-failed`
+
+Aurora's nightly update (`uupd`) stages a new system version in the
+background. These scripts, all in `overlay/usr/libexec/quine-linux/`, handle
+the two ways that can go wrong.
+
+**A new version that doesn't work:**
+- On the first login into a new version, `update-confirm` asks "Quine Linux
+  was updated from X to Y. Is everything working?" It's started by
+  `etc/xdg/autostart/quine-update-confirm.desktop` and shown with `kdialog`.
+  This is the same check layer-wizard does after layering a package.
+- **Keep this update** records the version in
+  `~/.local/state/quine-linux/confirmed-deployment`.
+- **Ask me later** asks again at the next login.
+- **Roll back** asks for confirmation, then runs `update-rollback` through
+  `pkexec`, which asks for an admin password. That runs
+  `bootc rollback --apply` and restarts into the previous version. If the
+  system image itself changed, it also records the image in
+  `/var/lib/quine-linux/rejected-images`.
+- A new install or new user isn't asked: their first login just records
+  the current version.
+- While layer-wizard has its own confirmation pending, `update-confirm`
+  stays quiet, so there's never a double prompt.
+
+**Not reinstalling a rejected image:** `update-skip-rejected` is an
+`ExecCondition` of `uupd.service` (`uupd.service.d/60-quine-graceful.conf`).
+It skips the nightly run while the newest image is one someone rolled back
+from. Updates resume by themselves once a newer image is published. Flatpak
+updates are skipped on those nights too, because uupd does both in one
+run. `update-check` doesn't offer a rejected image in the update bar either
+(`rejected: true`).
+
+**Failed updates:** after uupd's own retries, `quine-update-failed.service`
+(the unit's `OnFailure`) runs `update-failed`. It saves uupd's last errors,
+and whether the disk was full, to
+`/var/lib/quine-linux/last-update-failure.json`. `update-check` publishes
+that as `lastFailure` in `update-status.json`, for the update bar. uupd
+itself already notifies the user. A successful run deletes the file.
+
 ### overlay/etc/systemd/system/cs8409-intmike-power-fixup.service
 
 Hardware-specific fixup for the iMac19,2 internal mic (see below).

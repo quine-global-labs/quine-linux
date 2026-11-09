@@ -10,6 +10,10 @@
 #   new:   the staged or available image's version and build time
 #   error: why the registry check failed, if it did (state then falls back
 #          to what bootc already knew)
+#   lastFailure: why the last nightly update (uupd) failed, until one
+#          succeeds (update-failed: {at, diskFull, errors}), else null
+#   rejected: the registry's newest image is one a user rolled back from
+#          (update-rollback); it isn't offered, so state stays "current"
 set -euo pipefail
 
 out_dir=/run/quine-linux
@@ -23,14 +27,25 @@ if ! check_output=$(bootc upgrade --check 2>&1); then
   error=$(tail -n 1 <<<"$check_output")
 fi
 
-bootc status --json | jq --arg error "$error" --arg checked "$(date -Is)" '
+failure=/var/lib/quine-linux/last-update-failure.json
+rejected_list=/var/lib/quine-linux/rejected-images
+rejected='[]'
+[ ! -s "$rejected_list" ] || rejected=$(cut -d' ' -f1 "$rejected_list" | jq -R . | jq -cs .)
+
+bootc status --json | jq --arg error "$error" --arg checked "$(date -Is)" \
+  --argjson rejected "$rejected" \
+  --argjson lastFailure "$(cat "$failure" 2>/dev/null || echo null)" '
   .status as $s
   | ($s.booted.image.imageDigest // null) as $booted
   | ($s.staged.image // null) as $staged
-  | ($s.booted.cachedUpdate // null) as $cached
+  | ($s.booted.cachedUpdate // null) as $cachedAny
+  | (if $cachedAny != null and ($rejected | any(. == $cachedAny.imageDigest))
+     then null else $cachedAny end) as $cached
   | {
       checked: $checked,
       error: (if $error == "" then null else $error end),
+      lastFailure: $lastFailure,
+      rejected: ($cachedAny != null and $cached == null),
       current: {version: $s.booted.image.version, timestamp: $s.booted.image.timestamp},
       state: (
         if $staged != null and $staged.imageDigest != $booted then "staged"

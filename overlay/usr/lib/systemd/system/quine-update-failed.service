@@ -1,0 +1,6 @@
+[Unit]
+Description=Record why the nightly update (uupd) failed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/quine-linux/update-failed

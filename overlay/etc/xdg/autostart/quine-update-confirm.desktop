@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Confirm Quine Linux update
+Comment=After an update, asks whether to keep it or roll back
+Exec=/usr/libexec/quine-linux/update-confirm
+Icon=system-software-update
+NoDisplay=true
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=2

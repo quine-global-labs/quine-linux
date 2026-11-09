@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+# ExecCondition of uupd.service (uupd.service.d/60-quine-graceful.conf): skips
+# the nightly update while the newest image is one a user rolled back from
+# (update-rollback, /var/lib/quine-linux/rejected-images). Exit 1 skips the
+# run without failing it. It resumes on its own once a newer image is out.
+# That night's Flatpak updates are skipped too: uupd does both in one run.
+set -uo pipefail
+list=/var/lib/quine-linux/rejected-images
+[ -s "$list" ] || exit 0
+# Can't tell what's newest: let uupd run as usual.
+bootc upgrade --check >/dev/null 2>&1 || exit 0
+newest=$(bootc status --json | jq -r '.status.booted.cachedUpdate.imageDigest // empty')
+if [ -n "$newest" ] && grep -q "^$newest " "$list"; then
+  echo "Skipping tonight's update: the newest image ($newest) is one you rolled back from. Updates resume when a newer image is published."
+  exit 1
+fi
+exit 0

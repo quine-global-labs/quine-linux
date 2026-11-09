@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+# OnFailure of uupd.service (after its retries): records why the update
+# failed in /var/lib/quine-linux/last-update-failure.json, which update-check
+# copies into update-status.json as lastFailure, for the update bar. uupd
+# itself already notifies ("Some System Updates Failed"). A successful run
+# deletes the file (uupd.service.d/60-quine-graceful.conf).
+set -uo pipefail
+dir=/var/lib/quine-linux
+mkdir -p "$dir"
+
+if [ -n "${MONITOR_INVOCATION_ID:-}" ]; then
+  log=$(journalctl -o cat --no-pager _SYSTEMD_INVOCATION_ID="$MONITOR_INVOCATION_ID")
+else
+  log=$(journalctl -o cat --no-pager -u uupd.service -n 300)
+fi
+# uupd logs JSON lines (--json); keep its last few errors.
+errors=$(grep '"level":"ERROR"' <<<"$log" |
+  jq -r '[.msg, (.error // .err // empty)] | map(select(. != null and . != "") | tostring) | join(": ")' 2>/dev/null |
+  tail -n 5)
+disk_full=false
+grep -qiE 'min-free-space|No space left on device' <<<"$log" && disk_full=true
+
+jq -n --arg at "$(date -Is)" --arg errors "$errors" --argjson diskFull "$disk_full" \
+  '{at: $at, diskFull: $diskFull, errors: ($errors | split("\n") | map(select(. != "")))}' \
+  >"$dir/last-update-failure.json.tmp"
+chmod 0644 "$dir/last-update-failure.json.tmp"
+mv "$dir/last-update-failure.json.tmp" "$dir/last-update-failure.json"
+/usr/libexec/quine-linux/update-check || true

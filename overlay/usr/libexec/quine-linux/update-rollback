@@ -1,0 +1,20 @@
+#!/usr/bin/bash
+# Restarts into the previous deployment (bootc rollback --apply), for
+# update-confirm's Roll back, run as root through pkexec. If the system image
+# itself changed (not just layered packages), records the image rolled back
+# from in /var/lib/quine-linux/rejected-images, so the nightly update
+# doesn't install it again (update-skip-rejected).
+set -euo pipefail
+[ "$(id -u)" = 0 ] || { echo "update-rollback: run it as root (pkexec)" >&2; exit 1; }
+
+status=$(bootc status --json)
+jq -e '.status.rollback != null' <<<"$status" >/dev/null ||
+  { echo "There's no previous version to roll back to." >&2; exit 1; }
+booted=$(jq -r '.status.booted.image.imageDigest // empty' <<<"$status")
+previous=$(jq -r '.status.rollback.image.imageDigest // empty' <<<"$status")
+
+if [ -n "$booted" ] && [ "$booted" != "$previous" ]; then
+  mkdir -p /var/lib/quine-linux
+  printf '%s %s\n' "$booted" "$(date -Is)" >>/var/lib/quine-linux/rejected-images
+fi
+exec bootc rollback --apply

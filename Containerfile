@@ -82,6 +82,11 @@ COPY overlay/ /
 # alsa-tools provides hda-verb, used by cs8409-intmike-power-fixup.service.
 RUN dnf install -y alsa-tools
 
+# kdialog: update-confirm's "Keep this update / Roll back" prompt after an
+# update (overlay/usr/libexec/quine-linux/update-confirm). Usually already in
+# Kinoite; this makes sure.
+RUN dnf install -y kdialog
+
 # calligra-words, tailscale, teamviewer: NOT baked in here -- layer-wizard
 # (already installed below) ships them as built-in recipes instead, so
 # they're install-on-demand per machine rather than forced onto every
