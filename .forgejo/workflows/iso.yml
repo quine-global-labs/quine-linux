@@ -56,6 +56,12 @@ env:
   IMAGE: forge.in.quineglobal.com/quine-global-labs/quine-linux
   MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
   MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
+  # rclone's remote `store:`, all from the environment (no rclone.conf); each
+  # step that uses it adds RCLONE_CONFIG_STORE_ACCESS_KEY_ID/_SECRET_ACCESS_KEY.
+  # rclone, not mc: MinIO abandoned mc, and nixpkgs marks it insecure.
+  RCLONE_CONFIG_STORE_TYPE: s3
+  RCLONE_CONFIG_STORE_PROVIDER: Minio
+  RCLONE_CONFIG_STORE_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
 
 jobs:
   iso:
@@ -90,11 +96,9 @@ jobs:
       # mirror of code.forgejo.org/actions/checkout.
       - uses: https://forge.in.quineglobal.com/quine-global-labs/mirror-actions-checkout@v4
 
-      - name: Install task, mc, just, yq and cosign
-        # Only what the runner doesn't already have: runner-x86-linux has
-        # all five from nixpkgs (petersweb-infra, hosts/runner-x86-linux).
-        # dl.min.io's mc answers 410 Gone, so a runner without mc needs one
-        # installed.
+      - name: Install task, rclone, just, yq and cosign
+        # Only what the runner doesn't already have: both runners have all
+        # five from nixpkgs (petersweb-infra, nixos/forgejo-runner.nix).
         run: |
           bin="$HOME/.local/bin"
           mkdir -p "$bin"
@@ -104,9 +108,9 @@ jobs:
           have just || curl -fsSL https://just.systems/install.sh | bash -s -- --force --to "$bin"
           have yq || { curl -fsSL -o "$bin/yq" https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && chmod +x "$bin/yq"; }
           have cosign || { curl -fsSL -o "$bin/cosign" https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64 && chmod +x "$bin/cosign"; }
-          have mc || { curl -fsSL -o "$bin/mc" https://dl.min.io/client/mc/release/linux-amd64/mc && chmod +x "$bin/mc"; }
+          have rclone || { curl -fsSL -o /tmp/rclone.zip https://downloads.rclone.org/rclone-current-linux-amd64.zip && unzip -joq /tmp/rclone.zip '*/rclone' -d "$bin" && rm /tmp/rclone.zip; }
           echo "$bin" >> "$GITHUB_PATH"
-          for t in task just yq cosign mc; do printf '%s: ' "$t"; command -v "$t"; done
+          for t in task just yq cosign rclone; do printf '%s: ' "$t"; command -v "$t"; done
 
       - name: Log in to the registry
         env:
@@ -178,26 +182,25 @@ jobs:
 
       - name: Upload to MinIO
         env:
-          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          RCLONE_CONFIG_STORE_ACCESS_KEY_ID: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          RCLONE_CONFIG_STORE_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           SUFFIX: ${{ matrix.latest-suffix }}
         run: |
-          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
-          mc mb --ignore-existing "store/${MINIO_BUCKET}"
+          rclone mkdir "store:${MINIO_BUCKET}"
           # Latest only: each file is 5-8 GB, and the forge VM's disk is
           # shared. Tagged releases keep their own copies (releases/<tag>/).
           ls -lh output/qcow2/disk.qcow2
-          mc cp output/qcow2/disk.qcow2 "store/${MINIO_BUCKET}/disk/latest/disk$SUFFIX.qcow2"
+          rclone copyto output/qcow2/disk.qcow2 "store:${MINIO_BUCKET}/disk/latest/disk$SUFFIX.qcow2"
           ls -lh output/live/Quine-Linux-Live.iso
-          mc cp output/live/Quine-Linux-Live.iso "store/${MINIO_BUCKET}/live/latest/live$SUFFIX.iso"
+          rclone copyto output/live/Quine-Linux-Live.iso "store:${MINIO_BUCKET}/live/latest/live$SUFFIX.iso"
 
       - name: Upload the release's files
         # The release job below lists them in the release, with one
         # SHA256SUMS for both architectures from the SHA256SUMS.<arch> parts.
         if: github.ref_type == 'tag'
         env:
-          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          RCLONE_CONFIG_STORE_ACCESS_KEY_ID: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          RCLONE_CONFIG_STORE_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           ARCH: ${{ matrix.file-arch }}
         run: |
           tag=$GITHUB_REF_NAME
@@ -207,8 +210,7 @@ jobs:
           (cd release && sha256sum -- * > "SHA256SUMS.$ARCH")
           cat "release/SHA256SUMS.$ARCH"
 
-          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
-          for f in release/*; do mc cp "$f" "store/${MINIO_BUCKET}/releases/$tag/${f#release/}"; done
+          rclone copy release/ "store:${MINIO_BUCKET}/releases/$tag/"
 
       - name: Clean up
         if: always()
@@ -229,20 +231,19 @@ jobs:
     steps:
       - name: Publish the release
         env:
-          MINIO_ACCESS_KEY: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+          RCLONE_CONFIG_STORE_ACCESS_KEY_ID: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          RCLONE_CONFIG_STORE_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
           TOKEN: ${{ github.token }}
         run: |
           tag=$GITHUB_REF_NAME
-          mc alias set store "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
-          dir="store/${MINIO_BUCKET}/releases/$tag"
+          dir="store:${MINIO_BUCKET}/releases/$tag"
           sums=$(mktemp)
-          for part in $(mc ls --json "$dir/" | jq -r 'select(.key | startswith("SHA256SUMS.")) | .key' | sort); do
-            mc cat "$dir/$part" >>"$sums"
+          for part in $(rclone lsf --files-only --include 'SHA256SUMS.*' "$dir/" | sort); do
+            rclone cat "$dir/$part" >>"$sums"
           done
           [ -s "$sums" ] || { echo "::error::no architecture uploaded its files"; exit 1; }
           cat "$sums"
-          mc cp "$sums" "$dir/SHA256SUMS"
+          rclone copyto "$sums" "$dir/SHA256SUMS"
           files=(SHA256SUMS)
           mapfile -t -O 1 files < <(awk '{print $2}' "$sums")
 
