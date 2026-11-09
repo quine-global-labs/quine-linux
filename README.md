@@ -123,6 +123,12 @@ Weekly, runs as the user, no privilege needed: `podman system prune -af`,
 user via `overlay/usr/lib/systemd/user-preset/90-quine-linux.preset` — no
 manual `systemctl --user enable` needed.
 
+### overlay/etc/xdg/kwinrc
+
+KWin defaults for every user. The top-left hot corner that opens Overview
+is off (`[Effect-overview] BorderActivate=9`). A user's own
+`~/.config/kwinrc`, which System Settings writes, still overrides it.
+
 ### overlay/etc/systemd/system/cs8409-intmike-power-fixup.service
 
 Hardware-specific fixup for the iMac19,2 internal mic (see below).

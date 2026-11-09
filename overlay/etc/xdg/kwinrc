@@ -1,0 +1,9 @@
+# System-wide KWin defaults (quine-linux overlay). Each user's own
+# ~/.config/kwinrc overrides these.
+
+# No hot corner for Overview: KDE's default (top-left, ElectricTopLeft)
+# opens it whenever the mouse touches the corner. 9 = ElectricNone (KWin's
+# ElectricBorder enum). Re-enable in System Settings → Mouse & Touchpad →
+# Screen Edges.
+[Effect-overview]
+BorderActivate=9
