@@ -166,6 +166,14 @@ the Containerfile):
   `systemctl --user enable --now gpg-agent-ssh.socket` and point
   `SSH_AUTH_SOCK` at `$(gpgconf --list-dirs agent-ssh-socket)`.
 
+`~/.gnupg` is kept at mode 700 for every user
+(`overlay/usr/share/user-tmpfiles.d/quine-gnupg.conf`, applied at each
+login): created that way if it's missing, set back to 700 if something made
+it world-readable.
+
+KeyMaker (`io.github.tobagin.keysmith`), for making and managing SSH keys, is
+preinstalled (`overlay/etc/flatpak/preinstall.d/quine-linux.preinstall`).
+
 ### overlay/etc/xdg/kwinrc
 
 KWin defaults for every user. The top-left hot corner that opens Overview

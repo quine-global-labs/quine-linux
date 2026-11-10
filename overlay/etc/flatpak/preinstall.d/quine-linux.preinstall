@@ -20,6 +20,12 @@ IsRuntime=false
 Branch=stable
 IsRuntime=false
 
+# KeyMaker: makes and manages SSH keys (ssh-agent holds them; see README,
+# "SSH and GPG agents").
+[Flatpak Preinstall io.github.tobagin.keysmith]
+Branch=stable
+IsRuntime=false
+
 [Flatpak Preinstall org.kde.kclock]
 Install=false
 
