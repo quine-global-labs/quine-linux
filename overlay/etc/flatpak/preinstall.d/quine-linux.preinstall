@@ -21,10 +21,13 @@ Branch=stable
 IsRuntime=false
 
 # KeyMaker: makes and manages SSH keys (ssh-agent holds them; see README,
-# "SSH and GPG agents").
+# "SSH and GPG agents"). Our fork's build (new keys get id_ed25519 etc.
+# when free), from our own repo, remotes.d/quine.flatpakrepo: the
+# CollectionID makes preinstall take it from there, not Flathub.
 [Flatpak Preinstall io.github.tobagin.keysmith]
 Branch=stable
 IsRuntime=false
+CollectionID=com.quineglobal.Flatpak
 
 [Flatpak Preinstall org.kde.kclock]
 Install=false
