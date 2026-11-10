@@ -201,6 +201,19 @@ itself already notifies the user. A successful run deletes the file.
 
 Hardware-specific fixup for the iMac19,2 internal mic (see below).
 
+## Kickoff (the start menu)
+
+Built from our fork,
+[quine-global-labs/plasma-desktop](https://forge.in.quineglobal.com/quine-global-labs/plasma-desktop),
+branch `quine-v<Plasma version>` (`Containerfile`'s `kickoff-builder`
+stage). Our changes:
+
+- An update bar: "A system update is available" / "Restart to finish
+  updating", from `quine-update-check.service`.
+- While searching, a last row under the results, "Install “seahorse” from
+  Bazaar", which opens Bazaar searching for the same words
+  (`flatpak run io.github.kolunmi.Bazaar --search-for=…`).
+
 ## Hardware-specific patches
 
 `docs/` and `patches/` hold write-ups and out-of-tree kernel module patches
