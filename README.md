@@ -148,9 +148,23 @@ Continuous 500M journal retention cap instead of a periodic vacuum job.
 ### overlay/usr/lib/systemd/user/disk-cleanup.{service,timer}
 
 Weekly, runs as the user, no privilege needed: `podman system prune -af`,
-`flatpak uninstall --unused -y`, clears `~/.cache`. Auto-enabled for every
-user via `overlay/usr/lib/systemd/user-preset/90-quine-linux.preset` — no
-manual `systemctl --user enable` needed.
+`flatpak uninstall --unused -y`, clears `~/.cache`. Enabled for every user
+by `systemctl --global enable` in the Containerfile (and listed in
+`overlay/usr/lib/systemd/user-preset/90-quine-linux.preset`, which on its own
+does nothing: no one runs `systemctl --global preset` for files in the image).
+
+### SSH and GPG agents
+
+Both run for every user, socket-activated (`systemctl --global enable` in
+the Containerfile):
+- `ssh-agent.socket`: holds SSH keys. Plasma sets `SSH_AUTH_SOCK` to it
+  (`$XDG_RUNTIME_DIR/ssh-agent.socket`, from Fedora's
+  `/etc/xdg/plasma-workspace/env/ssh-agent.sh`).
+- `gpg-agent.socket`: GnuPG only. Its SSH emulation, `gpg-agent-ssh.socket`,
+  is left off, so there's one SSH agent and `ssh-add` always means
+  ssh-agent. To use a GPG key for SSH anyway:
+  `systemctl --user enable --now gpg-agent-ssh.socket` and point
+  `SSH_AUTH_SOCK` at `$(gpgconf --list-dirs agent-ssh-socket)`.
 
 ### overlay/etc/xdg/kwinrc
 

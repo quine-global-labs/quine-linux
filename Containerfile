@@ -132,9 +132,21 @@ RUN dnf install -y \
 COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so \
      /usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so
 
-# System-level units are enabled explicitly. User units are picked up
-# automatically via overlay/usr/lib/systemd/user-preset/.
+# System-level units are enabled explicitly.
 # quine-update-check.timer: the status Kickoff's update bar shows.
 # quine-data-disk-relabel.service: once, after an install with a data disk.
 RUN systemctl enable rpm-ostree-cleanup.timer cs8409-intmike-power-fixup.service \
       quine-update-check.timer quine-data-disk-relabel.service
+
+# User units, for every user (links in /etc/systemd/user/). A preset file
+# alone doesn't do it: nothing runs `systemctl --global preset` for files
+# laid into the image. overlay/usr/lib/systemd/user-preset/90-quine-linux.preset
+# lists the same. disk-cleanup.timer: weekly cleanup. ssh-agent.socket and
+# gpg-agent.socket: both agents, socket-activated. gpg-agent's ssh socket
+# (gpg-agent-ssh.socket) stays off, so SSH keys go to ssh-agent only.
+RUN systemctl --global enable disk-cleanup.timer ssh-agent.socket gpg-agent.socket && \
+    systemctl --global disable gpg-agent-ssh.socket && \
+    test -L /etc/systemd/user/sockets.target.wants/ssh-agent.socket && \
+    test -L /etc/systemd/user/sockets.target.wants/gpg-agent.socket && \
+    test ! -e /etc/systemd/user/sockets.target.wants/gpg-agent-ssh.socket && \
+    test ! -e /usr/lib/systemd/user/sockets.target.wants/gpg-agent-ssh.socket
