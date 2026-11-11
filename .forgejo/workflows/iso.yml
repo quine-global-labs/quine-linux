@@ -167,9 +167,10 @@ jobs:
             for try in 1 2 3 4 5; do
               echo "== pulling $img (attempt $try/5)"
               # A pull can also stall without failing (run 64: three hours on
-              # aurora:stable-arm64 from the forge); 30 minutes is far more
-              # than any of these takes.
-              timeout -k 60 30m podman pull --retry 5 --retry-delay 20s "$img" && break
+              # aurora:stable-arm64 from the forge). 60 minutes: the arm64
+              # runner reaches the forge through a Tailscale relay, and its
+              # 10 GB Aurora pull took 29.5 minutes (run 71).
+              timeout -k 60 60m podman pull --retry 5 --retry-delay 20s "$img" && break
               [ "$try" != 5 ] || { echo "== giving up on $img after 5 attempts"; exit 1; }
               echo "== pull of $img failed, retrying in 30s"; sleep 30
             done
