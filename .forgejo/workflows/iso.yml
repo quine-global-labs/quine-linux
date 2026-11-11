@@ -175,8 +175,10 @@ jobs:
               "$img"
           done
 
+      # The build steps retry on network errors (any fetch, anywhere in the
+      # build): .forgejo/retry-on-network-error.sh.
       - name: Build image
-        run: task build-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" $ARCH_VARS
+        run: .forgejo/retry-on-network-error.sh task build-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" $ARCH_VARS
 
       - name: Push image
         env:
@@ -190,7 +192,7 @@ jobs:
           done
 
       - name: Build disk image
-        run: task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" UPDATE_IMAGE="$UPDATE_IMAGE" $ARCH_VARS
+        run: .forgejo/retry-on-network-error.sh task build-disk-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" UPDATE_IMAGE="$UPDATE_IMAGE" $ARCH_VARS
 
       - name: Build live ISO
         # Installs UPDATE_IMAGE (quine-linux:latest, or latest-arm64), which
@@ -201,7 +203,7 @@ jobs:
         env:
           SUFFIX: ${{ matrix.tag-suffix }}
         run: >-
-          task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
+          .forgejo/retry-on-network-error.sh task build-live-iso CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE"
           UPDATE_IMAGE="$UPDATE_IMAGE" PAYLOAD_PULL="$IMAGE:${GITHUB_SHA::12}$SUFFIX" $ARCH_VARS
 
       - name: Upload to MinIO
