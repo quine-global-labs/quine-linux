@@ -121,19 +121,19 @@ jobs:
         # arm64, left too little of the 50 GB disk for bootc-image-builder
         # (run 50, attempt 2). Every job ends with prune -af anyway.
         #
-        # And the temp files: podman stages a whole image in TMPDIR (else
-        # /var/tmp) to commit a build step, and a build killed partway leaves
-        # its container_images_storage* behind. On arm64 /var/tmp is the 50 GB
-        # root disk, not the containers disk: 14 GB of leftovers there and the
-        # live ISO's commit ran out of space (run 60). So the leftovers go, and
-        # the rest of the job's temp files go to the containers disk.
+        # And the temp files: podman stages a whole image in /var/tmp to
+        # commit a build step, and a build killed partway leaves its
+        # container_images_storage* behind. On arm64 /var/tmp is the 54 GB
+        # root disk, not the 49 GB containers disk: 14 GB of leftovers there
+        # and the live ISO's commit ran out of space (run 60). Staging on the
+        # containers disk instead (TMPDIR) filled that one, which also holds
+        # the images (run 61). So the staging stays on /var/tmp, without
+        # leftovers.
         run: |
           ids=$(podman ps -aq --external)
           [ -z "$ids" ] || { echo "removing leftover build containers: $ids"; podman rm -f $ids || true; }
           podman image prune -af >/dev/null || true
           rm -rf /var/tmp/container_images_storage* /var/lib/containers/tmp
-          mkdir -p /var/lib/containers/tmp
-          echo "TMPDIR=/var/lib/containers/tmp" >>"$GITHUB_ENV"
           df -h /var/lib/containers/storage / | tail -2
 
       - name: Log in to the registry
@@ -247,7 +247,7 @@ jobs:
           ids=$(podman ps -aq --external)
           [ -z "$ids" ] || podman rm -f $ids || true
           podman image prune -af >/dev/null || true
-          rm -rf /var/lib/containers/tmp
+          rm -rf /var/tmp/container_images_storage*
 
   release:
     # After both architectures, even if one failed: the release gets
