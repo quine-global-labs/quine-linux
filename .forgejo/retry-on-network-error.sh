@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # retry-on-network-error.sh COMMAND...: runs COMMAND, and if it fails with
 # what looks like a dropped connection (any fetch: git, curl, dnf, npm,
 # podman pulls), runs it again, up to RETRIES times in all (default 3),
