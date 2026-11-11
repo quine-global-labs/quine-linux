@@ -166,7 +166,10 @@ jobs:
             start=$SECONDS
             for try in 1 2 3 4 5; do
               echo "== pulling $img (attempt $try/5)"
-              podman pull --retry 5 --retry-delay 20s "$img" && break
+              # A pull can also stall without failing (run 64: three hours on
+              # aurora:stable-arm64 from the forge); 30 minutes is far more
+              # than any of these takes.
+              timeout -k 60 30m podman pull --retry 5 --retry-delay 20s "$img" && break
               [ "$try" != 5 ] || { echo "== giving up on $img after 5 attempts"; exit 1; }
               echo "== pull of $img failed, retrying in 30s"; sleep 30
             done
@@ -175,8 +178,8 @@ jobs:
               "$img"
           done
 
-      # The build steps retry on network errors (any fetch, anywhere in the
-      # build): .forgejo/retry-on-network-error.sh.
+      # The build steps retry on network errors and stalls (any fetch,
+      # anywhere in the build): .forgejo/retry-on-network-error.sh.
       - name: Build image
         run: .forgejo/retry-on-network-error.sh task build-image CONTAINER_RUNTIME=podman BASE_IMAGE="$BASE_IMAGE" $ARCH_VARS
 
