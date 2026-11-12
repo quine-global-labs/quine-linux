@@ -19,8 +19,11 @@ nothing else.
 2. Stops VM 107, detaches its CD, deletes the old
    `local:iso/quine-linux-live-test.iso`, and has Proxmox download the new
    one straight from MinIO (checked against the checksum for a release).
-3. Attaches it, boots from it first, enables the QEMU guest agent's channel,
-   and starts the VM.
+3. Attaches it, enables the QEMU guest agent's channel, and starts the VM.
+   The VM must already boot from its CD first (`boot: order=ide2;virtio0`):
+   Proxmox counts the boot order as a disk setting (`VM.Config.Disk`), and
+   the token doesn't get that, as it would let it change the VM's disks too.
+   The script checks it and says so if not.
 4. Waits (15 minutes at most) for the live system's guest agent to answer:
    Fedora's `qemu-guest-agent` is in the image (Kinoite's
    `packages/common.yaml`). It passes when it does, and reports the OS and
