@@ -1,0 +1,39 @@
+name: VM test
+
+# Boots a live ISO on zeus's test VM (107, quine-live-test) and waits for it
+# to come up: .forgejo/vm-test.sh, docs/VM_TEST.md. By hand: Actions → VM
+# test → Run workflow, with a release tag or `latest` (the last build of
+# main). The VM stays up at the live desktop, to look at in Proxmox.
+#
+# Secrets: PVE_TOKEN (a Proxmox API token limited to this, docs/VM_TEST.md),
+# and for `latest`, MINIO_SECRET_KEY as iso.yml uses it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (v0.1.1-alpha.1) or latest'
+        type: string
+        default: latest
+
+concurrency:
+  group: vm-test
+  cancel-in-progress: false
+
+jobs:
+  vm-test:
+    # On zeus's LAN and the tailnet; any runner that reaches Proxmox would do.
+    runs-on: runner-x86-linux
+    steps:
+      - uses: https://forge.in.quineglobal.com/quine-global-labs/mirror-actions-checkout@v4
+      - name: Boot the live ISO on VM 107
+        env:
+          TAG: ${{ inputs.tag }}
+          PVE_TOKEN: ${{ secrets.PVE_TOKEN }}
+          MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
+          RCLONE_CONFIG_STORE_TYPE: s3
+          RCLONE_CONFIG_STORE_PROVIDER: Minio
+          RCLONE_CONFIG_STORE_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
+          RCLONE_CONFIG_STORE_ACCESS_KEY_ID: ${{ vars.MINIO_ACCESS_KEY || secrets.MINIO_ACCESS_KEY }}
+          RCLONE_CONFIG_STORE_SECRET_ACCESS_KEY: ${{ secrets.MINIO_SECRET_KEY }}
+        run: .forgejo/vm-test.sh "$TAG"
