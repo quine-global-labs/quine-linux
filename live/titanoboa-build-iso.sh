@@ -1,8 +1,9 @@
 #!/usr/bin/env -S bash -exo pipefail
 #
-# From github.com/ublue-os/titanoboa (Apache-2.0), build_iso.sh at 5c457c3,
-# unchanged: what its main.sh runs in a Fedora container with the live image
-# mounted at /rootfs and the output directory at /output.
+# From github.com/ublue-os/titanoboa (Apache-2.0), build_iso.sh at 5c457c3:
+# what its main.sh runs in a Fedora container with the live image mounted at
+# /rootfs and the output directory at /output. One change, marked "Quine
+# Linux": MokManager next to the shim the ISO boots.
 
 { export PS4='+( ${BASH_SOURCE}:${LINENO} ): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; } 2>/dev/null
 
@@ -40,6 +41,14 @@ done
 
 # Copy efi dir
 cp -avT /rootfs/boot/efi/EFI /work/EFI
+# Quine Linux: MokManager (mm*.efi) next to the shim the ISO boots
+# (EFI/BOOT/BOOT*.EFI), where shim looks for it. With a Secure Boot key
+# enrollment pending (our installer queues one, secureboot-enroll-key.ks)
+# shim must run it, and finding it only in EFI/fedora/ it reset the machine
+# instead: a boot loop ("Could not find MokManager", on VM 107).
+for mm in /work/EFI/fedora/mm*.efi; do
+    [ -e "$mm" ] && cp -av "$mm" /work/EFI/BOOT/
+done
 
 # Generate grub.cfg
 { grub_cfg="$(</dev/stdin)"; } <<EOF
