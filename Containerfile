@@ -97,6 +97,22 @@ RUN dnf install -y kdialog
 # Native RPMs: plasma-welcome (Welcome Center), Sunshine (game-stream host).
 RUN dnf remove -y plasma-welcome Sunshine
 
+# Our name, over Aurora's, in os-release: what the installer (its title and
+# "Let's install ... now"), Plasma's About page and fastfetch show, and new
+# installs' default hostname. Aurora's build (18-image-info.sh) wrote these;
+# its version stays, as the image's build version. ID=aurora and
+# VARIANT_ID stay too: Universal Blue's tooling (ujust, uupd, image-info)
+# reads them.
+RUN set -eux; \
+    f=/usr/lib/os-release; \
+    sed -i -e 's|^NAME=.*|NAME="Quine Linux"|' \
+           -e 's|^PRETTY_NAME="Aurora|PRETTY_NAME="Quine Linux|' \
+           -e 's|^DEFAULT_HOSTNAME=.*|DEFAULT_HOSTNAME="quine-linux"|' \
+           -e 's|^HOME_URL=.*|HOME_URL="https://linux.quineglobal.com"|' "$f"; \
+    grep -E '^(NAME|PRETTY_NAME|ID|DEFAULT_HOSTNAME|HOME_URL)=' "$f"; \
+    grep -q '^NAME="Quine Linux"' "$f"; \
+    grep -q '^PRETTY_NAME="Quine Linux' "$f"
+
 # Un-owned files baked directly into Aurora's own build, not from an RPM --
 # dnf/rpm can't remove these, so plain rm: Aurora Offline Docs (a webapp
 # shortcut to a local PDF) and Community (a webapp shortcut to the GitHub
