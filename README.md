@@ -236,6 +236,32 @@ stage). Our changes:
   Bazaar", which opens Bazaar searching for the same words
   (`flatpak run io.github.kolunmi.Bazaar --search-for=…`).
 
+## Launch feedback
+
+Plasma shows a starting app as a spinning icon in the task manager, and stock
+Plasma stops it after 5 seconds whether or not the app is up: a slow start
+(a Flatpak waiting on a portal, a swapping machine) then looks like nothing
+happened. Ours follows the launch instead (`taskmanager/startup-feedback.patch`
+on plasma-workspace's `libtaskmanager`, `Containerfile`'s
+`taskmanager-builder` stage):
+
+- KDE starts each app in its own systemd unit (`app-<id>@….service`; a
+  Flatpak moves on into `app-flatpak-<id>-….scope`). The icon spins while
+  the launch's units run and no window of the app has appeared, matched by
+  app id or by the window's process being in one of those units.
+- A tray icon from the app also ends it: it started in the background.
+- If the units end with no window: a notification, "<App> didn't open",
+  adding that another copy is running, and may not be responding, when one
+  is (a launch that hands over to a hung instance looks like this).
+- After 3 minutes: "<App> is still starting", with **Keep Waiting** (asks
+  again 3 minutes later) and **Stop <App>** (stops its units).
+- A launch with no unit to follow ends after the usual timeout, as before.
+- Apps with `StartupNotify=false` get no feedback, as before.
+
+The 3 minutes is `StillStartingTimeout` in `~/.config/klaunchrc`,
+`[TaskbarButtonSettings]`, in seconds. Wayland only (X11 is unchanged).
+The busy cursor still stops after its own timeout, as KWin draws it.
+
 ## Hardware-specific patches
 
 `docs/` and `patches/` hold write-ups and out-of-tree kernel module patches

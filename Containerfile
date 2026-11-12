@@ -74,6 +74,15 @@ RUN set -eux; \
     DESTDIR=/out cmake --install /build --strip; \
     ls -l /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so
 
+# --- Builds libtaskmanager (the task manager's models) with our launch
+# feedback (README, "Launch feedback"). taskmanager/build.sh: Fedora's own
+# source of the plasma-workspace the image ships, plus
+# taskmanager/startup-feedback.patch, -devel pinned like kickoff-builder's.
+FROM ${BASE_IMAGE} AS taskmanager-builder
+
+COPY taskmanager/ /tmp/taskmanager/
+RUN /tmp/taskmanager/build.sh
+
 # --- Final image. ---
 FROM ${BASE_IMAGE} AS final
 
@@ -147,6 +156,10 @@ RUN dnf install -y \
 # Kickoff with our update bar (kickoff-builder, above), over plasma-desktop's.
 COPY --from=kickoff-builder /out/usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so \
      /usr/lib64/qt6/plugins/plasma/applets/org.kde.plasma.kickoff.so
+
+# libtaskmanager with our launch feedback (taskmanager-builder, above), over
+# plasma-workspace-libs': the same file name, which libtaskmanager.so.6 links to.
+COPY --from=taskmanager-builder /out/usr/lib64/ /usr/lib64/
 
 # System-level units are enabled explicitly.
 # quine-update-check.timer: the status Kickoff's update bar shows.

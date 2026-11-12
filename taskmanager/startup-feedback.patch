@@ -1,0 +1,650 @@
+diff --git a/libtaskmanager/tasksmodel.cpp b/libtaskmanager/tasksmodel.cpp
+index 4607b5a..942ff3b 100644
+--- a/libtaskmanager/tasksmodel.cpp
++++ b/libtaskmanager/tasksmodel.cpp
+@@ -15,6 +15,7 @@
+ 
+ #include "launchertasksmodel.h"
+ #include "startuptasksmodel.h"
++#include "waylandstartuptasksmodel.h"
+ #include "windowtasksmodel.h"
+ 
+ #include "launchertasksmodel_p.h"
+@@ -189,6 +190,45 @@ void TasksModel::Private::initModels()
+ 
+     concatProxyModel->addSourceModel(startupTasksModel);
+ 
++    // Quine Linux: tell the startup feedback about windows (with their pid),
++    // so it can follow a launch past KWin's own notion of it ending. Once per
++    // window model: it and the startup models are shared by all TasksModels.
++    if (auto *startups = qobject_cast<WaylandStartupTasksModel *>(startupTasksModel->sourceModel());
++        startups && !windowTasksModel->property("_quine_startupHook").toBool()) {
++        windowTasksModel->setProperty("_quine_startupHook", true);
++        auto *windows = windowTasksModel;
++        // Queued: removing startup rows while the proxies are still taking in
++        // the window's row corrupts the task order (launchers move, take
++        // other apps' icons).
++        auto report = [startups, windows](int first, int last) {
++            for (int i = first; i <= last; ++i) {
++                const QModelIndex index = windows->index(i, 0);
++                const QString appId = index.data(AbstractTasksModel::AppId).toString();
++                const quint32 pid = index.data(AbstractTasksModel::AppPid).toUInt();
++                QMetaObject::invokeMethod(
++                    startups,
++                    [startups, appId, pid] {
++                        startups->windowAppeared(appId, pid);
++                    },
++                    Qt::QueuedConnection);
++            }
++        };
++        QObject::connect(windowTasksModel, &QAbstractItemModel::rowsInserted, startups, [report](const QModelIndex &parent, int first, int last) {
++            if (!parent.isValid()) {
++                report(first, last);
++            }
++        });
++        QObject::connect(windowTasksModel,
++                         &QAbstractItemModel::dataChanged,
++                         startups,
++                         [report](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QList<int> &roles) {
++                             if (!topLeft.parent().isValid()
++                                 && (roles.isEmpty() || roles.contains(AbstractTasksModel::AppId) || roles.contains(AbstractTasksModel::AppPid))) {
++                                 report(topLeft.row(), bottomRight.row());
++                             }
++                         });
++    }
++
+     // If we're in manual sort mode, we need to seed the sort map on pending row
+     // insertions.
+     QObject::connect(concatProxyModel, &QAbstractItemModel::rowsAboutToBeInserted, q, [this](const QModelIndex &parent, int start, int end) {
+diff --git a/libtaskmanager/waylandstartuptasksmodel.cpp b/libtaskmanager/waylandstartuptasksmodel.cpp
+index 760d91d..345ebbd 100644
+--- a/libtaskmanager/waylandstartuptasksmodel.cpp
++++ b/libtaskmanager/waylandstartuptasksmodel.cpp
+@@ -13,9 +13,19 @@
+ 
+ #include <qwayland-plasma-window-management.h>
+ 
++#include <KLocalizedString>
++
++#include <QDBusArgument>
++#include <QDBusConnection>
++#include <QDBusMessage>
++#include <QDBusObjectPath>
++#include <QDBusPendingCallWatcher>
++#include <QDBusPendingReply>
+ #include <QDebug>
++#include <QFile>
+ #include <QTimer>
+ #include <QUrl>
++#include <ctime>
+ #include <QtWaylandClient/QWaylandClientExtensionTemplate>
+ #include <algorithm>
+ 
+@@ -77,23 +87,199 @@ protected:
+     }
+ };
+ 
++// Quine Linux: the launch feedback follows the launched app instead of a
++// fixed timer.
++//
++// KDE starts an app (KIO) in a systemd unit named after it, as systemd's
++// desktop conventions say: app-<id>@<random>.service, and a Flatpak moves it
++// on into app-flatpak-<id>-<pid>.scope. While the feedback is up, this polls
++// systemd for the app's units, and tells the ones that started since the
++// launch (its own) from ones already running (another copy of the app), by
++// when systemd started them: a launcher in another process (KRunner) can
++// start its unit before this hears of the launch. Then:
++//  - a window of the app, by app id or by its pid being in one of those
++//    units, ends it (windowAppeared(), from TasksModel);
++//  - so does the app registering a tray icon (it started in the background);
++//  - KWin saying the startup finished doesn't end it while the units run:
++//    KWin keeps one startup at a time, and ends it when any window opens;
++//  - the units ending without a window ends it with a notification, "<App>
++//    didn't open" (and that another copy is running, if one is: a launch
++//    that hands over to a hung instance looks like this);
++//  - after StillStartingTimeout (klaunchrc [TaskbarButtonSettings], default
++//    180 s) a notification asks: Keep Waiting, or Stop <App>;
++//  - a launch with no unit to follow (not started through systemd) ends
++//    after the usual Timeout, as before.
++namespace
++{
++const QString s_systemd = QStringLiteral("org.freedesktop.systemd1");
++const QString s_systemdPath = QStringLiteral("/org/freedesktop/systemd1");
++const QString s_systemdManager = QStringLiteral("org.freedesktop.systemd1.Manager");
++const QString s_notifications = QStringLiteral("org.freedesktop.Notifications");
++const QString s_notificationsPath = QStringLiteral("/org/freedesktop/Notifications");
++const QString s_sniWatcher = QStringLiteral("org.kde.StatusNotifierWatcher");
++const QString s_sniWatcherPath = QStringLiteral("/StatusNotifierWatcher");
++constexpr std::chrono::seconds s_pollInterval{1};
++// A unit started this long before the launch was heard of is still its own.
++constexpr qint64 s_startSlackUsec = 2'000'000;
++
++// CLOCK_MONOTONIC in µs, systemd's *TimestampMonotonic clock.
++qint64 monotonicUsec()
++{
++    timespec ts{};
++    clock_gettime(CLOCK_MONOTONIC, &ts);
++    return qint64(ts.tv_sec) * 1'000'000 + ts.tv_nsec / 1'000;
++}
++
++struct UnitInfo {
++    QString name, description, loadState, activeState, subState, following;
++    QDBusObjectPath path;
++    quint32 jobId = 0;
++    QString jobType;
++    QDBusObjectPath jobPath;
++};
++
++const QDBusArgument &operator>>(const QDBusArgument &arg, UnitInfo &unit)
++{
++    arg.beginStructure();
++    arg >> unit.name >> unit.description >> unit.loadState >> unit.activeState >> unit.subState >> unit.following >> unit.path >> unit.jobId >> unit.jobType
++        >> unit.jobPath;
++    arg.endStructure();
++    return arg;
++}
++
++// As KIO escapes an app id into a unit name (KProcessRunner::escapeUnitName).
++QString escapeUnitName(const QString &input)
++{
++    QString res;
++    const QByteArray bytes = input.toUtf8();
++    for (const unsigned char c : bytes) {
++        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == ':' || c == '_' || c == '.') {
++            res += QLatin1Char(c);
++        } else {
++            res += QStringLiteral("\\x%1").arg(c, 2, 16, QLatin1Char('0'));
++        }
++    }
++    return res;
++}
++
++// Whether a unit is one of the app's: app[-<launcher>]-<id>[@<random>].service
++// or app[-<launcher>]-<id>-<random>.scope.
++bool unitBelongsTo(const QString &unit, const QString &appId)
++{
++    if (!unit.startsWith(QLatin1String("app-"))) {
++        return false;
++    }
++    QString rest = unit.mid(4);
++    if (rest.endsWith(QLatin1String(".service"))) {
++        rest.chop(8);
++        if (const int at = rest.indexOf(QLatin1Char('@')); at >= 0) {
++            rest.truncate(at);
++        }
++    } else if (rest.endsWith(QLatin1String(".scope"))) {
++        rest.chop(6);
++        const int dash = rest.lastIndexOf(QLatin1Char('-'));
++        if (dash < 0) {
++            return false;
++        }
++        rest.truncate(dash);
++    } else {
++        return false;
++    }
++    for (const QString &id : {escapeUnitName(appId), appId}) {
++        if (rest == id || rest.endsWith(QLatin1Char('-') + id)) {
++            return true;
++        }
++    }
++    return false;
++}
++
++// The cgroup path of a process, split: its units are among the parts.
++QStringList cgroupOf(quint32 pid)
++{
++    QFile file(QStringLiteral("/proc/%1/cgroup").arg(pid));
++    if (pid == 0 || !file.open(QIODevice::ReadOnly)) {
++        return {};
++    }
++    const auto lines = QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'));
++    for (const QString &line : lines) {
++        if (line.startsWith(QLatin1String("0::"))) { // cgroup v2
++            return line.mid(3).split(QLatin1Char('/'), Qt::SkipEmptyParts);
++        }
++    }
++    return {};
++}
++
++bool isAlive(const QString &activeState)
++{
++    return activeState != QLatin1String("inactive") && activeState != QLatin1String("failed");
++}
++}
++
++// Relays the notification server's signals.
++class StartupNotifications : public QObject
++{
++    Q_OBJECT
++public:
++    using QObject::QObject;
++public Q_SLOTS:
++    void onActionInvoked(uint id, const QString &action)
++    {
++        Q_EMIT actionInvoked(id, action);
++    }
++    void onClosed(uint id, uint reason)
++    {
++        Q_UNUSED(reason)
++        Q_EMIT closed(id);
++    }
++    void onTrayItemRegistered(const QString &service)
++    {
++        Q_EMIT trayItemRegistered(service);
++    }
++Q_SIGNALS:
++    void actionInvoked(uint id, const QString &action);
++    void closed(uint id);
++    void trayItemRegistered(const QString &service);
++};
++
+ class Q_DECL_HIDDEN WaylandStartupTasksModel::Private
+ {
+ public:
+     Private(WaylandStartupTasksModel *q);
+ 
++    struct Startup;
++
+     void addActivation(PlasmaActivation *activation);
+     void removeActivation(PlasmaActivation *activation);
++    Startup *find(PlasmaActivation *activation);
+ 
+     void init();
+     void loadConfig();
+ 
++    void pollUnits(PlasmaActivation *activation);
++    void unitsPolled(PlasmaActivation *activation, const QHash<QString, QDBusObjectPath> &alive);
++    void endIfOwns(const QStringList &cgroup);
++    void notifyStillStarting(PlasmaActivation *activation);
++    void notifyDidNotOpen(const Startup &startup, bool anotherRunning);
++    void stopUnits(const QStringList &units);
++    void trayItemRegistered(const QString &service);
++
+     struct Startup {
+         QString name;
+         QIcon icon;
++        QString iconName;
+         QString applicationId;
+         QUrl launcherUrl;
+         std::unique_ptr<PlasmaActivation> activation;
++        // Quine Linux: following the launch (above).
++        qint64 launchedUsec = 0; // when this heard of the launch (monotonic)
++        QHash<QString, qint64> unitStarts; // the app's units: when each started (-1: asking)
++        QStringList units; // the launch's own units, as last seen
++        bool sawUnit = false;
++        bool kwinFinished = false; // KWin said done; trusted once the units end
++        bool stopping = false; // the user chose Stop
++        uint notificationId = 0; // the "still starting" one
++        QTimer *pollTimer = nullptr;
++        QTimer *stillStartingTimer = nullptr;
+     };
+ 
+     WaylandStartupTasksModel *const q;
+@@ -101,6 +287,8 @@ public:
+     std::unique_ptr<PlasmaActivationFeedback> feedback = nullptr;
+     std::vector<Startup> startups;
+     std::chrono::seconds startupTimeout = std::chrono::seconds::zero();
++    std::chrono::seconds stillStartingTimeout{180};
++    StartupNotifications *notifications = nullptr;
+ };
+ 
+ WaylandStartupTasksModel::Private::Private(WaylandStartupTasksModel *q)
+@@ -115,6 +303,54 @@ void WaylandStartupTasksModel::Private::init()
+         loadConfig();
+     });
+ 
++    notifications = new StartupNotifications(q);
++    auto bus = QDBusConnection::sessionBus();
++    bus.connect(s_notifications,
++                s_notificationsPath,
++                s_notifications,
++                QStringLiteral("ActionInvoked"),
++                notifications,
++                SLOT(onActionInvoked(uint, QString)));
++    bus.connect(s_notifications,
++                s_notificationsPath,
++                s_notifications,
++                QStringLiteral("NotificationClosed"),
++                notifications,
++                SLOT(onClosed(uint, uint)));
++    bus.connect(s_sniWatcher,
++                s_sniWatcherPath,
++                s_sniWatcher,
++                QStringLiteral("StatusNotifierItemRegistered"),
++                notifications,
++                SLOT(onTrayItemRegistered(QString)));
++
++    QObject::connect(notifications, &StartupNotifications::actionInvoked, q, [this](uint id, const QString &action) {
++        for (auto &startup : startups) {
++            if (id == 0 || startup.notificationId != id) {
++                continue;
++            }
++            startup.notificationId = 0;
++            if (action == QLatin1String("stop")) {
++                startup.stopping = true;
++                stopUnits(startup.units);
++            } else if (action == QLatin1String("wait")) {
++                startup.stillStartingTimer->start(stillStartingTimeout);
++            }
++            return;
++        }
++    });
++    QObject::connect(notifications, &StartupNotifications::closed, q, [this](uint id) {
++        // Dismissed: keep waiting, without asking again.
++        for (auto &startup : startups) {
++            if (id != 0 && startup.notificationId == id) {
++                startup.notificationId = 0;
++            }
++        }
++    });
++    QObject::connect(notifications, &StartupNotifications::trayItemRegistered, q, [this](const QString &service) {
++        trayItemRegistered(service);
++    });
++
+     loadConfig();
+ }
+ 
+@@ -132,6 +368,7 @@ void WaylandStartupTasksModel::Private::loadConfig()
+ 
+     const KConfigGroup taskbarButtonConfig(configWatcher->config(), u"TaskbarButtonSettings"_s);
+     startupTimeout = std::chrono::seconds(taskbarButtonConfig.readEntry("Timeout", 5));
++    stillStartingTimeout = std::chrono::seconds(taskbarButtonConfig.readEntry("StillStartingTimeout", 180));
+ 
+     feedback = std::make_unique<PlasmaActivationFeedback>();
+ 
+@@ -167,26 +404,239 @@ void WaylandStartupTasksModel::Private::addActivation(PlasmaActivation *activati
+         startups.push_back(Startup{
+             .name = appData.name,
+             .icon = appData.icon,
++            .iconName = appData.icon.name(),
+             .applicationId = appId,
+             .launcherUrl = launcherUrl,
+             .activation = std::unique_ptr<PlasmaActivation>(activation),
++            .launchedUsec = monotonicUsec(),
+         });
+         q->endInsertRows();
+ 
+-        // Remove the activation if it doesn't finish within certain time interval.
++        // Without a unit to follow, remove the activation if it doesn't
++        // finish within certain time interval, as before.
+         auto *timeoutTimer = new QTimer(activation);
+         QObject::connect(timeoutTimer, &QTimer::timeout, q, [this, activation]() {
+-            removeActivation(activation);
++            if (auto *startup = find(activation); startup && !startup->sawUnit) {
++                qCDebug(TASKMANAGER_DEBUG) << "Startup" << startup->applicationId << "has no unit to follow: timed out";
++                removeActivation(activation);
++            }
+         });
+         timeoutTimer->setSingleShot(true);
+         timeoutTimer->start(startupTimeout);
++
++        auto &startup = startups.back();
++        startup.stillStartingTimer = new QTimer(activation);
++        startup.stillStartingTimer->setSingleShot(true);
++        QObject::connect(startup.stillStartingTimer, &QTimer::timeout, q, [this, activation]() {
++            notifyStillStarting(activation);
++        });
++        startup.pollTimer = new QTimer(activation);
++        startup.pollTimer->setInterval(s_pollInterval);
++        QObject::connect(startup.pollTimer, &QTimer::timeout, q, [this, activation]() {
++            pollUnits(activation);
++        });
++        pollUnits(activation);
++        startup.pollTimer->start();
+     });
+ 
+     QObject::connect(activation, &PlasmaActivation::finished, q, [this, activation]() {
++        auto *startup = find(activation);
++        if (startup && startup->sawUnit && !startup->units.isEmpty()) {
++            // KWin ends its startup when any window opens, or another app
++            // starts: keep following the units; trust KWin once they end.
++            qCDebug(TASKMANAGER_DEBUG) << "Startup" << startup->applicationId << "still running, though KWin finished it";
++            startup->kwinFinished = true;
++            return;
++        }
++        removeActivation(activation);
++    });
++}
++
++WaylandStartupTasksModel::Private::Startup *WaylandStartupTasksModel::Private::find(PlasmaActivation *activation)
++{
++    auto it = std::ranges::find_if(startups, [activation](const Startup &startup) {
++        return startup.activation.get() == activation;
++    });
++    return it == startups.end() ? nullptr : &*it;
++}
++
++void WaylandStartupTasksModel::Private::pollUnits(PlasmaActivation *activation)
++{
++    auto message = QDBusMessage::createMethodCall(s_systemd, s_systemdPath, s_systemdManager, QStringLiteral("ListUnitsByPatterns"));
++    message << QStringList{} << QStringList{QStringLiteral("app-*")};
++    // Parented to the activation: gone, and not answered, once it ends.
++    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(message), activation);
++    QObject::connect(watcher, &QDBusPendingCallWatcher::finished, q, [this, activation](QDBusPendingCallWatcher *watcher) {
++        watcher->deleteLater();
++        const QDBusMessage reply = watcher->reply();
++        auto *startup = find(activation);
++        if (!startup || reply.type() != QDBusMessage::ReplyMessage || reply.arguments().isEmpty()) {
++            return;
++        }
++        QHash<QString, QDBusObjectPath> alive;
++        const auto arg = reply.arguments().constFirst().value<QDBusArgument>();
++        arg.beginArray();
++        while (!arg.atEnd()) {
++            UnitInfo unit;
++            arg >> unit;
++            if (isAlive(unit.activeState) && unitBelongsTo(unit.name, startup->applicationId)) {
++                alive.insert(unit.name, unit.path);
++            }
++        }
++        arg.endArray();
++        unitsPolled(activation, alive);
++    });
++}
++
++void WaylandStartupTasksModel::Private::unitsPolled(PlasmaActivation *activation, const QHash<QString, QDBusObjectPath> &alive)
++{
++    auto *startup = find(activation);
++    if (!startup) {
++        return;
++    }
++
++    // When each unit started, asked once per unit.
++    for (auto it = alive.cbegin(); it != alive.cend(); ++it) {
++        if (startup->unitStarts.contains(it.key())) {
++            continue;
++        }
++        startup->unitStarts.insert(it.key(), -1);
++        auto message = QDBusMessage::createMethodCall(s_systemd, it.value().path(), QStringLiteral("org.freedesktop.DBus.Properties"), QStringLiteral("Get"));
++        message << QStringLiteral("org.freedesktop.systemd1.Unit") << QStringLiteral("InactiveExitTimestampMonotonic");
++        auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(message), activation);
++        QObject::connect(watcher, &QDBusPendingCallWatcher::finished, q, [this, activation, unit = it.key()](QDBusPendingCallWatcher *watcher) {
++            watcher->deleteLater();
++            const QDBusPendingReply<QDBusVariant> reply = *watcher;
++            if (auto *startup = find(activation)) {
++                // Unknown counts as already running: never mistaken for the launch.
++                startup->unitStarts.insert(unit, reply.isValid() ? qint64(reply.value().variant().toULongLong()) : 0);
++            }
++        });
++    }
++
++    QStringList launched;
++    bool anotherRunning = false;
++    bool asking = false;
++    for (auto it = alive.cbegin(); it != alive.cend(); ++it) {
++        const qint64 started = startup->unitStarts.value(it.key(), -1);
++        if (started < 0) {
++            asking = true;
++        } else if (started >= startup->launchedUsec - s_startSlackUsec) {
++            launched << it.key();
++        } else {
++            anotherRunning = true;
++        }
++    }
++    if (!launched.isEmpty()) {
++        startup->units = launched;
++        if (!startup->sawUnit) {
++            qCDebug(TASKMANAGER_DEBUG) << "Startup" << startup->applicationId << "follows" << launched;
++            startup->sawUnit = true;
++            startup->stillStartingTimer->start(stillStartingTimeout);
++        }
++        return;
++    }
++    if (startup->sawUnit && !asking) {
++        // The launch's units ended, and no window of the app appeared.
++        qCDebug(TASKMANAGER_DEBUG) << "Startup" << startup->applicationId << "ended without a window; KWin finished:" << startup->kwinFinished;
++        if (!startup->kwinFinished && !startup->stopping) {
++            notifyDidNotOpen(*startup, anotherRunning);
++        }
+         removeActivation(activation);
++    }
++}
++
++void WaylandStartupTasksModel::Private::endIfOwns(const QStringList &cgroup)
++{
++    if (cgroup.isEmpty()) {
++        return;
++    }
++    std::vector<PlasmaActivation *> ended;
++    for (const auto &startup : startups) {
++        if (std::ranges::any_of(startup.units, [&cgroup](const QString &unit) {
++                return cgroup.contains(unit);
++            })) {
++            ended.push_back(startup.activation.get());
++        }
++    }
++    for (auto *activation : ended) {
++        qCDebug(TASKMANAGER_DEBUG) << "Startup" << find(activation)->applicationId << "has a window or tray icon in its units";
++        removeActivation(activation);
++    }
++}
++
++void WaylandStartupTasksModel::Private::trayItemRegistered(const QString &service)
++{
++    if (startups.empty()) {
++        return;
++    }
++    // "org.kde.StatusNotifierItem-<pid>-<n>" or ":1.23", maybe with "/<path>".
++    const QString busName = service.section(QLatin1Char('/'), 0, 0);
++    auto message = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.DBus"),
++                                                  QStringLiteral("/org/freedesktop/DBus"),
++                                                  QStringLiteral("org.freedesktop.DBus"),
++                                                  QStringLiteral("GetConnectionUnixProcessID"));
++    message << busName;
++    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(message), q);
++    QObject::connect(watcher, &QDBusPendingCallWatcher::finished, q, [this](QDBusPendingCallWatcher *watcher) {
++        watcher->deleteLater();
++        const QDBusPendingReply<uint> reply = *watcher;
++        if (reply.isValid()) {
++            // Started in the background, in the tray: done.
++            endIfOwns(cgroupOf(reply.value()));
++        }
++    });
++}
++
++void WaylandStartupTasksModel::Private::notifyStillStarting(PlasmaActivation *activation)
++{
++    auto *startup = find(activation);
++    if (!startup || startup->units.isEmpty() || startup->notificationId != 0) {
++        return;
++    }
++    const int seconds = int(stillStartingTimeout.count());
++    const QString body = seconds < 120 ? i18ncp("@info", "It hasn't shown a window after %1 second.", "It hasn't shown a window after %1 seconds.", seconds)
++                                       : i18ncp("@info", "It hasn't shown a window after %1 minute.", "It hasn't shown a window after %1 minutes.", seconds / 60);
++    auto message = QDBusMessage::createMethodCall(s_notifications, s_notificationsPath, s_notifications, QStringLiteral("Notify"));
++    message << startup->name << uint(0) << startup->iconName << i18nc("@title", "%1 is still starting", startup->name)
++            << body
++            << QStringList{QStringLiteral("wait"),
++                           i18nc("@action:button", "Keep Waiting"),
++                           QStringLiteral("stop"),
++                           i18nc("@action:button %1 is an app's name", "Stop %1", startup->name)}
++            << QVariantMap{{QStringLiteral("urgency"), QVariant::fromValue(uchar(1))}} << int(0);
++    auto *watcher = new QDBusPendingCallWatcher(QDBusConnection::sessionBus().asyncCall(message), activation);
++    QObject::connect(watcher, &QDBusPendingCallWatcher::finished, q, [this, activation](QDBusPendingCallWatcher *watcher) {
++        watcher->deleteLater();
++        const QDBusPendingReply<uint> reply = *watcher;
++        if (auto *startup = find(activation); startup && reply.isValid()) {
++            startup->notificationId = reply.value();
++        }
+     });
+ }
+ 
++void WaylandStartupTasksModel::Private::notifyDidNotOpen(const Startup &startup, bool anotherRunning)
++{
++    const QString body = anotherRunning
++        ? i18nc("@info %1 is an app's name",
++                "It exited without showing a window. Another %1 is already running, and may not be responding.",
++                startup.name)
++        : i18nc("@info", "It exited without showing a window.");
++    auto message = QDBusMessage::createMethodCall(s_notifications, s_notificationsPath, s_notifications, QStringLiteral("Notify"));
++    message << startup.name << uint(0) << startup.iconName << i18nc("@title %1 is an app's name", "%1 didn't open", startup.name) << body
++            << QStringList{} << QVariantMap{} << int(-1);
++    QDBusConnection::sessionBus().asyncCall(message);
++}
++
++void WaylandStartupTasksModel::Private::stopUnits(const QStringList &units)
++{
++    for (const QString &unit : units) {
++        auto message = QDBusMessage::createMethodCall(s_systemd, s_systemdPath, s_systemdManager, QStringLiteral("StopUnit"));
++        message << unit << QStringLiteral("replace");
++        QDBusConnection::sessionBus().asyncCall(message);
++    }
++}
++
+ void WaylandStartupTasksModel::Private::removeActivation(PlasmaActivation *activation)
+ {
+     auto it = std::ranges::find_if(startups, [activation](const Startup &startup) {
+@@ -195,6 +645,11 @@ void WaylandStartupTasksModel::Private::removeActivation(PlasmaActivation *activ
+     if (it == startups.end()) {
+         return;
+     }
++    if (it->notificationId != 0) {
++        auto message = QDBusMessage::createMethodCall(s_notifications, s_notificationsPath, s_notifications, QStringLiteral("CloseNotification"));
++        message << it->notificationId;
++        QDBusConnection::sessionBus().asyncCall(message);
++    }
+     const int position = std::distance(startups.begin(), it);
+     q->beginRemoveRows(QModelIndex(), position, position);
+     startups.erase(it);
+@@ -244,6 +699,23 @@ int WaylandStartupTasksModel::rowCount(const QModelIndex &parent) const
+     return parent.isValid() ? 0 : d->startups.size();
+ }
+ 
++void WaylandStartupTasksModel::windowAppeared(const QString &appId, quint32 pid)
++{
++    if (d->startups.empty()) {
++        return;
++    }
++    std::vector<PlasmaActivation *> ended;
++    for (const auto &startup : d->startups) {
++        if (!appId.isEmpty() && startup.applicationId == appId) {
++            ended.push_back(startup.activation.get());
++        }
++    }
++    for (auto *activation : ended) {
++        d->removeActivation(activation);
++    }
++    d->endIfOwns(cgroupOf(pid));
++}
++
+ } // namespace TaskManager
+ 
+ #include "waylandstartuptasksmodel.moc"
+diff --git a/libtaskmanager/waylandstartuptasksmodel.h b/libtaskmanager/waylandstartuptasksmodel.h
+index 0028c3b..9ee4af2 100644
+--- a/libtaskmanager/waylandstartuptasksmodel.h
++++ b/libtaskmanager/waylandstartuptasksmodel.h
+@@ -23,6 +23,13 @@ public:
+     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+ 
++    /**
++     * A window appeared, or got its app id or pid: ends the startup it
++     * belongs to, by app id or by the pid being in the startup's systemd
++     * units. TasksModel calls it for each window. (Quine Linux)
++     */
++    void windowAppeared(const QString &appId, quint32 pid);
++
+ private:
+     class Private;
+     std::unique_ptr<Private> d;

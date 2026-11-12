@@ -25,6 +25,11 @@ other apps. This file is what you'd otherwise rediscover the hard way.
 - **Kickoff** (the start menu) is rebuilt from our plasma-desktop fork,
   branch `quine-v<Plasma version>`, which the fork's rebase workflow makes
   for each new Plasma. If it hasn't, the build stops and says so.
+- **libtaskmanager** (the task manager's models, in plasma-workspace) is
+  rebuilt with `taskmanager/startup-feedback.patch`, so the launch spinner
+  follows the app's systemd unit (README "Launch feedback"). `taskmanager/
+  build.sh` takes Fedora's source RPM of the installed version; if a new
+  Plasma moves the code, the patch stops applying and the build says so.
 - **Our apps** (layer-wizard, dnf-package-store, swap-watchdog) come from the
   forge's `quine` RPM group, built by each app's own CI; a fix to one reaches
   the image on the next build. KeyMaker comes as a Flatpak from our repo,
