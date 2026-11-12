@@ -181,6 +181,13 @@ EOF
 
 desktop-file-edit --set-key=StartupWMClass --set-value=slitherer \
   /usr/share/applications/liveinst.desktop
+# Its icon, org.fedoraproject.AnacondaInstaller, comes with fedora-logos,
+# which Aurora replaces with its own: the desktop shortcut (liveinst-setup.sh
+# copies this file there) and Kickoff's favourite showed a blank icon.
+# Breeze has the generic installer icon.
+desktop-file-edit --set-icon=system-software-install \
+  /usr/share/applications/liveinst.desktop
+test -e /usr/share/icons/breeze/apps/48/system-software-install.svg
 
 # Install the pulled image, then point the system at the registry for updates.
 tee -a /usr/share/anaconda/interactive-defaults.ks <<EOF
