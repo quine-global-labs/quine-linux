@@ -4,10 +4,10 @@ vars:
   IMAGE: quine-linux
   LIVE_IMAGE: quine-linux-live
   # What the Containerfile builds FROM: our Aurora fork
-  # (quine-global-labs/aurora), built and published by that repo's workflow.
+  # (quine-global/aurora), built and published by that repo's workflow.
   # Override with a local build of the fork (BASE_IMAGE=localhost/aurora:stable,
   # see README) or stock upstream (BASE_IMAGE=ghcr.io/ublue-os/aurora:stable).
-  BASE_IMAGE: forge.in.quineglobal.com/quine-global-labs/aurora:stable
+  BASE_IMAGE: forge.in.quineglobal.com/quine-global/aurora:stable
   # What installed systems follow for updates: Aurora's uupd.timer stages
   # whatever is newest there daily, for the next boot. Our own name, so it
   # outlives where the images are stored: today a pull-only proxy to the
@@ -28,7 +28,7 @@ vars:
   # What to build for: amd64 by default, so an arm64 host (e.g. Apple
   # Silicon) doesn't build for arm64 by accident. For arm64, pass
   # PLATFORM=linux/arm64 TARGET_ARCH=arm64 and the arm64 base
-  # (BASE_IMAGE=forge.in.quineglobal.com/quine-global-labs/aurora:stable-arm64),
+  # (BASE_IMAGE=forge.in.quineglobal.com/quine-global/aurora:stable-arm64),
   # as iso.yml's arm64 job does. Disk images need a host of that architecture.
   PLATFORM: linux/amd64
   TARGET_ARCH: amd64

@@ -6,10 +6,10 @@ Quine distro of Linux based on uBlue Aurora
 
 The image is built in two repos:
 
-- **[`quine-global-labs/aurora`](https://forge.in.quineglobal.com/quine-global-labs/aurora)**,
+- **[`quine-global/aurora`](https://forge.in.quineglobal.com/quine-global/aurora)**,
   our fork of [Aurora](https://github.com/ublue-os/aurora). Its workflow
   builds it with Aurora's own `just build` and publishes it as
-  `forge.in.quineglobal.com/quine-global-labs/aurora:stable`. Changes that
+  `forge.in.quineglobal.com/quine-global/aurora:stable`. Changes that
   have to happen *inside* Aurora's build (its package set, build scripts,
   the Kinoite base it starts from) go there, as commits on the fork.
 - **This repo's `Containerfile`**, which builds the quine-linux bootc image
@@ -17,7 +17,7 @@ The image is built in two repos:
   `kmod-builder` stage that compiles the CS8409 mic-fix kernel module (see
   [Hardware-specific patches](#hardware-specific-patches) below). Anything a
   `RUN` step on top of Aurora can do belongs here, not in the fork. Its
-  workflow publishes `forge.in.quineglobal.com/quine-global-labs/quine-linux`,
+  workflow publishes `forge.in.quineglobal.com/quine-global/quine-linux`,
   and the live ISO and disk image (to MinIO). Installed systems pull and
   update from the same image as `registry.quineglobal.com/quine-linux`, a
   pull-only name for it (Taskfile.yml's `UPDATE_IMAGE`).
@@ -59,7 +59,7 @@ sudo podman build -t quine-linux -f Containerfile .
 ```
 
 To build the Aurora fork yourself (Linux, with buildah, cpp, just >= 1.46,
-skopeo, jq, yq and cosign), in a clone of `quine-global-labs/aurora`:
+skopeo, jq, yq and cosign), in a clone of `quine-global/aurora`:
 
 ```sh
 sudo just build --image aurora --tag stable --flavor main   # -> localhost/aurora:stable
@@ -226,7 +226,7 @@ Hardware-specific fixup for the iMac19,2 internal mic (see below).
 ## Kickoff (the start menu)
 
 Built from our fork,
-[quine-global-labs/plasma-desktop](https://forge.in.quineglobal.com/quine-global-labs/plasma-desktop),
+[quine-global/plasma-desktop](https://forge.in.quineglobal.com/quine-global/plasma-desktop),
 branch `quine-v<Plasma version>` (`Containerfile`'s `kickoff-builder`
 stage). Our changes:
 

@@ -1,10 +1,10 @@
-# Built on our Aurora fork (quine-global-labs/aurora), which its own workflow
+# Built on our Aurora fork (quine-global/aurora), which its own workflow
 # builds and publishes to this forge's registry (`stable` for x86_64,
 # `stable-arm64` for aarch64; iso.yml picks). Pass e.g.
 # --build-arg BASE_IMAGE=ghcr.io/ublue-os/aurora:stable to build on stock
 # upstream Aurora instead, or localhost/aurora:stable for a local build of
 # the fork.
-ARG BASE_IMAGE=forge.in.quineglobal.com/quine-global-labs/aurora:stable
+ARG BASE_IMAGE=forge.in.quineglobal.com/quine-global/aurora:stable
 
 # --- Builds the out-of-tree snd-hda-codec-cs8409 module (iMac19,2 mic fix). ---
 # See docs/imac19-2-mic-fix.md and patches/snd-hda-codec-cs8409/ for the full
@@ -39,7 +39,7 @@ RUN set -eux; \
 
 # --- Builds Kickoff (the start menu) with our update bar. ---
 # Kickoff is QML packed into one plugin of plasma-desktop. This rebuilds
-# just that plugin from our fork, quine-global-labs/plasma-desktop, branch
+# just that plugin from our fork, quine-global/plasma-desktop, branch
 # quine-v<version>: KDE's release of the plasma-desktop version the image
 # ships, plus our commits. The final stage puts it in place of the stock
 # one. Like kmod-builder, it's built FROM BASE_IMAGE so it can't drift from
@@ -61,10 +61,10 @@ RUN set -eux; \
     done; \
     dnf install -y --setopt=install_weak_deps=False "${devel[@]}"; \
     V="$(rpm -q --qf '%{VERSION}' plasma-desktop)"; \
-    echo "Building Kickoff from quine-global-labs/plasma-desktop, branch quine-v${V}"; \
+    echo "Building Kickoff from quine-global/plasma-desktop, branch quine-v${V}"; \
     curl -fsSL --retry 3 -o /tmp/plasma-desktop.tar.gz \
-      "https://forge.in.quineglobal.com/quine-global-labs/plasma-desktop/archive/quine-v${V}.tar.gz" \
-      || { echo "No branch quine-v${V} in quine-global-labs/plasma-desktop: the image moved to Plasma ${V}; its rebase workflow makes the branch, or failed to (check its Actions)" >&2; exit 1; }; \
+      "https://forge.in.quineglobal.com/quine-global/plasma-desktop/archive/quine-v${V}.tar.gz" \
+      || { echo "No branch quine-v${V} in quine-global/plasma-desktop: the image moved to Plasma ${V}; its rebase workflow makes the branch, or failed to (check its Actions)" >&2; exit 1; }; \
     mkdir -p /build-src; \
     tar -xzf /tmp/plasma-desktop.tar.gz -C /build-src --strip-components=2 \
       plasma-desktop/applets/kickoff; \
@@ -142,15 +142,15 @@ RUN set -eux; \
     depmod -a "${NVR}"
 
 # Our own apps, from the forge's `quine` RPM group: each repo's rpm.yml
-# builds and uploads them (quine-global-labs/layer-wizard, dnf-package-store,
+# builds and uploads them (quine-global/layer-wizard, dnf-package-store,
 # swap-watchdog). The repo is only used here, not left configured: the apps
 # update with the image. kdotool, which swap-watchdog drives, is Fedora's.
 # Forgejo signs the repository metadata, not the packages, so dnf checks the
 # metadata (repo_gpgcheck), which pins each package's checksum.
 RUN dnf install -y \
-      --repofrompath=quine,https://forge.in.quineglobal.com/api/packages/quine-global-labs/rpm/quine \
+      --repofrompath=quine,https://forge.in.quineglobal.com/api/packages/quine-global/rpm/quine \
       --setopt=quine.gpgcheck=0 --setopt=quine.repo_gpgcheck=1 \
-      --setopt=quine.gpgkey=https://forge.in.quineglobal.com/api/packages/quine-global-labs/rpm/repository.key \
+      --setopt=quine.gpgkey=https://forge.in.quineglobal.com/api/packages/quine-global/rpm/repository.key \
       layer-wizard dnf-package-store swap-watchdog
 
 # Kickoff with our update bar (kickoff-builder, above), over plasma-desktop's.

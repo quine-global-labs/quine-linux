@@ -1,6 +1,6 @@
 [Flatpak Repo]
 # Quine Linux's own Flatpak repo: apps from our forks, built by their CI
-# (quine-global-labs/keymaker's .forgejo/workflows/flatpak.yml) and signed
+# (quine-global/keymaker's .forgejo/workflows/flatpak.yml) and signed
 # with key D8A7EB83CA7D77EFF171D12A98815AFF3222E41B. Preinstall picks apps
 # from it by collection ID (preinstall.d/quine-linux.preinstall).
 Version=1

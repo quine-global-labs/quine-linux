@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copies upstream images into this forge's registry, as
-# forge.in.quineglobal.com/quine-global-labs/mirror/<registry>/<path>,
+# forge.in.quineglobal.com/quine-global/mirror/<registry>/<path>,
 # which the runners' registries.conf tries before the upstream registry
 # (petersweb-infra, nixos/forgejo-runner.nix). So builds pull from
 # the forge, and still build from yesterday's copy when upstream is down.
@@ -13,7 +13,7 @@
 # mirror's last copy, or upstream's.
 set -uo pipefail
 
-mirror=${MIRROR:-forge.in.quineglobal.com/quine-global-labs/mirror}
+mirror=${MIRROR:-forge.in.quineglobal.com/quine-global/mirror}
 # Read from upstream itself, not from the mirror registries.conf points at.
 # The flag, not CONTAINERS_REGISTRIES_CONF: podman and buildah read that
 # variable, but skopeo never has. Until 2026-11-03 this exported it, skopeo

@@ -8,11 +8,11 @@ other apps. This file is what you'd otherwise rediscover the hard way.
 
 ## Where things are
 
-- **Two repos build the image.** `quine-global-labs/aurora` (the fork,
-  published as `forge.in.quineglobal.com/quine-global-labs/aurora:stable`
+- **Two repos build the image.** `quine-global/aurora` (the fork,
+  published as `forge.in.quineglobal.com/quine-global/aurora:stable`
   and `:stable-arm64`) for changes *inside* Aurora's build; this repo's
   `Containerfile` for everything a `RUN` on top can do. Prefer this repo.
-- **Published as** `forge.in.quineglobal.com/quine-global-labs/quine-linux`
+- **Published as** `forge.in.quineglobal.com/quine-global/quine-linux`
   (`latest`, `latest-arm64`, date and commit tags). Installed systems follow
   `registry.quineglobal.com/quine-linux:latest` (the same image, a pull-only
   name). There's one channel: every build of `main` reaches every machine;

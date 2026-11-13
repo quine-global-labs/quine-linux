@@ -1,8 +1,8 @@
 name: Image, disk image and live ISO
 
 # Builds the quine-linux image on our Aurora build (published by
-# quine-global-labs/aurora's workflow to this forge's registry), pushes it to
-# forge.in.quineglobal.com/quine-global-labs/quine-linux (`latest`,
+# quine-global/aurora's workflow to this forge's registry), pushes it to
+# forge.in.quineglobal.com/quine-global/quine-linux (`latest`,
 # `<date>`, the commit; installed systems pull it as
 # registry.quineglobal.com/quine-linux, a pull-only name for it), then
 # builds a disk image (qcow2) and the live ISO
@@ -26,7 +26,7 @@ name: Image, disk image and live ISO
 # 2 GiB limit, and this keeps one copy). The website lists these releases.
 #
 # Upstream images (Fedora's, bootc-image-builder) are vendored into
-# forge.in.quineglobal.com/quine-global-labs/mirror/ first, and pulled
+# forge.in.quineglobal.com/quine-global/mirror/ first, and pulled
 # from there (.forgejo/vendor-images.sh).
 #
 # Secrets: REGISTRY_TOKEN (a Forgejo token with package write access),
@@ -36,7 +36,7 @@ name: Image, disk image and live ISO
 # actor), MINIO_ENDPOINT (default https://s3.quineglobal.com), MINIO_BUCKET
 # (default quine-linux).
 
-# Also daily, two hours after quine-global-labs/aurora's daily build, so the
+# Also daily, two hours after quine-global/aurora's daily build, so the
 # image and ISO pick up its result. Forgejo reads the schedule from pushes to
 # main, but not from `[skip ci]` ones: after changing it, push without.
 on:
@@ -53,7 +53,7 @@ concurrency:
 
 env:
   REGISTRY: forge.in.quineglobal.com
-  IMAGE: forge.in.quineglobal.com/quine-global-labs/quine-linux
+  IMAGE: forge.in.quineglobal.com/quine-global/quine-linux
   MINIO_ENDPOINT: ${{ vars.MINIO_ENDPOINT || 'https://s3.quineglobal.com' }}
   MINIO_BUCKET: ${{ vars.MINIO_BUCKET || 'quine-linux' }}
   # rclone's remote `store:`, all from the environment (no rclone.conf); each
@@ -86,7 +86,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 300
     env:
-      BASE_IMAGE: forge.in.quineglobal.com/quine-global-labs/aurora:stable${{ matrix.tag-suffix }}
+      BASE_IMAGE: forge.in.quineglobal.com/quine-global/aurora:stable${{ matrix.tag-suffix }}
       # What installs of this architecture follow for updates (Taskfile.yml).
       UPDATE_IMAGE: registry.quineglobal.com/quine-linux:latest${{ matrix.tag-suffix }}
       # The tasks' architecture settings (Taskfile.yml).
@@ -94,7 +94,7 @@ jobs:
     steps:
       # No submodules: stage 0 (Aurora) comes from the registry now. Our pull
       # mirror of code.forgejo.org/actions/checkout.
-      - uses: https://forge.in.quineglobal.com/quine-global-labs/mirror-actions-checkout@v4
+      - uses: https://forge.in.quineglobal.com/quine-global/mirror-actions-checkout@v4
 
       - name: Install task, rclone, just, yq and cosign
         # Only what the runner doesn't already have: both runners have all

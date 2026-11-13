@@ -58,7 +58,7 @@ pveum acl modify /storage/local -user quine-ci@pve -role QuineVMTestStorage
 pveum acl modify /nodes/zeus -user quine-ci@pve -role QuineVMTestNode
 ```
 
-`token add` prints the secret once. Store it as the quine-global-labs (or
+`token add` prints the secret once. Store it as the quine-global (or
 quine-linux) Actions secret **`PVE_TOKEN`**, in the form
 `quine-ci@pve!vm-test=<secret>`.
 
