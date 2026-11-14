@@ -1,0 +1,37 @@
+name: Build everything
+
+# Builds Quine's RPMs (layer-wizard, dnf-package-store, swap-watchdog), waits
+# for all three to succeed, then starts the image build (iso.yml): its run is
+# linked in the log. The order and the repos are in .forgejo/build-all.mjs; README
+# "Building everything".
+#
+# Secret: BUILD_ALL_TOKEN, a Forgejo token (scope write:repository) of an
+# account that may run Actions in those repos and this one. The automatic
+# token only reaches this repo.
+
+on:
+  workflow_dispatch:
+    inputs:
+      wait_for_image:
+        # Off by default: the image takes about 3 hours, and a runner may stop
+        # a job at 3 hours (act_runner's default limit).
+        description: Also wait for the image build (about 3 hours)
+        type: boolean
+        default: false
+
+concurrency:
+  group: build-all
+  cancel-in-progress: false
+
+jobs:
+  build-all:
+    # Not runner-x86-linux: this job waits for the image build, which needs
+    # that runner (one job at a time) itself.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: https://forge.in.quineglobal.com/quine-global/mirror-actions-checkout@v4
+      - name: Build each stage, in order
+        env:
+          TOKEN: ${{ secrets.BUILD_ALL_TOKEN }}
+          WAIT_FOR_LAST: ${{ inputs.wait_for_image }}
+        run: node .forgejo/build-all.mjs

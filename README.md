@@ -70,6 +70,27 @@ An ISO can then be generated from the built image with `bootc-image-builder`
 [osbuild/image-builder](https://github.com/osbuild/image-builder), and the old
 `quay.io/centos-bootc/bootc-image-builder` image is no longer updated).
 
+## Building everything
+
+The image installs Quine's own RPMs (layer-wizard, dnf-package-store,
+swap-watchdog) from the forge's `quine` RPM group, which each app's
+`rpm.yml` publishes. When those need building first (a change to one of
+them, or after moving them to another owner, which leaves their packages
+behind), run **Build everything** (`.forgejo/workflows/build-all.yml`)
+instead of building each by hand:
+
+1. It starts `rpm.yml` in the three app repos at once and waits for all of
+   them; if one fails, it stops there and links the run.
+2. Then it starts this repo's `iso.yml` and links that run. Tick
+   **Also wait for the image build** to follow it to the end (about 3
+   hours; a runner may stop a job at 3 hours, so it's off by default).
+
+The stages and repos are the list at the top of `.forgejo/build-all.mjs`;
+adding a dependency is a line there. It needs the secret `BUILD_ALL_TOKEN`:
+a Forgejo token (scope `write:repository`) of an account that may run
+Actions in those repos and this one, since the automatic token only reaches
+this repo.
+
 ## Releasing
 
 On the forge: **Actions → Release → Run workflow**. It works out the next
