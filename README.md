@@ -264,6 +264,9 @@ The busy cursor still stops after its own timeout, as KWin draws it.
 
 ## App updates on launch
 
+(Where every Quine app is published and how each updates:
+[docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).)
+
 A Flatpak app updates when it's opened, not on a schedule: opening it checks
 its repo, and if there's a newer version, a small "Updating <App>…" window
 (with **Skip**) installs it before the app starts. It doesn't depend on the

@@ -34,6 +34,8 @@ other apps. This file is what you'd otherwise rediscover the hard way.
   forge's `quine` RPM group, built by each app's own CI; a fix to one reaches
   the image on the next build. KeyMaker comes as a Flatpak from our repo,
   flatpak.quineglobal.com.
+- **How everything is published and updated** (the public hosts, signing
+  keys, which app updates how): [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 - `installer/` and `output/` are local leftovers, not part of the build.
 
 ## CI (`.forgejo/workflows/`)
