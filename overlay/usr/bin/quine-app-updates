@@ -1,0 +1,303 @@
+#!/usr/bin/python3
+"""Flatpak apps update when they're opened (README "App updates on launch").
+
+  quine-app-updates launch APP_ID -- COMMAND...
+      What a Flatpak app's menu entry runs: if a newer version is published,
+      shows "Updating <App>…" (with Skip), installs it, then runs COMMAND
+      (the entry's own `flatpak run …`). Offline, or more than a few seconds
+      to find out: opens the installed version straight away.
+  quine-app-updates sync-launchers --system | --user
+      Rewrites Flatpak's exported menu entries so they open through `launch`
+      (quine-app-launchers.service, when apps are installed or removed).
+  quine-app-updates off [APP_ID]   stop updating on launch (one app, or all)
+  quine-app-updates on [APP_ID]    undo `off`
+  quine-app-updates status
+
+Opting out: users with `off` (~/.config/quine-linux/app-updates.conf; an
+admin can set the same in /etc/quine-linux/app-updates.conf), app developers
+with `flatpak build-finish --metadata=X-Quine=UpdateOnLaunch=false`.
+
+Independent of the system's own updates: nothing here runs on a schedule.
+"""
+
+import configparser
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+CHECK_TIMEOUT = 4  # seconds to find out whether there's an update
+SYSTEM_CONFIG = Path("/etc/quine-linux/app-updates.conf")
+USER_CONFIG = Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "quine-linux/app-updates.conf"
+
+# Flatpak's exported menu entries, and where ours go (an XDG data dir that
+# 61-quine-app-launchers and profile.d put ahead of Flatpak's, so ours win).
+EXPORTS = {
+    "--system": Path("/var/lib/flatpak/exports/share/applications"),
+    "--user": Path.home() / ".local/share/flatpak/exports/share/applications",
+}
+LAUNCHERS = {
+    "--system": Path("/var/lib/quine-linux/app-launchers/applications"),
+    "--user": Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state")
+    / "quine-linux/app-launchers/applications",
+}
+SELF = "/usr/bin/quine-app-updates"
+
+# Sandbox permissions live in these metadata groups; anything an update adds
+# to them is asked about first.
+PERMISSION_GROUPS = ("Context", "Session Bus Policy", "System Bus Policy")
+
+
+def run(*args, timeout=None):
+    return subprocess.run(args, capture_output=True, text=True, timeout=timeout)
+
+
+# ---------------------------------------------------------------- config
+
+
+def read_config():
+    config = configparser.ConfigParser(delimiters=("=",))
+    config.optionxform = str  # app ids are case-sensitive
+    config.read([SYSTEM_CONFIG, USER_CONFIG])
+    return config
+
+
+def enabled_for(app_id, config):
+    if config.has_option("Apps", app_id):
+        return config.getboolean("Apps", app_id)
+    return config.getboolean("Updates", "OnLaunch", fallback=True)
+
+
+def set_option(app_id, on):
+    config = configparser.ConfigParser(delimiters=("=",))
+    config.optionxform = str
+    config.read(USER_CONFIG)
+    section, key = ("Apps", app_id) if app_id else ("Updates", "OnLaunch")
+    if not config.has_section(section):
+        config.add_section(section)
+    config.set(section, key, "true" if on else "false")
+    USER_CONFIG.parent.mkdir(parents=True, exist_ok=True)
+    with open(USER_CONFIG, "w") as f:
+        config.write(f)
+
+
+# ---------------------------------------------------------------- flatpak
+
+
+def metadata(text):
+    parsed = configparser.ConfigParser(delimiters=("=",), interpolation=None, strict=False)
+    parsed.optionxform = str
+    parsed.read_string(text)
+    return parsed
+
+
+def new_permissions(installed, remote):
+    """Permissions the remote version has that the installed one doesn't."""
+    added = []
+    for group in PERMISSION_GROUPS:
+        if not remote.has_section(group):
+            continue
+        for key, value in remote.items(group):
+            old = set(installed.get(group, key, fallback="").split(";")) if installed.has_section(group) else set()
+            for item in filter(None, value.split(";")):
+                if item not in old:
+                    added.append(f"{key}: {item}" if group == "Context" else f"{group} {key}: {item}")
+    return added
+
+
+def installed_app(app_id):
+    """(--user or --system, its name), as `flatpak run` picks: the user's copy
+    first. From `flatpak list`: plain `flatpak info` can abort on an assertion
+    after printing (seen with flatpak 1.16)."""
+    found = {}
+    out = run("flatpak", "list", "--app", "--columns=application,name,installation").stdout
+    for line in out.splitlines():
+        fields = line.split("\t")
+        if len(fields) == 3 and fields[0] == app_id:
+            found[fields[2].strip()] = fields[1].strip() or app_id
+    for where in ("user", "system"):
+        if where in found:
+            return f"--{where}", found[where]
+    return None, None
+
+
+def is_running(app_id):
+    return app_id in run("flatpak", "ps", "--columns=application").stdout.split()
+
+
+# ---------------------------------------------------------------- ui
+
+
+class Progress:
+    """kdialog's busy bar with a Skip button; nothing without a display."""
+
+    def __init__(self, title, text):
+        self.ref = None
+        if not (os.environ.get("WAYLAND_DISPLAY") or os.environ.get("DISPLAY")) or not shutil.which("kdialog"):
+            return
+        out = run("kdialog", "--title", title, "--progressbar", text, "0").stdout.split()
+        if len(out) == 2:
+            self.ref = out
+            self.call("showCancelButton", "b", "true")
+
+    def call(self, method, *signature_and_args):
+        if self.ref:
+            service, path = self.ref
+            return run("busctl", "--user", "call", service, path, "org.kde.kdialog.ProgressDialog", method, *signature_and_args)
+
+    def cancelled(self):
+        out = self.call("wasCancelled")
+        return bool(out and out.stdout.strip() == "b true")
+
+    def close(self):
+        self.call("close")
+
+
+def ask(title, text, yes, no):
+    if not shutil.which("kdialog"):
+        return False
+    return run("kdialog", "--title", title, "--yes-label", yes, "--no-label", no, "--yesno", text).returncode == 0
+
+
+def notify(title, text):
+    if shutil.which("notify-send"):
+        run("notify-send", "--app-name=Quine Linux", title, text)
+
+
+# ---------------------------------------------------------------- launch
+
+
+def update_before_launch(app_id):
+    if is_running(app_id):  # another window of it: it's already up to date
+        return
+    where, name = installed_app(app_id)
+    if not where:
+        return
+    installed_meta = metadata(run("flatpak", "info", where, "-m", app_id).stdout)
+    if installed_meta.get("X-Quine", "UpdateOnLaunch", fallback="true").lower() == "false":
+        return
+
+    ref = run("flatpak", "info", where, "--show-ref", app_id).stdout.strip()
+    origin = run("flatpak", "info", where, "--show-origin", app_id).stdout.strip()
+    local = run("flatpak", "info", where, "--show-commit", app_id).stdout.strip()
+    try:
+        remote_info = run("flatpak", "remote-info", where, "--show-commit", origin, ref, timeout=CHECK_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return
+    remote = remote_info.stdout.strip()
+    if remote_info.returncode != 0 or not remote or remote == local:
+        return
+
+    try:
+        remote_meta = metadata(run("flatpak", "remote-info", where, "-m", origin, ref, timeout=CHECK_TIMEOUT).stdout)
+    except subprocess.TimeoutExpired:
+        return
+    added = new_permissions(installed_meta, remote_meta)
+    if added and not ask(
+        f"Update {name}?",
+        f"The new version of {name} asks for more access:\n\n" + "\n".join(f"• {a}" for a in added),
+        "Update and Open",
+        "Open Without Updating",
+    ):
+        return
+
+    progress = Progress(name, f"Updating {name}…")
+    # -y, not --noninteractive: if the update needs something that takes an
+    # admin (a new runtime in the system installation), polkit can still ask.
+    # Output to a file: a pipe nobody reads until the end could fill and stall it.
+    with tempfile.TemporaryFile("w+") as log:
+        update = subprocess.Popen(["flatpak", "update", where, "-y", app_id], stdout=log, stderr=subprocess.STDOUT)
+        while update.poll() is None:
+            if progress.cancelled():
+                update.terminate()
+                update.wait()
+                break
+            time.sleep(0.3)
+        progress.close()
+        log.seek(0)
+        output = log.read().strip().splitlines()
+    if update.returncode not in (0, -15):
+        notify(f"Couldn't update {name}", (output[-1] if output else "flatpak update failed") + "\nOpening the installed version.")
+
+
+def launch(args):
+    if len(args) < 3 or args[1] != "--":
+        sys.exit("usage: quine-app-updates launch APP_ID -- COMMAND...")
+    app_id, command = args[0], args[2:]
+    if enabled_for(app_id, read_config()):
+        try:
+            update_before_launch(app_id)
+        except Exception as err:  # never keep an app from opening
+            print(f"quine-app-updates: {app_id}: {err}", file=sys.stderr)
+    os.execvp(command[0], command)
+
+
+# ---------------------------------------------------------------- menu entries
+
+
+def rewrite(desktop_file):
+    """The entry with each `flatpak run` going through `launch`, or None."""
+    lines = desktop_file.read_text().splitlines()
+    app_id = next((line.split("=", 1)[1].strip() for line in lines if line.startswith("X-Flatpak=")), None)
+    if not app_id:
+        return None
+    out = []
+    for line in lines:
+        if line.startswith("Exec=") and "flatpak run" in line and SELF not in line:
+            line = f"Exec={SELF} launch {app_id} -- {line[5:]}"
+        elif line.startswith("DBusActivatable="):
+            # D-Bus activation would start the app without its Exec line.
+            line = "DBusActivatable=false"
+        out.append(line)
+    return "\n".join(out) + "\n"
+
+
+def sync_launchers(where):
+    source, target = EXPORTS[where], LAUNCHERS[where]
+    target.mkdir(parents=True, exist_ok=True)
+    wanted = {}
+    for entry in sorted(source.glob("*.desktop")) if source.is_dir() else []:
+        try:
+            content = rewrite(entry)
+        except OSError:
+            continue  # a dangling export
+        if content:
+            wanted[entry.name] = content
+    for name, content in wanted.items():
+        path = target / name
+        if not path.exists() or path.read_text() != content:
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(content)
+            tmp.replace(path)
+    for path in target.glob("*.desktop"):
+        if path.name not in wanted:
+            path.unlink()
+
+
+# ---------------------------------------------------------------- main
+
+
+def main(argv):
+    command, args = (argv[0], argv[1:]) if argv else ("status", [])
+    if command == "launch":
+        launch(args)
+    elif command == "sync-launchers" and args in (["--system"], ["--user"]):
+        sync_launchers(args[0])
+    elif command in ("on", "off") and len(args) <= 1:
+        set_option(args[0] if args else None, command == "on")
+        print(f"Updates on launch {command}" + (f" for {args[0]}" if args else ""))
+    elif command == "status":
+        config = read_config()
+        print("Updates on launch:", "on" if config.getboolean("Updates", "OnLaunch", fallback=True) else "off")
+        for app_id, value in config.items("Apps") if config.has_section("Apps") else []:
+            print(f"  {app_id}: {'on' if value.lower() == 'true' else 'off'}")
+    else:
+        print(__doc__.strip(), file=sys.stderr)
+        sys.exit(2)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

@@ -1,0 +1,10 @@
+[Unit]
+Description=Open Flatpak apps through quine-app-updates (system installation)
+Documentation=file:///usr/bin/quine-app-updates
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/quine-app-updates sync-launchers --system
+
+[Install]
+WantedBy=multi-user.target

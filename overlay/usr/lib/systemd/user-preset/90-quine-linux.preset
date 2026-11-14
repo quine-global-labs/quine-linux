@@ -8,3 +8,6 @@ enable disk-cleanup.timer
 enable ssh-agent.socket
 enable gpg-agent.socket
 disable gpg-agent-ssh.socket
+# Flatpak apps in the user's installation open through quine-app-updates.
+enable quine-app-launchers.path
+enable quine-app-launchers.service

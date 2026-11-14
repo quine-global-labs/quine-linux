@@ -262,6 +262,49 @@ The 3 minutes is `StillStartingTimeout` in `~/.config/klaunchrc`,
 `[TaskbarButtonSettings]`, in seconds. Wayland only (X11 is unchanged).
 The busy cursor still stops after its own timeout, as KWin draws it.
 
+## App updates on launch
+
+A Flatpak app updates when it's opened, not on a schedule: opening it checks
+its repo, and if there's a newer version, a small "Updating <App>…" window
+(with **Skip**) installs it before the app starts. It doesn't depend on the
+system's own update (uupd) and nothing runs in the background. All of it is
+`overlay/usr/bin/quine-app-updates`.
+
+- **How launches go through it.** Flatpak exports each app's menu entry
+  (`/var/lib/flatpak/exports/share/applications`, and
+  `~/.local/share/flatpak/exports/…` for the user's own installation).
+  `quine-app-launchers.path` notices apps being installed or removed and
+  `quine-app-updates sync-launchers` writes a copy of each entry with
+  `Exec=quine-app-updates launch <app id> -- <the original flatpak run …>`
+  (and `DBusActivatable=false`, which would skip the Exec line) into
+  `/var/lib/quine-linux/app-launchers` and
+  `~/.local/state/quine-linux/app-launchers`. Those come first in
+  `XDG_DATA_DIRS` (`/usr/lib/systemd/user-environment-generators/61-quine-app-launchers`,
+  `/etc/profile.d/quine-app-launchers.sh`), so the menu, KRunner and pinned
+  launchers use them. `flatpak run` typed in a terminal goes around it.
+- **On launch:** if the app is already running, nothing. Otherwise one
+  `flatpak remote-info` against its remote, at most 4 seconds: no newer
+  commit, offline, or slow, and the installed version opens at once.
+  Otherwise `flatpak update -y <app>` with the progress window; **Skip**
+  stops it and opens the installed version, and a failed update says so in
+  a notification and does the same.
+- **New permissions:** if the new version's metadata asks for access the
+  installed one doesn't have (`[Context]`, the bus policies), it asks first:
+  **Update and Open** or **Open Without Updating**.
+- **No password:** Flatpak's polkit policy lets the person at the computer
+  update installed apps. An update that needs a new runtime is an install,
+  which Aurora's rules allow for `wheel` without asking; anyone else gets
+  polkit's prompt.
+- **Opting out.** Users: `quine-app-updates off` (all apps) or
+  `quine-app-updates off <app id>`, `on` to undo, `status` to see
+  (`~/.config/quine-linux/app-updates.conf`; an admin can set the same in
+  `/etc/quine-linux/app-updates.conf`). App developers:
+  `flatpak build-finish --metadata=X-Quine=UpdateOnLaunch=false`, read from
+  the installed app's metadata.
+
+Tested in a Fedora 44 container against a local repo (updates, permission
+changes, both opt-outs, offline, removed apps); not yet in a Plasma session.
+
 ## Hardware-specific patches
 
 `docs/` and `patches/` hold write-ups and out-of-tree kernel module patches

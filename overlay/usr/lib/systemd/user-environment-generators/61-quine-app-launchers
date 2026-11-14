@@ -1,0 +1,10 @@
+#!/usr/bin/sh
+# Puts quine-app-updates' menu entries ahead of Flatpak's own exports, which
+# 60-flatpak has just added to XDG_DATA_DIRS: same file names, so ours win and
+# Flatpak apps open through `quine-app-updates launch`. profile.d does the same
+# for login shells (/etc/profile.d/quine-app-launchers.sh).
+case ":${XDG_DATA_DIRS}:" in
+  *:/var/lib/quine-linux/app-launchers:*) exit 0 ;;
+esac
+state=${XDG_STATE_HOME:-$HOME/.local/state}
+echo "XDG_DATA_DIRS=$state/quine-linux/app-launchers:/var/lib/quine-linux/app-launchers${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
